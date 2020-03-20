@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ccl.wx.mapper.UserLikeMapper">
+    <resultMap id="BaseResultMap" type="com.ccl.wx.entity.UserLike">
+        <!--@mbg.generated-->
+        <!--@Table user_like-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="type_id" jdbcType="BIGINT" property="typeId"/>
+        <result column="type" jdbcType="INTEGER" property="type"/>
+        <result column="like_userid" jdbcType="VARCHAR" property="likeUserid"/>
+        <result column="like_status" jdbcType="INTEGER" property="likeStatus"/>
+        <result column="like_createtime" jdbcType="TIMESTAMP" property="likeCreatetime"/>
+        <result column="like_updatetime" jdbcType="TIMESTAMP" property="likeUpdatetime"/>
+        <result column="circle_id" jdbcType="BIGINT" property="circleId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, type_id, `type`, like_userid, like_status, like_createtime, like_updatetime,
+        circle_id
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from user_like
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        <!--@mbg.generated-->
+        delete from user_like
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.UserLike"
+            useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into user_like (type_id, `type`, like_userid,
+        like_status, like_createtime, like_updatetime,
+        circle_id)
+        values (#{typeId,jdbcType=BIGINT}, #{type,jdbcType=INTEGER}, #{likeUserid,jdbcType=VARCHAR},
+        #{likeStatus,jdbcType=INTEGER}, #{likeCreatetime,jdbcType=TIMESTAMP}, #{likeUpdatetime,jdbcType=TIMESTAMP},
+        #{circleId,jdbcType=BIGINT})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.UserLike"
+            useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into user_like
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="typeId != null">
+                type_id,
+            </if>
+            <if test="type != null">
+                `type`,
+            </if>
+            <if test="likeUserid != null">
+                like_userid,
+            </if>
+            <if test="likeStatus != null">
+                like_status,
+            </if>
+            <if test="likeCreatetime != null">
+                like_createtime,
+            </if>
+            <if test="likeUpdatetime != null">
+                like_updatetime,
+            </if>
+            <if test="circleId != null">
+                circle_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="typeId != null">
+                #{typeId,jdbcType=BIGINT},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="likeUserid != null">
+                #{likeUserid,jdbcType=VARCHAR},
+            </if>
+            <if test="likeStatus != null">
+                #{likeStatus,jdbcType=INTEGER},
+            </if>
+            <if test="likeCreatetime != null">
+                #{likeCreatetime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="likeUpdatetime != null">
+                #{likeUpdatetime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="circleId != null">
+                #{circleId,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ccl.wx.entity.UserLike">
+        <!--@mbg.generated-->
+        update user_like
+        <set>
+            <if test="typeId != null">
+                type_id = #{typeId,jdbcType=BIGINT},
+            </if>
+            <if test="type != null">
+                `type` = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="likeUserid != null">
+                like_userid = #{likeUserid,jdbcType=VARCHAR},
+            </if>
+            <if test="likeStatus != null">
+                like_status = #{likeStatus,jdbcType=INTEGER},
+            </if>
+            <if test="likeCreatetime != null">
+                like_createtime = #{likeCreatetime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="likeUpdatetime != null">
+                like_updatetime = #{likeUpdatetime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="circleId != null">
+                circle_id = #{circleId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ccl.wx.entity.UserLike">
+        <!--@mbg.generated-->
+        update user_like
+        set type_id = #{typeId,jdbcType=BIGINT},
+        `type` = #{type,jdbcType=INTEGER},
+        like_userid = #{likeUserid,jdbcType=VARCHAR},
+        like_status = #{likeStatus,jdbcType=INTEGER},
+        like_createtime = #{likeCreatetime,jdbcType=TIMESTAMP},
+        like_updatetime = #{likeUpdatetime,jdbcType=TIMESTAMP},
+        circle_id = #{circleId,jdbcType=BIGINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <!--auto generated by MybatisCodeHelper on 2020-01-28-->
+    <select id="selectByTypeId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user_like
+        where type_id=#{typeId,jdbcType=BIGINT}
+    </select>
+
+    <update id="concatLikeUserId">
+      update user_like set like_userid = concat(like_userid, #{userId,jdbcType=VARCHAR})
+      where type_id = #{diaryId,jdbcType=BIGINT}
+    </update>
+
+<!--auto generated by MybatisCodeHelper on 2020-02-22-->
+    <select id="selectIdByTypeId" resultType="java.lang.Long">
+        select id
+        from user_like
+        where type_id=#{typeId,jdbcType=BIGINT}
+    </select>
+</mapper>

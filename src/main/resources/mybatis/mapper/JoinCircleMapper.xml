@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ccl.wx.mapper.JoinCircleMapper">
+    <resultMap id="BaseResultMap" type="com.ccl.wx.entity.JoinCircle">
+        <!--@mbg.generated-->
+        <!--@Table join_circle-->
+        <id column="circle_id" jdbcType="BIGINT" property="circleId"/>
+        <id column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="join_time" jdbcType="TIMESTAMP" property="joinTime"/>
+        <result column="user_status" jdbcType="INTEGER" property="userStatus"/>
+        <result column="user_signin" jdbcType="INTEGER" property="userSignin"/>
+        <result column="user_permission" jdbcType="INTEGER" property="userPermission"/>
+        <result column="user_vitality" jdbcType="BIGINT" property="userVitality"/>
+        <result column="user_nick_name" jdbcType="VARCHAR" property="userNickName"/>
+        <result column="user_sign_time" jdbcType="TIMESTAMP" property="userSignTime"/>
+        <result column="user_sign_status" jdbcType="INTEGER" property="userSignStatus"/>
+        <result column="user_signin_day" jdbcType="BIGINT" property="userSigninDay"/>
+        <result column="exit_time" jdbcType="TIMESTAMP" property="exitTime"/>
+        <result column="refuse_reason" jdbcType="VARCHAR" property="refuseReason"/>
+        <result column="out_reason" jdbcType="VARCHAR" property="outReason"/>
+        <result column="clockin_calendar" jdbcType="LONGVARCHAR" property="clockinCalendar"/>
+        <result column="theme_id" jdbcType="VARCHAR" property="themeId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        circle_id, user_id, join_time, user_status, user_signin, user_permission, user_vitality,
+        user_nick_name, user_sign_time, user_sign_status, user_signin_day, exit_time, refuse_reason,
+        out_reason, clockin_calendar, theme_id
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="map" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from join_circle
+        where circle_id = #{circleId,jdbcType=BIGINT}
+        and user_id = #{userId,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="map">
+        <!--@mbg.generated-->
+        delete from join_circle
+        where circle_id = #{circleId,jdbcType=BIGINT}
+        and user_id = #{userId,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.ccl.wx.entity.JoinCircle">
+        <!--@mbg.generated-->
+        insert into join_circle (circle_id, user_id, join_time,
+        user_status, user_signin, user_permission,
+        user_vitality, user_nick_name, user_sign_time,
+        user_sign_status, user_signin_day, exit_time,
+        refuse_reason, out_reason, clockin_calendar,
+        theme_id)
+        values (#{circleId,jdbcType=BIGINT}, #{userId,jdbcType=VARCHAR}, #{joinTime,jdbcType=TIMESTAMP},
+        #{userStatus,jdbcType=INTEGER}, #{userSignin,jdbcType=INTEGER}, #{userPermission,jdbcType=INTEGER},
+        #{userVitality,jdbcType=BIGINT}, #{userNickName,jdbcType=VARCHAR}, #{userSignTime,jdbcType=TIMESTAMP},
+        #{userSignStatus,jdbcType=INTEGER}, #{userSigninDay,jdbcType=BIGINT}, #{exitTime,jdbcType=TIMESTAMP},
+        #{refuseReason,jdbcType=VARCHAR}, #{outReason,jdbcType=VARCHAR}, #{clockinCalendar,jdbcType=LONGVARCHAR},
+        #{themeId,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.ccl.wx.entity.JoinCircle">
+        <!--@mbg.generated-->
+        insert into join_circle
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="circleId != null">
+                circle_id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="joinTime != null">
+                join_time,
+            </if>
+            <if test="userStatus != null">
+                user_status,
+            </if>
+            <if test="userSignin != null">
+                user_signin,
+            </if>
+            <if test="userPermission != null">
+                user_permission,
+            </if>
+            <if test="userVitality != null">
+                user_vitality,
+            </if>
+            <if test="userNickName != null">
+                user_nick_name,
+            </if>
+            <if test="userSignTime != null">
+                user_sign_time,
+            </if>
+            <if test="userSignStatus != null">
+                user_sign_status,
+            </if>
+            <if test="userSigninDay != null">
+                user_signin_day,
+            </if>
+            <if test="exitTime != null">
+                exit_time,
+            </if>
+            <if test="refuseReason != null">
+                refuse_reason,
+            </if>
+            <if test="outReason != null">
+                out_reason,
+            </if>
+            <if test="clockinCalendar != null">
+                clockin_calendar,
+            </if>
+            <if test="themeId != null">
+                theme_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="circleId != null">
+                #{circleId,jdbcType=BIGINT},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="joinTime != null">
+                #{joinTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userStatus != null">
+                #{userStatus,jdbcType=INTEGER},
+            </if>
+            <if test="userSignin != null">
+                #{userSignin,jdbcType=INTEGER},
+            </if>
+            <if test="userPermission != null">
+                #{userPermission,jdbcType=INTEGER},
+            </if>
+            <if test="userVitality != null">
+                #{userVitality,jdbcType=BIGINT},
+            </if>
+            <if test="userNickName != null">
+                #{userNickName,jdbcType=VARCHAR},
+            </if>
+            <if test="userSignTime != null">
+                #{userSignTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userSignStatus != null">
+                #{userSignStatus,jdbcType=INTEGER},
+            </if>
+            <if test="userSigninDay != null">
+                #{userSigninDay,jdbcType=BIGINT},
+            </if>
+            <if test="exitTime != null">
+                #{exitTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="refuseReason != null">
+                #{refuseReason,jdbcType=VARCHAR},
+            </if>
+            <if test="outReason != null">
+                #{outReason,jdbcType=VARCHAR},
+            </if>
+            <if test="clockinCalendar != null">
+                #{clockinCalendar,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="themeId != null">
+                #{themeId,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ccl.wx.entity.JoinCircle">
+        <!--@mbg.generated-->
+        update join_circle
+        <set>
+            <if test="joinTime != null">
+                join_time = #{joinTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userStatus != null">
+                user_status = #{userStatus,jdbcType=INTEGER},
+            </if>
+            <if test="userSignin != null">
+                user_signin = #{userSignin,jdbcType=INTEGER},
+            </if>
+            <if test="userPermission != null">
+                user_permission = #{userPermission,jdbcType=INTEGER},
+            </if>
+            <if test="userVitality != null">
+                user_vitality = #{userVitality,jdbcType=BIGINT},
+            </if>
+            <if test="userNickName != null">
+                user_nick_name = #{userNickName,jdbcType=VARCHAR},
+            </if>
+            <if test="userSignTime != null">
+                user_sign_time = #{userSignTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userSignStatus != null">
+                user_sign_status = #{userSignStatus,jdbcType=INTEGER},
+            </if>
+            <if test="userSigninDay != null">
+                user_signin_day = #{userSigninDay,jdbcType=BIGINT},
+            </if>
+            <if test="exitTime != null">
+                exit_time = #{exitTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="refuseReason != null">
+                refuse_reason = #{refuseReason,jdbcType=VARCHAR},
+            </if>
+            <if test="outReason != null">
+                out_reason = #{outReason,jdbcType=VARCHAR},
+            </if>
+            <if test="clockinCalendar != null">
+                clockin_calendar = #{clockinCalendar,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="themeId != null">
+                theme_id = #{themeId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where circle_id = #{circleId,jdbcType=BIGINT}
+        and user_id = #{userId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ccl.wx.entity.JoinCircle">
+        <!--@mbg.generated-->
+        update join_circle
+        set join_time = #{joinTime,jdbcType=TIMESTAMP},
+        user_status = #{userStatus,jdbcType=INTEGER},
+        user_signin = #{userSignin,jdbcType=INTEGER},
+        user_permission = #{userPermission,jdbcType=INTEGER},
+        user_vitality = #{userVitality,jdbcType=BIGINT},
+        user_nick_name = #{userNickName,jdbcType=VARCHAR},
+        user_sign_time = #{userSignTime,jdbcType=TIMESTAMP},
+        user_sign_status = #{userSignStatus,jdbcType=INTEGER},
+        user_signin_day = #{userSigninDay,jdbcType=BIGINT},
+        exit_time = #{exitTime,jdbcType=TIMESTAMP},
+        refuse_reason = #{refuseReason,jdbcType=VARCHAR},
+        out_reason = #{outReason,jdbcType=VARCHAR},
+        clockin_calendar = #{clockinCalendar,jdbcType=LONGVARCHAR},
+        theme_id = #{themeId,jdbcType=VARCHAR}
+        where circle_id = #{circleId,jdbcType=BIGINT}
+        and user_id = #{userId,jdbcType=VARCHAR}
+    </update>
+
+    <!--auto generated by MybatisCodeHelper on 2019-11-10-->
+    <select id="selectUserIdByCircleId" resultType="java.lang.String">
+        select user_id
+        from join_circle
+        where circle_id=#{circleId,jdbcType=BIGINT}
+    </select>
+
+    <update id="addUserSigninDay">
+        update join_circle set user_signin_day = user_signin_day + #{number,jdbcType=INTEGER}
+        where circle_id = #{circleId,jdbcType=BIGINT} and user_id = #{userid,jdbcType=VARCHAR}
+    </update>
+    <update id="addUserVitality">
+        update join_circle set user_vitality = user_vitality + #{number,jdbcType=INTEGER}
+        where circle_id = #{circleId,jdbcType=BIGINT} and user_id = #{userid,jdbcType=VARCHAR}
+    </update>
+    <update id="addUserSignIn">
+        update join_circle set user_signin = user_signin + #{number,jdbcType=INTEGER}
+        where circle_id = #{circleId,jdbcType=BIGINT} and user_id = #{userId,jdbcType=VARCHAR}
+    </update>
+
+    <!--auto generated by MybatisCodeHelper on 2019-11-17-->
+    <select id="selectAllByCircleId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from join_circle
+        where circle_id=#{circleId,jdbcType=BIGINT}
+    </select>
+
+    <!--auto generated by MybatisCodeHelper on 2019-11-19-->
+    <select id="selectAllByCircleIdAndUserStatus" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from join_circle
+        where circle_id=#{circleId,jdbcType=BIGINT} and user_status=#{userStatus,jdbcType=INTEGER}
+    </select>
+
+    <!--  拼接用户打卡日历  -->
+    <update id="concatClockInCalendar">
+        update join_circle set clockin_calendar =
+        <choose>
+            <when test="flag">
+                concat(clockin_calendar, #{calendar,jdbcType=VARCHAR})
+            </when>
+            <otherwise>
+                concat_ws(",",clockin_calendar,#{calendar,jdbcType=VARCHAR})
+            </otherwise>
+        </choose>
+        where user_id = #{userid,jdbcType=VARCHAR} and circle_id = #{circleid,jdbcType=VARCHAR}
+    </update>
+
+    <!--  获取用户的所有打卡天数  -->
+    <select id="sumUserSigninDayByUserid" resultType="int">
+        select sum(user_signin_day)
+        from join_circle
+        where user_id = #{userid,jdbcType=VARCHAR}
+    </select>
+
+    <!--auto generated by MybatisCodeHelper on 2019-12-05-->
+    <select id="countByUserIdAndUserPermission" resultType="java.lang.Integer">
+        select count(1)
+        from join_circle
+        where user_id=#{userId,jdbcType=VARCHAR} and user_permission=#{userPermission,jdbcType=INTEGER}
+    </select>
+    <select id="sumUserVitalityByUserid" resultType="int">
+        select sum(user_vitality)
+        from join_circle
+        where user_id = #{userid,jdbcType=VARCHAR}
+    </select>
+
+    <!--auto generated by MybatisCodeHelper on 2019-12-07-->
+    <select id="selectAllByUserIdAndUserPermission" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from join_circle
+        where user_id=#{userId,jdbcType=VARCHAR} and user_permission=#{userPermission,jdbcType=INTEGER}
+    </select>
+
+    <!--auto generated by MybatisCodeHelper on 2020-02-12-->
+    <select id="selectUserIdByCircleIdAndUserStatus" resultType="java.lang.String">
+        select user_id
+        from join_circle
+        where circle_id=#{circleId,jdbcType=BIGINT} and user_status=#{userStatus,jdbcType=INTEGER}
+    </select>
+    <!--  查询列表中全部的数据  -->
+    <select id="selectAllData" resultMap="BaseResultMap">
+        select *
+        from join_circle
+    </select>
+
+    <!--auto generated by MybatisCodeHelper on 2020-02-25-->
+    <select id="countByCircleIdAndUserSignStatus" resultType="java.lang.Integer">
+        select count(1)
+        from join_circle
+        where circle_id=#{circleId,jdbcType=BIGINT} and user_sign_status=#{userSignStatus,jdbcType=INTEGER}
+    </select>
+
+    <!--auto generated by MybatisCodeHelper on 2020-02-28-->
+    <select id="countByCircleIdAndUserStatus" resultType="java.lang.Integer">
+        select count(1)
+        from join_circle
+        where circle_id=#{circleId,jdbcType=BIGINT} and user_status=#{userStatus,jdbcType=INTEGER}
+    </select>
+
+    <!--auto generated by MybatisCodeHelper on 2020-02-28-->
+    <select id="selectUseridGetVitalitySort" resultType="java.lang.String">
+        select user_id
+        from join_circle
+        where circle_id=#{circleId,jdbcType=BIGINT} and user_status=#{userStatus,jdbcType=INTEGER} order by
+        user_vitality desc
+        limit #{start,jdbcType=INTEGER},#{pageNumber,jdbcType=INTEGER}
+    </select>
+
+    <update id="concatCircleTheme">
+        update join_circle set theme_id =
+        <choose>
+            <when test="flag">
+                concat(theme_id, #{themeId,jdbcType=VARCHAR})
+            </when>
+            <otherwise>
+                concat_ws(",", theme_id, #{themeId,jdbcType=VARCHAR})
+            </otherwise>
+        </choose>
+        where circle_id = #{circleId,jdbcType=BIGINT} and user_id = #{userId,jdbcType=VARCHAR}
+    </update>
+
+    <!--auto generated by MybatisCodeHelper on 2020-03-07-->
+    <update id="updateByCircleId">
+        update join_circle
+        set user_sign_status = #{signInStatus,jdbcType=INTEGER}
+        where circle_id=#{circleId,jdbcType=BIGINT}
+    </update>
+
+    <select id="getUserVitalityRanking" resultType="java.util.HashMap">
+        <!--        select join_circle.user_id,nickName,avatarUrl,gender,user_vitality,@rownum := @rownum + 1 as rownum-->
+        <!--        from (select @rownum := #{start,jdbcType=INTEGER}) r,join_circle,user_info-->
+        <!--        where circle_id = #{circleId,jdbcType=BIGINT} and user_status = 0 and join_circle.user_id = user_info.id-->
+        <!--        order by user_vitality desc, join_time asc limit #{start,jdbcType=INTEGER},#{pageNumber,jdbcType=INTEGER};-->
+        select join_circle.user_id,nickname,avatarurl,gender,user_vitality,row_number() over(order by user_vitality
+        desc,join_time asc) as row_num
+        from join_circle,user_info
+        where circle_id = #{circleId,jdbcType=BIGINT} and join_circle.user_id = user_info.id
+        limit #{start,jdbcType=INTEGER},#{pageNumber,jdbcType=INTEGER}
+    </select>
+
+    <select id="getUserSignInRanking" resultType="java.util.HashMap">
+        <!--        select join_circle.user_id,nickName,avatarUrl,gender,user_signin,Round(@rownum := @rownum + 1) as rownum-->
+        <!--        from (select @rownum := #{start,jdbcType=INTEGER}) r,join_circle,user_info-->
+        <!--        where circle_id = #{circleId,jdbcType=BIGINT} and user_status = 0 and join_circle.user_id = user_info.id-->
+        <!--        order by user_signin desc, join_time asc limit #{start,jdbcType=INTEGER},#{pageNumber,jdbcType=INTEGER};-->
+        select join_circle.user_id,nickname,avatarurl,gender,user_signin,row_number() over(order by user_signin
+        desc,join_time asc) as row_num
+        from join_circle,user_info
+        where circle_id = #{circleId,jdbcType=BIGINT} and join_circle.user_id = user_info.id
+        limit #{start,jdbcType=INTEGER},#{pageNumber,jdbcType=INTEGER}
+    </select>
+    <select id="getUserVitalityRankingInfo" resultType="java.util.Map">
+        select user.* from(
+        select join_circle.user_id,nickname,avatarurl,gender,user_vitality,row_number() over(order by user_signin desc,join_time asc) as row_num
+        from join_circle,user_info
+        where circle_id = #{circleId,jdbcType=BIGINT} and join_circle.user_id = user_info.id limit #{start,jdbcType=INTEGER},#{pageNumber,jdbcType=INTEGER}) as user
+        where user_id = #{userId,jdbcType=VARCHAR};
+    </select>
+    <select id="getUserSignInRankingInfo" resultType="java.util.Map">
+        select user.* from(
+        select join_circle.user_id,nickname,avatarurl,gender,user_signin,row_number() over(order by user_signin desc,join_time asc) as row_num
+        from join_circle,user_info
+        where circle_id = #{circleId,jdbcType=BIGINT} and join_circle.user_id = user_info.id limit #{start,jdbcType=INTEGER},#{pageNumber,jdbcType=INTEGER}) as user
+        where user_id = #{userId,jdbcType=VARCHAR};
+    </select>
+    <select id="getUserVitalityInfo" resultType="java.util.Map">
+        select join_circle.user_id,nickName,avatarUrl,gender,user_vitality
+        from join_circle,user_info
+        where join_circle.user_id = user_info.id and circle_id = #{circleId,jdbcType=BIGINT} and join_circle.user_id = #{userId,jdbcType=VARCHAR};
+    </select>
+    <select id="getUserSignInInfo" resultType="java.util.Map">
+        select join_circle.user_id,nickName,avatarUrl,gender,user_signin
+        from join_circle,user_info
+        where join_circle.user_id = user_info.id and circle_id = #{circleId,jdbcType=BIGINT} and join_circle.user_id = #{userId,jdbcType=VARCHAR};
+    </select>
+</mapper>

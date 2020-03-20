@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ccl.wx.mapper.PlanMapper">
+    <resultMap id="BaseResultMap" type="com.ccl.wx.entity.Plan">
+        <!--@mbg.generated-->
+        <!--@Table plan-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="start_time" jdbcType="VARCHAR" property="startTime"/>
+        <result column="end_time" jdbcType="VARCHAR" property="endTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="del_time" jdbcType="VARCHAR" property="delTime"/>
+        <result column="sign" jdbcType="INTEGER" property="sign"/>
+        <result column="url" jdbcType="LONGVARCHAR" property="url"/>
+        <result column="userid" jdbcType="VARCHAR" property="userid"/>
+        <result column="quotes" jdbcType="LONGVARCHAR" property="quotes"/>
+        <result column="author" jdbcType="VARCHAR" property="author"/>
+        <result column="title_time" jdbcType="VARCHAR" property="titleTime"/>
+        <result column="title_time_end" jdbcType="VARCHAR" property="titleTimeEnd"/>
+        <result column="finish" jdbcType="VARCHAR" property="finish"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, content, start_time, end_time, create_time, del_time, sign, url, userid, quotes,
+        author, title_time, title_time_end, finish
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from plan
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        <!--@mbg.generated-->
+        delete from plan
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.Plan"
+            useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into plan (content, start_time, end_time,
+        create_time, del_time, sign,
+        url, userid, quotes,
+        author, title_time, title_time_end,
+        finish)
+        values (#{content,jdbcType=VARCHAR}, #{startTime,jdbcType=VARCHAR}, #{endTime,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP}, #{delTime,jdbcType=VARCHAR}, #{sign,jdbcType=INTEGER},
+        #{url,jdbcType=LONGVARCHAR}, #{userid,jdbcType=VARCHAR}, #{quotes,jdbcType=LONGVARCHAR},
+        #{author,jdbcType=VARCHAR}, #{titleTime,jdbcType=VARCHAR}, #{titleTimeEnd,jdbcType=VARCHAR},
+        #{finish,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.Plan"
+            useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into plan
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="content != null">
+                content,
+            </if>
+            <if test="startTime != null">
+                start_time,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="delTime != null">
+                del_time,
+            </if>
+            <if test="sign != null">
+                sign,
+            </if>
+            <if test="url != null">
+                url,
+            </if>
+            <if test="userid != null">
+                userid,
+            </if>
+            <if test="quotes != null">
+                quotes,
+            </if>
+            <if test="author != null">
+                author,
+            </if>
+            <if test="titleTime != null">
+                title_time,
+            </if>
+            <if test="titleTimeEnd != null">
+                title_time_end,
+            </if>
+            <if test="finish != null">
+                finish,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="content != null">
+                #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="startTime != null">
+                #{startTime,jdbcType=VARCHAR},
+            </if>
+            <if test="endTime != null">
+                #{endTime,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="delTime != null">
+                #{delTime,jdbcType=VARCHAR},
+            </if>
+            <if test="sign != null">
+                #{sign,jdbcType=INTEGER},
+            </if>
+            <if test="url != null">
+                #{url,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="userid != null">
+                #{userid,jdbcType=VARCHAR},
+            </if>
+            <if test="quotes != null">
+                #{quotes,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="author != null">
+                #{author,jdbcType=VARCHAR},
+            </if>
+            <if test="titleTime != null">
+                #{titleTime,jdbcType=VARCHAR},
+            </if>
+            <if test="titleTimeEnd != null">
+                #{titleTimeEnd,jdbcType=VARCHAR},
+            </if>
+            <if test="finish != null">
+                #{finish,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ccl.wx.entity.Plan">
+        <!--@mbg.generated-->
+        update plan
+        <set>
+            <if test="content != null">
+                content = #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime,jdbcType=VARCHAR},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="delTime != null">
+                del_time = #{delTime,jdbcType=VARCHAR},
+            </if>
+            <if test="sign != null">
+                sign = #{sign,jdbcType=INTEGER},
+            </if>
+            <if test="url != null">
+                url = #{url,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="userid != null">
+                userid = #{userid,jdbcType=VARCHAR},
+            </if>
+            <if test="quotes != null">
+                quotes = #{quotes,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="author != null">
+                author = #{author,jdbcType=VARCHAR},
+            </if>
+            <if test="titleTime != null">
+                title_time = #{titleTime,jdbcType=VARCHAR},
+            </if>
+            <if test="titleTimeEnd != null">
+                title_time_end = #{titleTimeEnd,jdbcType=VARCHAR},
+            </if>
+            <if test="finish != null">
+                finish = #{finish,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ccl.wx.entity.Plan">
+        <!--@mbg.generated-->
+        update plan
+        set content = #{content,jdbcType=VARCHAR},
+        start_time = #{startTime,jdbcType=VARCHAR},
+        end_time = #{endTime,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        del_time = #{delTime,jdbcType=VARCHAR},
+        sign = #{sign,jdbcType=INTEGER},
+        url = #{url,jdbcType=LONGVARCHAR},
+        userid = #{userid,jdbcType=VARCHAR},
+        quotes = #{quotes,jdbcType=LONGVARCHAR},
+        author = #{author,jdbcType=VARCHAR},
+        title_time = #{titleTime,jdbcType=VARCHAR},
+        title_time_end = #{titleTimeEnd,jdbcType=VARCHAR},
+        finish = #{finish,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <!--auto generated by MybatisCodeHelper on 2019-10-11-->
+    <select id="findAllByUserid" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from plan
+        where userid=#{userid,jdbcType=VARCHAR}
+    </select>
+
+    <!--auto generated by MybatisCodeHelper on 2019-10-12-->
+    <select id="findAllByUseridAndTitleTime" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from plan
+        where userid=#{userid,jdbcType=VARCHAR} and title_time=#{titleTime,jdbcType=VARCHAR}
+    </select>
+
+    <!--auto generated by MybatisCodeHelper on 2019-10-12-->
+    <select id="findStartTimeByUserid" resultType="java.lang.String">
+        select start_time
+        from plan
+        where userid=#{userid,jdbcType=VARCHAR}
+    </select>
+
+    <select id="findAllDatePlans" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from plan
+        where userid = #{userid,jdbcTypeName=VARCHAR} and #{time,jdbcType=VARCHAR} between title_time and title_time_end
+    </select>
+
+    <update id="concatDelTime">
+        update plan set del_time = concat(del_time, #{time,jdbcType=VARCHAR})
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <update id="concatFinish">
+        update plan set finish = concat(finish, #{time,jdbcType=VARCHAR})
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

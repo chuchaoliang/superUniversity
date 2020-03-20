@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ccl.wx.mapper.TodayContentMapper">
+    <resultMap id="BaseResultMap" type="com.ccl.wx.entity.TodayContent">
+        <!--@mbg.generated-->
+        <!--@Table today_content-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="circle_id" jdbcType="BIGINT" property="circleId"/>
+        <result column="today_content" jdbcType="LONGVARCHAR" property="todayContent"/>
+        <result column="today_image" jdbcType="VARCHAR" property="todayImage"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="delete_time" jdbcType="TIMESTAMP" property="deleteTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="content_status" jdbcType="INTEGER" property="contentStatus"/>
+        <result column="read_number" jdbcType="BIGINT" property="readNumber"/>
+        <result column="head_image" jdbcType="VARCHAR" property="headImage"/>
+        <result column="theme_title" jdbcType="VARCHAR" property="themeTitle"/>
+        <result column="theme_video" jdbcType="VARCHAR" property="themeVideo"/>
+        <result column="theme_voice" jdbcType="VARCHAR" property="themeVoice"/>
+        <result column="read_user" jdbcType="LONGVARCHAR" property="readUser"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, circle_id, today_content, today_image, create_time, delete_time, update_time,
+        content_status, read_number, head_image, theme_title, theme_video, theme_voice, read_user
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from today_content
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        <!--@mbg.generated-->
+        delete from today_content
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.TodayContent"
+            useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into today_content (circle_id, today_content, today_image,
+        create_time, delete_time, update_time,
+        content_status, read_number, head_image,
+        theme_title, theme_video, theme_voice,
+        read_user)
+        values (#{circleId,jdbcType=BIGINT}, #{todayContent,jdbcType=LONGVARCHAR}, #{todayImage,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP}, #{deleteTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+        #{contentStatus,jdbcType=INTEGER}, #{readNumber,jdbcType=BIGINT}, #{headImage,jdbcType=VARCHAR},
+        #{themeTitle,jdbcType=VARCHAR}, #{themeVideo,jdbcType=VARCHAR}, #{themeVoice,jdbcType=VARCHAR},
+        #{readUser,jdbcType=LONGVARCHAR})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.TodayContent"
+            useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into today_content
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="circleId != null">
+                circle_id,
+            </if>
+            <if test="todayContent != null">
+                today_content,
+            </if>
+            <if test="todayImage != null">
+                today_image,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="deleteTime != null">
+                delete_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="contentStatus != null">
+                content_status,
+            </if>
+            <if test="readNumber != null">
+                read_number,
+            </if>
+            <if test="headImage != null">
+                head_image,
+            </if>
+            <if test="themeTitle != null">
+                theme_title,
+            </if>
+            <if test="themeVideo != null">
+                theme_video,
+            </if>
+            <if test="themeVoice != null">
+                theme_voice,
+            </if>
+            <if test="readUser != null">
+                read_user,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="circleId != null">
+                #{circleId,jdbcType=BIGINT},
+            </if>
+            <if test="todayContent != null">
+                #{todayContent,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="todayImage != null">
+                #{todayImage,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deleteTime != null">
+                #{deleteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="contentStatus != null">
+                #{contentStatus,jdbcType=INTEGER},
+            </if>
+            <if test="readNumber != null">
+                #{readNumber,jdbcType=BIGINT},
+            </if>
+            <if test="headImage != null">
+                #{headImage,jdbcType=VARCHAR},
+            </if>
+            <if test="themeTitle != null">
+                #{themeTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="themeVideo != null">
+                #{themeVideo,jdbcType=VARCHAR},
+            </if>
+            <if test="themeVoice != null">
+                #{themeVoice,jdbcType=VARCHAR},
+            </if>
+            <if test="readUser != null">
+                #{readUser,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ccl.wx.entity.TodayContent">
+        <!--@mbg.generated-->
+        update today_content
+        <set>
+            <if test="circleId != null">
+                circle_id = #{circleId,jdbcType=BIGINT},
+            </if>
+            <if test="todayContent != null">
+                today_content = #{todayContent,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="todayImage != null">
+                today_image = #{todayImage,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deleteTime != null">
+                delete_time = #{deleteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="contentStatus != null">
+                content_status = #{contentStatus,jdbcType=INTEGER},
+            </if>
+            <if test="readNumber != null">
+                read_number = #{readNumber,jdbcType=BIGINT},
+            </if>
+            <if test="headImage != null">
+                head_image = #{headImage,jdbcType=VARCHAR},
+            </if>
+            <if test="themeTitle != null">
+                theme_title = #{themeTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="themeVideo != null">
+                theme_video = #{themeVideo,jdbcType=VARCHAR},
+            </if>
+            <if test="themeVoice != null">
+                theme_voice = #{themeVoice,jdbcType=VARCHAR},
+            </if>
+            <if test="readUser != null">
+                read_user = #{readUser,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ccl.wx.entity.TodayContent">
+        <!--@mbg.generated-->
+        update today_content
+        set circle_id = #{circleId,jdbcType=BIGINT},
+        today_content = #{todayContent,jdbcType=LONGVARCHAR},
+        today_image = #{todayImage,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        delete_time = #{deleteTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        content_status = #{contentStatus,jdbcType=INTEGER},
+        read_number = #{readNumber,jdbcType=BIGINT},
+        head_image = #{headImage,jdbcType=VARCHAR},
+        theme_title = #{themeTitle,jdbcType=VARCHAR},
+        theme_video = #{themeVideo,jdbcType=VARCHAR},
+        theme_voice = #{themeVoice,jdbcType=VARCHAR},
+        read_user = #{readUser,jdbcType=LONGVARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <!--auto generated by MybatisCodeHelper on 2020-01-12-->
+    <select id="getAllByCircleId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from today_content
+        where circle_id=#{circleId,jdbcType=BIGINT}
+    </select>
+
+    <!--auto generated by MybatisCodeHelper on 2020-01-12-->
+    <select id="selectByCircleIdAndContentStatus" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from today_content
+        where circle_id=#{circleId,jdbcType=BIGINT} and content_status=#{contentStatus,jdbcType=INTEGER}
+    </select>
+    <update id="concatImage">
+        update today_content set today_image =
+        <choose>
+            <when test="flag">
+                concat(today_image,#{imagePath,jdbcType=VARCHAR})
+            </when>
+            <otherwise>
+                concat_ws(",",today_image, #{imagePath,jdbcType=VARCHAR})
+            </otherwise>
+        </choose>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <!--auto generated by MybatisCodeHelper on 2020-03-07-->
+    <select id="selectAllByCircleId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from today_content
+        where circle_id=#{circleId,jdbcType=BIGINT}
+    </select>
+
+    <!--auto generated by MybatisCodeHelper on 2020-03-07-->
+    <select id="selectAllByContentStatus" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from today_content
+        where content_status=#{contentStatus,jdbcType=INTEGER}
+    </select>
+
+    <!--auto generated by MybatisCodeHelper on 2020-03-07-->
+    <select id="countByCircleIdAndContentStatus" resultType="java.lang.Integer">
+        select count(1)
+        from today_content
+        where circle_id=#{circleId,jdbcType=BIGINT} and content_status != #{contentStatus,jdbcType=INTEGER}
+    </select>
+
+    <update id="concatUserRead">
+        update today_content set read_user =
+        <choose>
+            <when test="flag">
+                concat(read_user, #{userId,jdbcType=VARCHAR})
+            </when>
+            <otherwise>
+                concat_ws(",",read_user, #{userId,jdbcType=VARCHAR})
+            </otherwise>
+        </choose>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <!--auto generated by MybatisCodeHelper on 2020-03-12-->
+    <select id="selectAllByCircleIdOrderByCreateTimeDesc" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from today_content
+        where circle_id=#{circleId,jdbcType=BIGINT} order by create_time desc
+        limit #{start,jdbcType=INTEGER},#{pageNumber,jdbcType=INTEGER}
+    </select>
+
+    <select id="countTodayCircleClockIn" resultType="java.lang.Integer">
+        select count(1)
+        from user_diary
+        where (diary_status = 0 or diary_status = 1) and
+        theme_id = #{themeId,jdbcType=INTEGER} and
+        circle_id = #{circleId,jdbcType=BIGINT} and
+        datediff(diary_createtime,now()) = 0
+    </select>
+</mapper>
