@@ -2,6 +2,7 @@ package com.ccl.wx.service;
 
 import com.ccl.wx.entity.JoinCircle;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -131,4 +132,35 @@ public interface JoinCircleService {
      * @return
      */
     List<Map> getUserSignInInfo(Long circleId, String userId);
+
+    /**
+     * 获取圈子某一天的打卡信息
+     *
+     * @param circleId 圈子id
+     * @param date     日期
+     * @return
+     */
+    String getCircleSignInInfo(Long circleId, Date date);
+
+    /**
+     * 根据日期获取某一天打卡用户信息
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param date     日期
+     * @param page     页数
+     * @return
+     */
+    String getUserSignStatisticsSuccessInfo(Long circleId, String userId, Date date, Integer page);
+
+    /**
+     * 根据日期获取某一天未打卡的用户信息
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param date     日期
+     * @param page     页数
+     * @return
+     */
+    String getUserSignStatisticsFailInfo(Long circleId, String userId, Date date, Integer page);
 }

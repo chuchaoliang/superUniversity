@@ -5,6 +5,7 @@ import com.ccl.wx.dto.UserDiaryDTO;
 import com.ccl.wx.entity.UserDiary;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -196,11 +197,21 @@ public interface UserDiaryService {
      * 判断当天用户的主题所对的的日记是否全部删除
      * 为空 true
      * 不为空 false
-     * @param userId    用户id
-     * @param circleId  圈子id
-     * @param diaryCreateTime  日记创建时间
-     * @param diaryStatus   日志状态
+     *
+     * @param userId          用户id
+     * @param circleId        圈子id
+     * @param diaryCreateTime 日记创建时间
+     * @param diaryStatus     日志状态
      * @return
      */
     boolean judgeThemeIdIsNull(String userId, Long circleId, String diaryCreateTime, Integer diaryStatus);
+
+    /**
+     * 获取圈子中某一天的打卡人数
+     *
+     * @param circleId 圈子id
+     * @param date     日期
+     * @return
+     */
+    int countThemeUserNumberByDate(Long circleId, Date date);
 }

@@ -254,4 +254,26 @@ public interface JoinCircleMapper {
      * @return
      */
     List<Map> getUserSignInInfo(@Param("circleId") Long circleId, @Param("userId") String userId);
+
+    /**
+     * 打卡统计：获取用户某一天成功打卡用户信息
+     *
+     * @param circleId 圈子id
+     * @param date     日期
+     * @param start    开始页
+     * @param page     第几页
+     * @return
+     */
+    List<Map> getUserSuccessSignInByDate(@Param("circleId") Long circleId, @Param("date") String date, @Param("start") Integer start, @Param("page") Integer page);
+
+    /**
+     * 打卡统计：获取用户某一天未打卡用户信息
+     *
+     * @param circleId 圈子id
+     * @param date     日期
+     * @param start    开始页
+     * @param page     第几页
+     * @return
+     */
+    List<Map> getUserFailSignInByDate(@Param("circleId") Long circleId, @Param("date") String date, @Param("start") Integer start, @Param("page") Integer page);
 }

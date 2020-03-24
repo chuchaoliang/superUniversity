@@ -1,4 +1,5 @@
 package com.ccl.wx.mapper;
+
 import com.ccl.wx.entity.UserDiary;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -147,19 +148,39 @@ public interface UserDiaryMapper {
 
     /**
      * 判断此主题今天用户是否发表过日记 获得总数 如果为0 则未发表，否则发表过
+     *
      * @param userId
      * @param circleId
      * @param themeId
      * @return
      */
-    int countByUserIdAndCircleIdAndThemeId(@Param("userId")String userId,@Param("circleId")Long circleId,@Param("themeId")Integer themeId);
+    int countByUserIdAndCircleIdAndThemeId(@Param("userId") String userId, @Param("circleId") Long circleId, @Param("themeId") Integer themeId);
 
     /**
-     * 查看用户的日志信息总数
-     * @param userId 用户id
-     * @param circleId 圈子id
+     * 查看用户的日志信息总数(全部日志包括非法日志和删除日志)
+     *
+     * @param userId              用户id
+     * @param circleId            圈子id
      * @param likeDiaryCreatetime 要查询的时间
      * @return
      */
-    int countByUserIdAndCircleIdAndDiaryCreatetimeLike(@Param("userId")String userId,@Param("circleId")Long circleId,@Param("likeDiaryCreatetime")String likeDiaryCreatetime);
+    int countByUserIdAndCircleIdAndDiaryCreatetimeLike(@Param("userId") String userId, @Param("circleId") Long circleId, @Param("likeDiaryCreatetime") String likeDiaryCreatetime);
+
+    /**
+     * 获取圈子的某一天的打卡人数
+     *
+     * @param circleId 圈子id
+     * @param date     日期 格式(yyyyMMdd)
+     * @return
+     */
+    int countThemeUserNumberByDate(@Param("circleId") Long circleId, @Param("date") String date);
+
+    /**
+     * 获取圈子某一天的所有打卡用户
+     *
+     * @param circleId 圈子id
+     * @param date     打卡日期
+     * @return
+     */
+    List<String> selectUserSignInIdByDate(@Param("circleId") Long circleId, @Param("date") String date);
 }

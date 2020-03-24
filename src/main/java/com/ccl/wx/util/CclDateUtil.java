@@ -60,7 +60,7 @@ public class CclDateUtil {
 
     public static String format(Date date) {
         long delta = System.currentTimeMillis() - date.getTime();
-        if (delta < 1L * ONE_MINUTE) {
+        if (delta < ONE_MINUTE) {
             long seconds = toSeconds(delta);
             return (seconds <= 0 ? 1 : seconds) + ONE_SECOND_AGO;
         }
@@ -86,6 +86,25 @@ public class CclDateUtil {
             long years = toYears(delta);
             return (years <= 0 ? 1 : years) + ONE_YEAR_AGO;
         }
+    }
+
+    public static String formatDateHoursMinutes(Date date) {
+        // 获取小时数
+        int hour = DateUtil.hour(date, true);
+        // 获取分钟数
+        int minute = DateUtil.minute(date);
+        StringBuilder time = new StringBuilder();
+        if (hour < 10) {
+            time.append(0).append(hour);
+        } else {
+            time.append(hour);
+        }
+        if (minute < 10) {
+            time.append(":").append(0).append(minute);
+        } else {
+            time.append(":").append(minute);
+        }
+        return time.toString();
     }
 
     private static long toSeconds(long date) {

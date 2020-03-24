@@ -410,4 +410,25 @@
         from join_circle,user_info
         where join_circle.user_id = user_info.id and circle_id = #{circleId,jdbcType=BIGINT} and join_circle.user_id = #{userId,jdbcType=VARCHAR};
     </select>
+    <select id="getUserSuccessSignInByDate" resultType="java.util.Map">
+        SELECT diary.user_id,nickName,avatarUrl,COUNT(diary.user_id) as theme_number,MAX(diary.diary_createtime) as diary_createtime
+        FROM user_diary as diary,user_info as info
+        WHERE circle_id = #{circleId,jdbcType=BIGINT} AND DATE_FORMAT(diary_createtime,'%Y%m%d') = #{date,jdbcType=VARCHAR} AND (diary_status = 0 OR diary_status = 1)
+        AND diary.user_id = info.id
+        GROUP BY diary.user_id
+        ORDER BY diary_createtime DESC
+        LIMIT #{start,jdbcType=INTEGER},#{page,jdbcType=INTEGER};
+    </select>
+    <select id="getUserFailSignInByDate" resultType="java.util.Map">
+        select circle.user_id,nickName,avatarUrl,user_signin_day
+        from join_circle as circle,user_info as info
+        where circle_id = #{circleId,jdbcType=BIGINT} and not exists (
+            select user_id
+            from user_diary
+            where circle_id = #{circleId,jdbcType=BIGINT} and date_format(diary_createtime,'%Y%m%d') = #{date,jdbcType=VARCHAR} and (diary_status = 0 or diary_status = 1)
+            group by user_id
+        ) and circle.user_id = info.id and circle.user_status = 0
+        order by join_time desc
+        limit #{start,jdbcType=INTEGER},#{page,jdbcType=INTEGER}
+    </select>
 </mapper>

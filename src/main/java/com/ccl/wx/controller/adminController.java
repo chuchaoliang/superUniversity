@@ -6,15 +6,17 @@ import com.ccl.wx.annotation.ParamCheck;
 import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.mapper.JoinCircleMapper;
 import com.ccl.wx.service.JoinCircleService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * @author 褚超亮
@@ -29,6 +31,9 @@ public class adminController {
 
     @Autowired
     private JoinCircleService joinCircleService;
+
+    @Resource
+    private RabbitTemplate rabbitTemplate;
 
     @GetMapping("/index")
     public String index() {
@@ -74,5 +79,19 @@ public class adminController {
         List<Map> userInfo = joinCircleService.getUserVitalityRankingInfo(9L, "o1x2q5czO_xCH9eemeEfL41_gvMk", 0, 5);
         List<Map> userInfo1 = joinCircleService.getUserSignInRankingInfo(9L, "o1x2q5czO_xCH9eemeEfL41_gvMk", 0, 200);
         return JSON.toJSONString(userInfo1);
+    }
+
+    @GetMapping("/test5")
+    public String test5() {
+        String messageId = String.valueOf(UUID.randomUUID());
+        String messageData = "test message, hello!";
+        String createTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        Map<String, Object> map = new HashMap<>();
+        map.put("messageId", messageId);
+        map.put("messageData", messageData);
+        map.put("createTime", createTime);
+        //将消息携带绑定键值：TestDirectRouting 发送到交换机TestDirectExchange
+        rabbitTemplate.convertAndSend("TestDirectExchange", "TestDirectRouting", map);
+        return "ok";
     }
 }

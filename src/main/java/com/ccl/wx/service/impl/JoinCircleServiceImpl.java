@@ -1,30 +1,41 @@
 package com.ccl.wx.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.ccl.wx.dto.UserSignSuccessDTO;
 import com.ccl.wx.entity.JoinCircle;
 import com.ccl.wx.enums.EnumPage;
 import com.ccl.wx.enums.EnumUserCircle;
 import com.ccl.wx.exception.UserJoinCircleException;
 import com.ccl.wx.mapper.JoinCircleMapper;
 import com.ccl.wx.service.JoinCircleService;
+import com.ccl.wx.service.UserDiaryService;
+import com.ccl.wx.util.CclDateUtil;
 import com.ccl.wx.util.CclUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author 褚超亮
  * @date 2020/3/7 17:19
  */
-
+@Slf4j
+@Transactional(rollbackFor = Exception.class)
 @Service
 public class JoinCircleServiceImpl implements JoinCircleService {
 
     @Resource
     private JoinCircleMapper joinCircleMapper;
+
+    @Resource
+    private UserDiaryService userDiaryService;
 
     @Override
     public int deleteByPrimaryKey(Long circleId, String userId) {
@@ -160,5 +171,78 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         userSignInData.add(userSignInRanking);
         userSignInData.add(judgeNextPage);
         return JSON.toJSONString(userSignInData);
+    }
+
+    @Override
+    public String getCircleSignInInfo(Long circleId, Date date) {
+        // 获取圈子总人数
+        int circleNumber = countByCircleIdAndUserStatus(circleId, EnumUserCircle.USER_NORMAL_STATUS.getValue());
+        // 获取打卡人数
+        int signInSuccessNumber = userDiaryService.countThemeUserNumberByDate(circleId, date);
+        // 获取未打卡人数
+        int signInFailNumber = Math.max(Math.subtractExact(circleNumber, signInSuccessNumber), 0);
+        HashMap<String, Integer> hashMap = new HashMap<>(2);
+        hashMap.put("success", signInSuccessNumber);
+        hashMap.put("fail", signInFailNumber);
+        return JSON.toJSONString(hashMap);
+    }
+
+    @Override
+    public String getUserSignStatisticsSuccessInfo(Long circleId, String userId, Date date, Integer page) {
+        // 格式化时间
+        String formatDate = DateUtil.format(date, DatePattern.PURE_DATE_PATTERN);
+        int pageNumber = EnumPage.PAGE_NUMBER.getValue();
+        List<Map> userSuccessSignInByDate = joinCircleMapper.getUserSuccessSignInByDate(circleId, formatDate, page * pageNumber, pageNumber);
+        ArrayList<UserSignSuccessDTO> userSignSuccessDTOS = new ArrayList<>();
+        for (Map userSuccessInfo : userSuccessSignInByDate) {
+            // 将Map中的数据复制到Bean中
+            UserSignSuccessDTO userSignSuccessDTO = BeanUtil.fillBeanWithMap(userSuccessInfo, new UserSignSuccessDTO(), false);
+            JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userSignSuccessDTO.getUserId());
+            if (joinCircle == null) {
+                throw new UserJoinCircleException("此用户不在此圈子中-->" + userSignSuccessDTO.getUserId());
+            } else {
+                if (joinCircle.getUserStatus() != EnumUserCircle.USER_NORMAL_STATUS.getValue()) {
+                    continue;
+                }
+            }
+            // 设置用户打卡天数
+            userSignSuccessDTO.setUserSigninDay(joinCircle.getUserSigninDay().intValue());
+            Date diaryCreateTime = userSignSuccessDTO.getDiaryCreatetime();
+            if (DateUtil.betweenDay(date, new Date(), true) == 0) {
+                // 是今天
+                userSignSuccessDTO.setFormatDiaryCreate(CclDateUtil.format(diaryCreateTime));
+            } else {
+                // 不是今天
+                userSignSuccessDTO.setFormatDiaryCreate(CclDateUtil.formatDateHoursMinutes(diaryCreateTime));
+            }
+            userSignSuccessDTOS.add(userSignSuccessDTO);
+        }
+        // 获取某一天的打卡总人数
+        int signInNumber = userDiaryService.countThemeUserNumberByDate(circleId, date);
+        // 判断是否存在下一页
+        boolean judgeNextPage = CclUtil.judgeNextPage(signInNumber, pageNumber, page);
+        List<Object> returnList = new ArrayList<>();
+        returnList.add(userSignSuccessDTOS);
+        returnList.add(judgeNextPage);
+        return JSON.toJSONStringWithDateFormat(returnList, DatePattern.NORM_DATETIME_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+    }
+
+    @Override
+    public String getUserSignStatisticsFailInfo(Long circleId, String userId, Date date, Integer page) {
+        // 格式化时间
+        String formatDate = DateUtil.format(date, DatePattern.PURE_DATE_PATTERN);
+        int pageNumber = EnumPage.PAGE_NUMBER.getValue();
+        // 获取未打卡用户数据
+        List<Map> userFailSignInByDate = joinCircleMapper.getUserFailSignInByDate(circleId, formatDate, pageNumber * page, pageNumber);
+        // 获取今天的打卡人数
+        int signInNumber = userDiaryService.countThemeUserNumberByDate(circleId, date);
+        // 获取圈子总人数
+        Integer circleNumber = joinCircleMapper.countByCircleIdAndUserStatus(circleId, EnumUserCircle.USER_NORMAL_STATUS.getValue());
+        // 判断是否存在下一页
+        boolean judgeNextPage = CclUtil.judgeNextPage(circleNumber - signInNumber, pageNumber, page);
+        List<Object> returnList = new ArrayList<>();
+        returnList.add(userFailSignInByDate);
+        returnList.add(judgeNextPage);
+        return JSON.toJSONString(returnList);
     }
 }

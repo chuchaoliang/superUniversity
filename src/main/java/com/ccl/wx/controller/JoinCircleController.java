@@ -5,12 +5,14 @@ import com.ccl.wx.annotation.ParamCheck;
 import com.ccl.wx.enums.EnumPage;
 import com.ccl.wx.service.JoinCircleService;
 import io.swagger.annotations.Api;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -82,6 +84,57 @@ public class JoinCircleController {
                                        @RequestParam(value = "userId", required = false) String userId) {
         List<Map> userSignInRankingInfo = joinCircleService.getUserSignInRankingInfo(circleId, userId, 0, EnumPage.LAST_NUMBER.getValue());
         return JSON.toJSONString(userSignInRankingInfo);
+    }
+
+    /**
+     * 根据日期获取用户打卡统计信息(已打卡)
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param date     时间(格式年月日)
+     * @param page     第几页
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/menu/statistics/all/success")
+    public String getUserSignStatisticsSuccessInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                   @RequestParam(value = "userId", required = false) String userId,
+                                                   @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyyMMdd") Date date,
+                                                   @RequestParam(value = "page", required = false) Integer page) {
+        return joinCircleService.getUserSignStatisticsSuccessInfo(circleId, userId, date, page);
+    }
+
+    /**
+     * 根据日期获取用户打卡统计信息（未打卡）
+     * 参数含义同上
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param date     时间
+     * @param page     第几页
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/menu/statistics/all/fail")
+    public String getUserSignStatisticsFailInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                @RequestParam(value = "userId", required = false) String userId,
+                                                @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyyMMdd") Date date,
+                                                @RequestParam(value = "page", required = false) Integer page) {
+        return joinCircleService.getUserSignStatisticsFailInfo(circleId, userId, date, page);
+    }
+
+    /**
+     * 根据日期获取打卡信息 已打卡人数，未打卡人数
+     *
+     * @param circleId 圈子id
+     * @param date     日期 yyyyMMdd
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/menu/statistics/number")
+    public String getSignStatisticsNumberInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                                              @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyyMMdd") Date date) {
+        return joinCircleService.getCircleSignInInfo(circleId, date);
     }
 }
 

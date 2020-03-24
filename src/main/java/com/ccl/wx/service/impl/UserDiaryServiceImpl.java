@@ -94,6 +94,12 @@ public class UserDiaryServiceImpl implements UserDiaryService {
     }
 
     @Override
+    public int countThemeUserNumberByDate(Long circleId, Date date) {
+        String formatDate = DateUtil.format(date, DatePattern.PURE_DATE_PATTERN);
+        return userDiaryMapper.countThemeUserNumberByDate(circleId, formatDate);
+    }
+
+    @Override
     public String updateCircleTodayContent(CircleTodayContentDTO circleTodayContentDTO) {
         // 根据id查询每日内容的数据
         TodayContent todayContent = todayContentService.selectByPrimaryKey(circleTodayContentDTO.getId());
@@ -220,7 +226,7 @@ public class UserDiaryServiceImpl implements UserDiaryService {
             // 删除此日志主题
             themeIdsList.removeIf(s -> s.equals(themeId));
             // 判断列表id对应的日志是否为空
-            if (themeIdsList.size() == 0) {
+            if (themeIdsList.isEmpty()) {
                 // 日志已经全部删除
                 joinCircle.setUserSignStatus(EnumUserClockIn.USER_CLOCK_IN_FAIL.getValue());
                 joinCircle.setThemeId("");
@@ -256,7 +262,7 @@ public class UserDiaryServiceImpl implements UserDiaryService {
     @Override
     public boolean judgeThemeIdIsNull(String userId, Long circleId, String diaryCreateTime, Integer diaryStatus) {
         List<UserDiary> userDiaries = userDiaryMapper.selectAllByUserIdAndCircleIdAndDiaryCreatetimeLikeAndDiaryStatus(userId, circleId, diaryCreateTime, diaryStatus);
-        if (userDiaries.size() != 0) {
+        if (!userDiaries.isEmpty()) {
             return false;
         }
         return true;
@@ -268,8 +274,7 @@ public class UserDiaryServiceImpl implements UserDiaryService {
         int index = getTargetStrIndexOf(createTime, dateList, EnumUserVitalityJoint.USER_JOINT_STRING.getValue());
         // 得到目标日期
         String targetStr = dateList.get(index);
-        String vitality = EnumUserVitalityJoint.USER_JOINT_STRING.getValue() + targetStr.split(EnumUserVitalityJoint.USER_JOINT_STRING.getValue())[1];
-        return vitality;
+        return EnumUserVitalityJoint.USER_JOINT_STRING.getValue() + targetStr.split(EnumUserVitalityJoint.USER_JOINT_STRING.getValue())[1];
     }
 
     @Override

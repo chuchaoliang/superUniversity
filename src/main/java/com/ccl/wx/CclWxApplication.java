@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @EnableScheduling
 @EnableCaching(proxyTargetClass = true)
+//@EnableAspectJAutoProxy(exposeProxy = true)
 @EnableTransactionManagement
 @MapperScan("com.ccl.wx.mapper")
 @SpringBootApplication
