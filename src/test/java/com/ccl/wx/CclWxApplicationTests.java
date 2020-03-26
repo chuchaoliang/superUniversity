@@ -62,13 +62,13 @@ public class CclWxApplicationTests {
 
     @Test
     public void test1() {
-        todayContentService.deleteCircleThemeFormDatabase();
+        System.out.println(defaultProperties.toString());
     }
 
     @SneakyThrows
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Test
-    public void test() {
+    public void test() throws Exception {
         new Thread(() -> {
             System.out.println("-----");
             circleInfoMapper.selectByCircleId(5L);

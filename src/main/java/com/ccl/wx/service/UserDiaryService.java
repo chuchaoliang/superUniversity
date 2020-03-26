@@ -218,13 +218,15 @@ public interface UserDiaryService {
     /**
      * 获取主题id下的正常状态日志总数
      *
-     * @param themeId 主题id
+     * @param themeId  主题id
+     * @param circleId 圈子id
      * @return
      */
-    int countByThemeIdAndDiaryStatus(Integer themeId);
+    int countByThemeIdAndDiaryStatus(Integer themeId, Integer circleId);
 
     /**
      * 根据日记id和日记状态查询日志
+     *
      * @param value 日记状态
      * @return
      */

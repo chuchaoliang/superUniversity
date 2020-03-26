@@ -58,7 +58,7 @@ public class TodayContent implements Serializable {
     private Date updateTime;
 
     /**
-     * 今日内容状态（0正常1已经更新2已经删除）
+     * 今日内容状态（0正常1删除）
      */
     @ApiModelProperty(value = "今日内容状态（0正常1已经删除）")
     private Integer contentStatus;

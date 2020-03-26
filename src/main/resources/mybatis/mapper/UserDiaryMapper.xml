@@ -374,6 +374,6 @@
     <select id="countByThemeIdAndDiaryStatus" resultType="java.lang.Integer">
         select count(1)
         from user_diary
-        where theme_id=#{themeId,jdbcType=INTEGER} and (diary_status=0 or diary_status=1)
+        where theme_id=#{themeId,jdbcType=INTEGER} and circle_id = #{circleId,jdbcType=INTEGER} and (diary_status=0 or diary_status=1)
     </select>
 </mapper>

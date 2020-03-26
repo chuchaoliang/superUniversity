@@ -3,7 +3,6 @@ package com.ccl.wx.service.impl;
 import cn.hutool.core.date.DatePattern;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.ccl.wx.dto.CircleThemeDTO;
 import com.ccl.wx.dto.CircleTodayContentDTO;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.entity.JoinCircle;
@@ -15,7 +14,9 @@ import com.ccl.wx.service.CircleInfoService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.TodayContentService;
 import com.ccl.wx.service.UserDiaryService;
+import com.ccl.wx.util.CclUtil;
 import com.ccl.wx.util.FtpUtil;
+import com.ccl.wx.vo.CircleThemeVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -95,13 +96,13 @@ public class TodayContentServiceImpl implements TodayContentService {
     }
 
     @Override
-    public String getTodayContentById(Long id) {
-        TodayContent todayContent = todayContentMapper.selectByPrimaryKey(id);
+    public String selectCircleThemeInfoById(Long themeId, Long circleId) {
+        TodayContent todayContent = todayContentMapper.selectByPrimaryKey(themeId);
         CircleTodayContentDTO circleTodayContentDTO = new CircleTodayContentDTO();
         // 判断是否有此今日内容 一般肯定不为空
         if (StringUtils.isEmpty(todayContent)) {
-            // 出错今日内容为空
-            return "-1";
+            // 出错今日内容为空，出现未知错误
+            return EnumResultStatus.UNKNOWN.getValue();
         } else {
             // 今日内容不为空
             BeanUtils.copyProperties(todayContent, circleTodayContentDTO);
@@ -109,7 +110,10 @@ public class TodayContentServiceImpl implements TodayContentService {
                 List<String> images = Arrays.asList(todayContent.getTodayImage().split(","));
                 circleTodayContentDTO.setTodayImages(images);
             }
-            return JSON.toJSONStringWithDateFormat(circleTodayContentDTO, DatePattern.NORM_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+            // 根据主题id查询此主题存在的日志数量
+            int diaryNumber = userDiaryService.countByThemeIdAndDiaryStatus(todayContent.getId().intValue(), circleId.intValue());
+            circleTodayContentDTO.setDiaryNumber(diaryNumber);
+            return JSON.toJSONStringWithDateFormat(circleTodayContentDTO, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
         }
     }
 
@@ -162,6 +166,7 @@ public class TodayContentServiceImpl implements TodayContentService {
         return EnumResultStatus.SUCCESS.getValue();
     }
 
+    @Deprecated
     @Override
     public String getCircleTheme(Long circleId, String sign) {
         List<TodayContent> todayContents = todayContentMapper.getAllByCircleId(circleId);
@@ -245,51 +250,92 @@ public class TodayContentServiceImpl implements TodayContentService {
 
     @Override
     public String selectAllThemeByCircleIdPage(Long circleId, String userId, Integer page) {
-        // 查询用户加入圈子的信息 TODO
-        JoinCircle joinCircle = joinCircleService.selectByPrimaryKey(circleId, userId);
-        // 判断此用户今日打卡主题是否为空
-        if (!StringUtils.isEmpty(joinCircle.getThemeId())) {
-            // 主题列表
-            List<String> themes = Arrays.asList(joinCircle.getThemeId().split(","));
-            int pageNumber = EnumPage.PAGE_NUMBER.getValue();
-            List<TodayContent> todayContents = todayContentMapper.selectAllByCircleIdOrderByCreateTimeDesc(circleId, page * pageNumber, pageNumber);
-        }
-        return null;
-    }
-
-    @Override
-    public String selectAllThemeByCircleId(Long circleId, String userId) {
-        return null;
-    }
-
-    @Override
-    public String selectAllThemeByCircleIdDecorate(Long circleId, String userId) {
         // 查询用户加入圈子的信息
         JoinCircle joinCircle = joinCircleService.selectByPrimaryKey(circleId, userId);
-        List<TodayContent> todayContents = todayContentMapper.selectAllByCircleId(circleId);
-        // 获取日记的打卡列表
-        List<String> themes = Arrays.asList(joinCircle.getThemeId().split(","));
-        // 今日打卡主题不为空
-        List<CircleThemeDTO> circleThemeDTOS = new ArrayList<>();
-        TodayContent decorateTodayContent = new TodayContent();
-        // 设置圈子id
-        decorateTodayContent.setCircleId(circleId);
-        // 设置主题id
-        decorateTodayContent.setId(0L);
-        decorateTodayContent.setHeadImage(defaultProperties.getDefaultImage());
-        decorateTodayContent.setThemeTitle("无主题");
-        todayContents.add(decorateTodayContent);
-        for (TodayContent todayContent : todayContents) {
-            CircleThemeDTO circleThemeDTO = new CircleThemeDTO();
-            BeanUtils.copyProperties(todayContent, circleThemeDTO);
-            int diaryNumber = userDiaryService.countByThemeIdAndDiaryStatus(todayContent.getId().intValue());
-            // 设置此主题的日志总数
-            circleThemeDTO.setDiaryNumber(diaryNumber);
-            // 判断用户今天是否打卡
-            circleThemeDTO.setJudgeClockIn(themes.contains(String.valueOf(todayContent.getId())));
-            circleThemeDTOS.add(circleThemeDTO);
+        // 判断此用户今日打卡主题是否为空
+        int pageNumber = EnumPage.PAGE_NUMBER.getValue();
+        List<TodayContent> todayContents = todayContentMapper.selectAllByCircleIdOrderByCreateTimeDesc(circleId, EnumThemeStatus.USE_STATUS.getValue(), page * pageNumber, pageNumber);
+        CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
+        // 判断是否还有下一页
+        boolean nextPage = CclUtil.judgeNextPage(circleInfo.getThemeSum(), pageNumber, page);
+        // 如果没有下一页 将无主题添加进来
+        if (!nextPage) {
+            TodayContent todayContent = selectCircleDefaultThemeInfo(circleId);
+            todayContents.add(todayContent);
         }
-        return JSON.toJSONStringWithDateFormat(circleThemeDTOS, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+        List<CircleThemeVO> circleThemeVOS = new ArrayList<>();
+        for (TodayContent todayContent : todayContents) {
+            CircleThemeVO circleThemeVO = new CircleThemeVO();
+            // 如果圈子主题是否为空
+            if (StringUtils.isEmpty(todayContent.getHeadImage())) {
+                todayContent.setHeadImage(defaultProperties.getDefaultThemeImage());
+            }
+            // 根据主题id查询此主题存在的日志数量
+            int diaryNumber = userDiaryService.countByThemeIdAndDiaryStatus(todayContent.getId().intValue(), circleId.intValue());
+            BeanUtils.copyProperties(todayContent, circleThemeVO);
+            // 设置日志总数
+            circleThemeVO.setDiaryNumber(diaryNumber);
+            // 设置今天是否打卡
+            circleThemeVO.setSignInSuccess(false);
+            if (!StringUtils.isEmpty(joinCircle.getThemeId())) {
+                List<String> themes = Arrays.asList(joinCircle.getThemeId().split(","));
+                if (themes.contains(String.valueOf(todayContent.getId()))) {
+                    // 用户今天此主题已经打卡
+                    circleThemeVO.setSignInSuccess(true);
+                }
+            }
+            circleThemeVO.setCircleMaster(false);
+            // 判断是否为圈主
+            if (userId.equals(circleInfo.getCircleUserid())) {
+                circleThemeVO.setCircleMaster(true);
+            }
+            circleThemeVO.setDefaultTheme(false);
+            // 判断是否为默认主题
+            if (defaultProperties.getDefaultThemeId().equals(todayContent.getId().intValue())) {
+                circleThemeVO.setDefaultTheme(true);
+            }
+            circleThemeVOS.add(circleThemeVO);
+        }
+        List<Object> themeList = new ArrayList<>();
+        themeList.add(circleThemeVOS);
+        themeList.add(nextPage);
+        return JSON.toJSONStringWithDateFormat(themeList, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+    }
+
+    @Override
+    public String selectAllThemeByCircleHome(String userId, Long circleId) {
+        List<TodayContent> todayContents = todayContentMapper.selectAllByCircleIdOrderByCreateTimeDesc(circleId, EnumThemeStatus.USE_STATUS.getValue(), 0, EnumPage.CIRCLE_HOME_THEME.getValue());
+        todayContents.add(selectCircleDefaultThemeInfo(circleId));
+        List<CircleThemeVO> circleThemeVOS = new ArrayList<>();
+        for (TodayContent todayContent : todayContents) {
+            if (StringUtils.isEmpty(todayContent.getHeadImage())) {
+                todayContent.setHeadImage(defaultProperties.getDefaultThemeImage());
+            }
+            CircleThemeVO circleThemeVO = new CircleThemeVO();
+            BeanUtils.copyProperties(todayContent, circleThemeVO);
+            // 根据主题id查询此主题存在的日志数量
+            int diaryNumber = userDiaryService.countByThemeIdAndDiaryStatus(todayContent.getId().intValue(), circleId.intValue());
+            circleThemeVO.setDiaryNumber(diaryNumber);
+            circleThemeVOS.add(circleThemeVO);
+        }
+        return JSON.toJSONStringWithDateFormat(circleThemeVOS, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+    }
+
+    @Override
+    public TodayContent selectCircleDefaultThemeInfo(Long circleId) {
+        TodayContent todayContent = new TodayContent();
+        CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
+        // 设置主题id
+        todayContent.setId(defaultProperties.getDefaultThemeId().longValue());
+        // 设置圈子id
+        todayContent.setCircleId(circleId);
+        // 设置主题标题
+        todayContent.setThemeTitle(defaultProperties.getDefaultThemeTitle());
+        // 设置主题创建时间
+        todayContent.setCreateTime(circleInfo.getCircleCreatetime());
+        // 设置主题头像
+        todayContent.setHeadImage(defaultProperties.getDefaultThemeImage());
+        return todayContent;
     }
 
     @Override
@@ -324,6 +370,7 @@ public class TodayContentServiceImpl implements TodayContentService {
                     // 上传成功
                     todayContent.setThemeVideo(videoPath);
                     todayContentMapper.updateByPrimaryKeySelective(todayContent);
+                    return EnumResultStatus.SUCCESS.getValue();
                 } else {
                     // 上传失败
                     return EnumResultStatus.FAIL.getValue();

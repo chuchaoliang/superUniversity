@@ -54,8 +54,8 @@ public interface TodayContentMapper {
     /**
      * 拼接用户阅读人id字符串
      *
-     * @param id
-     * @param userId
+     * @param id     主题id
+     * @param userId 用户id
      * @param flag
      */
     int concatUserRead(@Param("id") Long id, @Param("userId") String userId, @Param("flag") Boolean flag);
@@ -63,15 +63,15 @@ public interface TodayContentMapper {
     /**
      * 根据圈子id查询圈子主题信息
      *
-     * @param circleId
+     * @param circleId 圈子id
      * @return
      */
     List<TodayContent> selectAllByCircleId(@Param("circleId") Long circleId);
 
     /**
-     * 根据日记状态获取圈子主题信息
+     * 根据主题状态获取圈子主题信息
      *
-     * @param contentStatus
+     * @param contentStatus 主题状态
      * @return
      */
     List<TodayContent> selectAllByContentStatus(@Param("contentStatus") Integer contentStatus);
@@ -86,12 +86,13 @@ public interface TodayContentMapper {
     Integer countByCircleIdAndContentStatus(@Param("circleId") Long circleId, @Param("contentStatus") Integer contentStatus);
 
     /**
-     * 获取圈子id的主题
+     * 根据主题状态，获取圈子id的全部主题
      *
-     * @param circleId   圈子id
-     * @param start      开始数
-     * @param pageNumber 每页的数据
+     * @param circleId      圈子id
+     * @param contentStatus 主题状态
+     * @param start         开始数
+     * @param pageNumber    每页的数据
      * @return
      */
-    List<TodayContent> selectAllByCircleIdOrderByCreateTimeDesc(@Param("circleId") Long circleId, @Param("start") Integer start, @Param("pageNumber") Integer pageNumber);
+    List<TodayContent> selectAllByCircleIdOrderByCreateTimeDesc(@Param("circleId") Long circleId, @Param("contentStatus") Integer contentStatus, @Param("start") Integer start, @Param("pageNumber") Integer pageNumber);
 }
