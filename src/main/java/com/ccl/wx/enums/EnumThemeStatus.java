@@ -7,19 +7,14 @@ package com.ccl.wx.enums;
 public enum EnumThemeStatus {
 
     /**
-     * 主题使用状态
+     * 主题正常状态
      */
     USE_STATUS(0),
 
     /**
-     * 主题更新状态
-     */
-    UPDATE_STATUS(1),
-
-    /**
      * 主题删除状态
      */
-    DELETE_STATUS(2);
+    DELETE_STATUS(1);
 
     private int value;
 

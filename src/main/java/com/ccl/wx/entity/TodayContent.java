@@ -2,9 +2,10 @@ package com.ccl.wx.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * @author 褚超亮
@@ -59,7 +60,7 @@ public class TodayContent implements Serializable {
     /**
      * 今日内容状态（0正常1已经更新2已经删除）
      */
-    @ApiModelProperty(value = "今日内容状态（0正常1已经更新2已经删除）")
+    @ApiModelProperty(value = "今日内容状态（0正常1已经删除）")
     private Integer contentStatus;
 
     /**

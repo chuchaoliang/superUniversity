@@ -1,7 +1,7 @@
 package com.ccl.wx.service;
 
 import com.ccl.wx.dto.CommentDTO;
-import com.ccl.wx.pojo.DiaryHideComment;
+import com.ccl.wx.entity.Comment;import com.ccl.wx.pojo.DiaryHideComment;
 
 import java.util.List;
 
@@ -30,8 +30,24 @@ public interface CommentService {
     /**
      * 根据日志id判断是否隐藏评论
      * 是否显示 查看全部**条评论和回复
+     *
      * @param diaryId
      * @return
      */
     DiaryHideComment judgeHideCommentById(Long diaryId);
+
+    int deleteByPrimaryKey(Long id);
+
+    int insert(Comment record);
+
+    int insertSelective(Comment record);
+
+    Comment selectByPrimaryKey(Long id);
+
+    int updateByPrimaryKeySelective(Comment record);
+
+    int updateByPrimaryKey(Comment record);
+
+    List<Long> selectIdByDiaryId(Long diaryId);
 }
+

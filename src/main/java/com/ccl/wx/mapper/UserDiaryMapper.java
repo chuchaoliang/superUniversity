@@ -183,4 +183,12 @@ public interface UserDiaryMapper {
      * @return
      */
     List<String> selectUserSignInIdByDate(@Param("circleId") Long circleId, @Param("date") String date);
+
+    /**
+     * 查询主题id下的全部日志总数
+     *
+     * @param themeId 主题id
+     * @return
+     */
+    int countByThemeIdAndDiaryStatus(@Param("themeId") Integer themeId);
 }

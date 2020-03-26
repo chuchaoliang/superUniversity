@@ -102,11 +102,20 @@ public interface JoinCircleMapper {
     /**
      * 更新圈子全部用户的打卡状态
      *
-     * @param signInStatus
-     * @param circleId
+     * @param signInStatus 用户打卡状态
+     * @param circleId     圈子id
      * @return
      */
     int updateByCircleId(@Param("circleId") Long circleId, @Param("signInStatus") Integer signInStatus);
+
+    /**
+     * 更新圈子状态
+     *
+     * @param circleId       圈子id
+     * @param userSignStatus 用户部分打卡状态
+     * @return
+     */
+    int updateByCircleIdAndUserSignStatus(@Param("circleId") Long circleId, @Param("userSignStatus") Integer userSignStatus);
 
     /**
      * 拼接用户签到日历

@@ -7,12 +7,12 @@ import com.ccl.wx.service.TodayContentService;
 import com.ccl.wx.service.UserDiaryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -26,7 +26,7 @@ import java.util.Date;
 @Component
 public class CircleScheduleController implements ApplicationContextAware {
 
-    @Autowired
+    @Resource
     private CircleScheduleService circleScheduleService;
 
     private static ApplicationContext context = null;
@@ -36,10 +36,15 @@ public class CircleScheduleController implements ApplicationContextAware {
      */
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DatePattern.NORM_DATETIME_PATTERN);
 
-    @Autowired
+    /**
+     * 日志输出字符
+     */
+    public static final String LOG_STR = "----------------------------------------------------------";
+
+    @Resource
     private UserDiaryService userDiaryService;
 
-    @Autowired
+    @Resource
     private TodayContentService todayContentService;
 
     @Override
@@ -64,9 +69,9 @@ public class CircleScheduleController implements ApplicationContextAware {
     public void saveUserLikeDataPersistence() {
         String activeProfile = getActiveProfile();
         if (EnumEnvironmentProfile.PROD_PROFILE.getValue().equals(activeProfile)) {
-            log.info("----------------------------------------------------------");
+            log.info(LOG_STR);
             log.info(dateFormat.format(new Date()) + "：将点赞数据持久化到mysql");
-            log.info("----------------------------------------------------------");
+            log.info(LOG_STR);
             circleScheduleService.saveUserLikeDataPersistence();
         }
     }
@@ -80,9 +85,9 @@ public class CircleScheduleController implements ApplicationContextAware {
     public void saveUserAccountLikeDataPersistence() {
         String activeProfile = getActiveProfile();
         if (EnumEnvironmentProfile.PROD_PROFILE.getValue().equals(activeProfile)) {
-            log.info("----------------------------------------------------------");
+            log.info(LOG_STR);
             log.info(dateFormat.format(new Date()) + "：将点赞数目总数持久化到mysql");
-            log.info("----------------------------------------------------------");
+            log.info(LOG_STR);
             circleScheduleService.saveUserAccountLikeDataPersistence();
         }
     }
@@ -95,10 +100,10 @@ public class CircleScheduleController implements ApplicationContextAware {
     public void deleteUserDiaryAndComment() {
         String activeProfile = getActiveProfile();
         if (EnumEnvironmentProfile.PROD_PROFILE.getValue().equals(activeProfile)) {
-            log.info("----------------------------------------------------------");
+            log.info(LOG_STR);
             log.info(dateFormat.format(new Date()) + "：开始删除用户日志信息");
             circleScheduleService.deleteUserDiaryInfoAndComment();
-            log.info("----------------------------------------------------------");
+            log.info(LOG_STR);
         }
     }
 
@@ -109,10 +114,10 @@ public class CircleScheduleController implements ApplicationContextAware {
     public void saveDiaryBrowse() {
         String activeProfile = getActiveProfile();
         if (EnumEnvironmentProfile.PROD_PROFILE.getValue().equals(activeProfile)) {
-            log.info("----------------------------------------------------------");
+            log.info(LOG_STR);
             log.info(dateFormat.format(new Date()) + "：持久化日记浏览量到数据库中");
             userDiaryService.saveDiaryBrowseNumber();
-            log.info("----------------------------------------------------------");
+            log.info(LOG_STR);
         }
     }
 
@@ -124,10 +129,10 @@ public class CircleScheduleController implements ApplicationContextAware {
     public void deleteCircleTheme() {
         String activeProfile = getActiveProfile();
         if (EnumEnvironmentProfile.PROD_PROFILE.getValue().equals(activeProfile)) {
-            log.info("----------------------------------------------------------");
+            log.info(LOG_STR);
             log.info(dateFormat.format(new Date()) + "：删除圈子中删除状态的主题");
             todayContentService.deleteCircleThemeFormDatabase();
-            log.info("----------------------------------------------------------");
+            log.info(LOG_STR);
         }
     }
 }

@@ -17,6 +17,16 @@ public enum EnumRedis {
     NUMBER("sum"),
 
     /**
+     * redis存储的点赞前缀
+     */
+    LIKE_PREFIX("like::"),
+
+    /**
+     * redis存储的点赞总数前缀
+     */
+    LIKE_SUM_PREFIX("account::"),
+
+    /**
      * redis连接符号
      */
     REDIS_JOINT("::");

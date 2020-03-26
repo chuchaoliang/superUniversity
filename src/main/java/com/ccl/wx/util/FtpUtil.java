@@ -1,24 +1,27 @@
 package com.ccl.wx.util;
 
 import cn.hutool.extra.ftp.Ftp;
+import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.properties.FtpProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.io.IOException;
 
 /**
  * @author CCL
  */
+@Slf4j
 @Component
 public class FtpUtil {
 
@@ -33,7 +36,7 @@ public class FtpUtil {
         FtpUtil.FILE_USELESS_PREFIX = FILE_USELESS_PREFIX;
     }
 
-    @Autowired
+    @Resource
     private FtpProperties initFtpProperties;
 
     /**
@@ -50,17 +53,21 @@ public class FtpUtil {
     public static String uploadFile(String userid, MultipartFile file) {
         String filename = CclUtil.getFileUploadName(file);
         String fileaddress = CclUtil.getFileUploadAddress(userid, file).replace("\\", "/");
-        System.out.println("文件名：" + filename);
-        System.out.println("文件地址：" + fileaddress);
-        System.out.println("处理后的文件地址：" + CclUtil.delStringPrefix(fileaddress, ftpProperties.getBasePath()));
+        if (EnumResultStatus.FAIL.getValue().equals(fileaddress)) {
+            // 上传文件类型不支持
+            return EnumResultStatus.UNKNOWN.getValue();
+        }
+        log.info("文件名：" + filename);
+        log.info("文件地址：" + fileaddress);
+        log.info("处理后的文件地址：" + CclUtil.delStringPrefix(fileaddress, ftpProperties.getBasePath()));
         boolean uploadStatus = upload(CclUtil.delStringPrefix(fileaddress, ftpProperties.getBasePath()), filename, file);
         if (uploadStatus) {
             logger.info("文件：【" + file.getOriginalFilename() + "】上传成功");
-            //TODO
             return ftpProperties.getHttpPath() + CclUtil.delStringPrefix(fileaddress, FILE_USELESS_PREFIX) + filename;
         } else {
             logger.info("文件：【" + file.getOriginalFilename() + "】上传失败");
-            return "fail";
+            // 上传文件失败
+            return EnumResultStatus.FAIL.getValue();
         }
     }
 
@@ -71,10 +78,10 @@ public class FtpUtil {
             boolean deleteFile = deleteFile(CclUtil.getFileLocation(filepath, ftpProperties.getHttpPath()), CclUtil.getFileName(filepath));
             if (deleteFile) {
                 logger.info("图片路径：【" + filepath + "】删除成功！");
-                return "success";
+                return EnumResultStatus.SUCCESS.getValue();
             } else {
                 logger.info("圈子头像路径：【" + filepath + "】删除失败！");
-                return null;
+                return EnumResultStatus.UNKNOWN.getValue();
             }
         }
     }

@@ -214,4 +214,19 @@ public interface UserDiaryService {
      * @return
      */
     int countThemeUserNumberByDate(Long circleId, Date date);
+
+    /**
+     * 获取主题id下的正常状态日志总数
+     *
+     * @param themeId 主题id
+     * @return
+     */
+    int countByThemeIdAndDiaryStatus(Integer themeId);
+
+    /**
+     * 根据日记id和日记状态查询日志
+     * @param value 日记状态
+     * @return
+     */
+    List<Long> selectIdByDiaryStatus(Integer value);
 }

@@ -4,16 +4,17 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import com.ccl.wx.entity.UserDiary;
 import com.ccl.wx.entity.UserLike;
+import com.ccl.wx.enums.EnumLike;
+import com.ccl.wx.enums.EnumRedis;
 import com.ccl.wx.enums.EnumUserDiary;
-import com.ccl.wx.mapper.*;
-import com.ccl.wx.service.CircleScheduleService;
+import com.ccl.wx.service.*;
 import com.ccl.wx.util.FtpUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -24,54 +25,25 @@ import java.util.*;
 @Service
 public class CircleScheduleServiceImpl implements CircleScheduleService {
 
-    @Autowired
+    @Resource
     private RedisTemplate redisTemplate;
 
-    @Autowired
-    private UserLikeMapper userLikeMapper;
+    @Resource
+    private UserDiaryService userDiaryService;
 
-    @Autowired
-    private JoinCircleMapper joinCircleMapper;
+    @Resource
+    private UserLikeService userLikeService;
 
-    @Autowired
-    private UserDiaryMapper userDiaryMapper;
+    @Resource
+    private CommentService commentService;
 
-    @Autowired
-    private CommentMapper commentMapper;
-
-    @Autowired
-    private ReplyMapper replyMapper;
-
-    /**
-     * redis存储的点赞前缀
-     */
-    private final static String LIKE_PREFIX = "like::";
-
-    /**
-     * redis存储的点赞和前缀
-     */
-    private final static String LIKE_SUM_PREFIX = "account::";
-
-    /**
-     * redis中连接符号
-     */
-    private final static String CONNECT_VALUE = "::";
-
-    /**
-     * 点赞状态
-     */
-    private final static Integer LIKE_STATUS = 1;
-
-    /**
-     * 取消点赞状态
-     */
-    private final static Integer UNLIKE_STATUS = 0;
-
+    @Resource
+    private ReplyService replyService;
 
     @Override
     public void saveUserLikeDataPersistence() {
         // 获取所有的键
-        Set<String> likeUsers = redisTemplate.keys(LIKE_PREFIX + "*");
+        Set<String> likeUsers = redisTemplate.keys(EnumRedis.LIKE_PREFIX.getValue() + "*");
         log.info(DateUtil.format(new Date(), DatePattern.NORM_DATETIME_MINUTE_PATTERN) + "持久化点赞数据：" + likeUsers.size() + "条数据");
         if (likeUsers.size() != 0) {
             // 遍历
@@ -79,27 +51,27 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
                 // 得到圈子id 和 日志id 数组
                 redisTemplate.opsForHash().entries(likeUser).forEach((key, value) -> {
                     // 为有效点赞
-                    String[] userIdArray = String.valueOf(likeUser).split(CONNECT_VALUE);
-                    String[] circleIdAndDiaryId = String.valueOf(key).split(CONNECT_VALUE);
+                    String[] userIdArray = String.valueOf(likeUser).split(EnumRedis.REDIS_JOINT.getValue());
+                    String[] circleIdAndDiaryId = String.valueOf(key).split(EnumRedis.REDIS_JOINT.getValue());
                     String circleId = circleIdAndDiaryId[0];
                     String diaryId = circleIdAndDiaryId[1];
                     String userId = userIdArray[1];
-                    UserLike userLikeInfo = userLikeMapper.selectByTypeId(Long.valueOf(diaryId));
-                    if (value.equals(LIKE_STATUS)) {
+                    UserLike userLikeInfo = userLikeService.selectByTypeId(Long.valueOf(diaryId));
+                    if (value.equals(EnumLike.LIKE_SUCCESS.getValue())) {
                         UserLike userLike = new UserLike();
                         if (userLikeInfo != null) {
                             // 更新数据
-                            userLikeMapper.concatLikeUserId(Long.valueOf(diaryId), userId + ",");
+                            userLikeService.concatLikeUserId(Long.valueOf(diaryId), userId + ",");
                         } else {
                             // 插入数据
                             userLike.setLikeUserid(userId + ",");
                             userLike.setCircleId(Long.valueOf(circleId));
                             userLike.setTypeId(Long.valueOf(diaryId));
-                            userLike.setType(1);
+                            userLike.setType(EnumLike.LIKE_DIARY.getValue());
                             userLike.setLikeCreatetime(new Date());
                             userLike.setLikeUpdatetime(new Date());
-                            userLike.setLikeStatus(1);
-                            userLikeMapper.insertSelective(userLike);
+                            userLike.setLikeStatus(EnumLike.LIKE_SUCCESS.getValue());
+                            userLikeService.insertSelective(userLike);
                         }
                     } else {
                         // 若点赞对象不为空，且点赞用户不为空
@@ -107,13 +79,13 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
                             List<String> likeUserIds = new ArrayList<>(Arrays.asList(userLikeInfo.getLikeUserid().split(",")));
                             if (likeUserIds.contains(userId) && likeUserIds.size() == 1) {
                                 // 存在且只有这一个用户，直接删除
-                                userLikeMapper.deleteByPrimaryKey(userLikeInfo.getId());
+                                userLikeService.deleteByPrimaryKey(userLikeInfo.getId());
                             } else {
                                 // 如果点赞列表中存在此信息，更新数据
                                 userLikeInfo.setLikeUpdatetime(new Date());
                                 likeUserIds.removeIf(s -> s.equals(userId));
                                 userLikeInfo.setLikeUserid(String.join(",", likeUserIds) + ",");
-                                userLikeMapper.updateByPrimaryKeySelective(userLikeInfo);
+                                userLikeService.updateByPrimaryKeySelective(userLikeInfo);
                             }
                         }
                     }
@@ -127,13 +99,13 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
     @Override
     public void saveUserAccountLikeDataPersistence() {
         // 获取like的全部键
-        Set<String> keys = redisTemplate.keys(LIKE_SUM_PREFIX + "*");
+        Set<String> keys = redisTemplate.keys(EnumRedis.LIKE_SUM_PREFIX.getValue() + "*");
         int size = keys.size();
         log.info(DateUtil.format(new Date(), DatePattern.NORM_DATETIME_MINUTE_PATTERN) + "redis中点赞中总数量：" + keys.size() + "条数据");
         for (String key : keys) {
             String[] split = key.split("::");
             String diaryId = split[1];
-            UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(Long.valueOf(diaryId));
+            UserDiary userDiary = userDiaryService.selectByPrimaryKey(Long.valueOf(diaryId));
             // 判断日记是否为空或者是否为删除状态
             if (userDiary == null || userDiary.getDiaryStatus().equals(EnumUserDiary.USER_DIARY_DELETE.getValue())) {
                 size--;
@@ -147,7 +119,7 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
                 userDiary.setDiaryLike(likeAccount);
             }
             // 更新数据
-            userDiaryMapper.updateByPrimaryKeySelective(userDiary);
+            userDiaryService.updateByPrimaryKeySelective(userDiary);
             // 删除redis中的数据
             redisTemplate.delete(key);
         }
@@ -159,9 +131,9 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
         // 删除的 日记总数、评论总数、回复总数、点赞总数
         int diarySum = 0, commentSum = 0, replySum = 0, likeSum = 0;
         // 获取所有删除状态的日志信息
-        List<Long> diaryIds = userDiaryMapper.selectIdByDiaryStatus(EnumUserDiary.USER_DIARY_DELETE.getValue());
+        List<Long> diaryIds = userDiaryService.selectIdByDiaryStatus(EnumUserDiary.USER_DIARY_DELETE.getValue());
         for (Long diaryId : diaryIds) {
-            UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(diaryId);
+            UserDiary userDiary = userDiaryService.selectByPrimaryKey(diaryId);
             // 查看日志图片信息
             String diaryImage = userDiary.getDiaryImage();
             // 图片信息是否为空
@@ -175,30 +147,30 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
                 }
             }
             // 根据日记id查询全部评论列表
-            List<Long> commentIds = commentMapper.selectIdByDiaryId(diaryId);
+            List<Long> commentIds = commentService.selectIdByDiaryId(diaryId);
             // 根据日记id删除评论
             for (Long commentId : commentIds) {
                 commentSum++;
-                commentMapper.deleteByPrimaryKey(commentId);
+                commentService.deleteByPrimaryKey(commentId);
             }
             // 根据日记id查询全部回复列表
-            List<Long> replyIds = replyMapper.selectIdByDiaryId(diaryId);
+            List<Long> replyIds = replyService.selectIdByDiaryId(diaryId);
             // 根据日记id删除回复
             for (Long replyId : replyIds) {
                 replySum++;
-                replyMapper.deleteByPrimaryKey(replyId);
+                replyService.deleteByPrimaryKey(replyId);
             }
             // 根据日记id删除全部点赞列表
-            List<Long> likeIds = userLikeMapper.selectIdByTypeId(diaryId);
+            List<Long> likeIds = userLikeService.selectIdByTypeId(diaryId);
             // 根据日记id删除点赞
             for (Long likeId : likeIds) {
                 likeSum++;
-                userLikeMapper.deleteByPrimaryKey(likeId);
+                userLikeService.deleteByPrimaryKey(likeId);
             }
             // 删除日志
             diarySum++;
             // 删除日志信息
-            userDiaryMapper.deleteByPrimaryKey(diaryId);
+            userDiaryService.deleteByPrimaryKey(diaryId);
         }
         // 格式化时间
         String dateInfo = DateUtil.format(new Date(), DatePattern.NORM_DATETIME_PATTERN);

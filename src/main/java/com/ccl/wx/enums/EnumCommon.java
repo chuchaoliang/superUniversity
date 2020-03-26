@@ -8,9 +8,19 @@ public enum EnumCommon {
     /**
      * 字符串连接拼接符号
      */
-    STRING_JOINT(",");
+    STRING_JOINT(","),
 
-    public String value;
+    /**
+     * 更新时的加值
+     */
+    UPDATE_ADD("1"),
+
+    /**
+     * 更新时候的减值
+     */
+    UPDATE_SUB("-1");
+
+    private String value;
 
     EnumCommon(String value) {
         this.value = value;

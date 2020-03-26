@@ -274,13 +274,4 @@
         where circle_id=#{circleId,jdbcType=BIGINT} order by create_time desc
         limit #{start,jdbcType=INTEGER},#{pageNumber,jdbcType=INTEGER}
     </select>
-
-    <select id="countTodayCircleClockIn" resultType="java.lang.Integer">
-        select count(1)
-        from user_diary
-        where (diary_status = 0 or diary_status = 1) and
-        theme_id = #{themeId,jdbcType=INTEGER} and
-        circle_id = #{circleId,jdbcType=BIGINT} and
-        datediff(diary_createtime,now()) = 0
-    </select>
 </mapper>

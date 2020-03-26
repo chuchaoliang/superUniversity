@@ -38,6 +38,18 @@ public class CircleThemeDTO {
     private String todayImage;
 
     /**
+     * 视频路径
+     */
+    @ApiModelProperty(value = "视频路径")
+    private String themeVideo;
+
+    /**
+     * 声音路径
+     */
+    @ApiModelProperty(value = "声音路径")
+    private String themeVoice;
+
+    /**
      * 创建时间
      */
     @ApiModelProperty(value = "创建时间")
@@ -64,6 +76,6 @@ public class CircleThemeDTO {
     /**
      * 此主题的打卡总人数
      */
-    @ApiModelProperty(value = "打卡总人数")
-    private Integer clockInNumber;
+    @ApiModelProperty(value = "打卡日记总数")
+    private Integer diaryNumber;
 }

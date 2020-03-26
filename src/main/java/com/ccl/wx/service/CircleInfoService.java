@@ -22,5 +22,13 @@ public interface CircleInfoService {
 
     int updateByPrimaryKey(CircleInfo record);
 
+    /**
+     * 根据圈子id 更新圈子主题总数
+     *
+     * @param circleId 圈子id
+     * @param value    需要+ - 的值 + 1 - 1
+     * @return
+     */
+    int updateThemeNumberByCircleId(Long circleId, Integer value);
 }
 

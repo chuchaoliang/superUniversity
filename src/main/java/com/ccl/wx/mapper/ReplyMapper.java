@@ -1,15 +1,14 @@
 package com.ccl.wx.mapper;
 
 import com.ccl.wx.entity.Reply;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
+import org.apache.ibatis.annotations.Mapper;import org.apache.ibatis.annotations.Param;import java.util.List;
 
 /**
  * @author 褚超亮
- * @date 2020/1/21 19:25
+ * @date 2020/3/25 20:05
  */
 
+@Mapper
 public interface ReplyMapper {
     int deleteByPrimaryKey(Long id);
 

@@ -38,6 +38,16 @@ public interface JoinCircleService {
     int concatCircleTheme(Long circleId, String userId, String themeId, Boolean flag);
 
     /**
+     * 创建主题后，那些全部打卡的主题设置为部分打卡
+     * 更新某一日用户全部打卡的用户状态
+     *
+     * @param circleId       圈子id
+     * @param userSignStatus 用户状态
+     * @return
+     */
+    int updateByCircleIdAndUserSignStatus(Long circleId, Integer userSignStatus);
+
+    /**
      * 更新圈子全部成员打卡状态
      *
      * @param circleId

@@ -1,15 +1,14 @@
 package com.ccl.wx.mapper;
 
 import com.ccl.wx.entity.UserLike;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
+import org.apache.ibatis.annotations.Mapper;import org.apache.ibatis.annotations.Param;import java.util.List;
 
 /**
  * @author 褚超亮
- * @date 2020/1/28 10:18
+ * @date 2020/3/25 19:33
  */
 
+@Mapper
 public interface UserLikeMapper {
     int deleteByPrimaryKey(Long id);
 
@@ -34,7 +33,7 @@ public interface UserLikeMapper {
     /**
      * 拼接点赞用户id
      *
-     * @param diaryId
+     * @param diaryId 点赞对应的id
      * @param userId
      * @return
      */
