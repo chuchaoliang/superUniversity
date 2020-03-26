@@ -63,6 +63,11 @@ public class JoinCircleServiceImpl implements JoinCircleService {
     }
 
     @Override
+    public int updateByCircleIdAndUserSignStatus(Long circleId, Integer userSignStatus) {
+        return joinCircleMapper.updateByCircleIdAndUserSignStatus(circleId, userSignStatus);
+    }
+
+    @Override
     public int updateByPrimaryKey(JoinCircle record) {
         return joinCircleMapper.updateByPrimaryKey(record);
     }

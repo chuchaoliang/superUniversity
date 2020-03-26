@@ -1,6 +1,8 @@
 package com.ccl.wx.util;
 
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import com.ccl.wx.enums.EnumResultStatus;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -31,8 +33,12 @@ public class CclUtil {
     /**
      * 常见的音频类型
      */
-    private final static String VOICE_TYPE = "m4a,wav,mp3,aac";
+    private final static String VOICE_TYPE = "mp3,wma,flac,aac,mmf,amr,m4a,m4r,Ogg,wav,wavpack,au,CD";
 
+    /**
+     * 常见的视频类型
+     */
+    private final static String VIDEO_TYPE = "mp4,avi,3gp,rmvb,rm,wmv,mkv,mpeg,vob,mov,swf,flv,f4v,dat,VCD,DVD";
 
     /**
      * 文件上传路径
@@ -313,7 +319,7 @@ public class CclUtil {
 
     /**
      * 获取图片上传文件夹
-     * 用户名-当前时间（年月日时分秒）-image（图片）/voice（声音）
+     * 用户名-当前时间（年月日时分秒）-image（图片）/voice（声音）/ video（视频）
      *
      * @param userid 用户id
      * @param file   上传的文件
@@ -323,28 +329,47 @@ public class CclUtil {
         StringBuilder fileAddress = new StringBuilder();
         fileAddress
                 .append(FILE_LOCAL_PATH.replace("/", File.separator))
-                .append(userid + File.separator)
-                .append(cn.hutool.core.date.DateUtil.format(new Date(), "yyyyMMdd") + File.separator);
-        //try {
-        // 获取文件类型
-        //String fileType = FileTypeUtil.getType(file.getInputStream());
+                .append(userid).append(File.separator)
+                .append(cn.hutool.core.date.DateUtil.format(new Date(), DatePattern.PURE_DATE_PATTERN))
+                .append(File.separator);
         String fileType = FilenameUtils.getExtension(file.getOriginalFilename());
         List<String> imageList = Arrays.asList(IMAGE_TYPE.split(","));
         List<String> voiceList = Arrays.asList(VOICE_TYPE.split(","));
+        List<String> videoList = Arrays.asList(VIDEO_TYPE.split(","));
         if (imageList.contains(fileType)) {
             // 是图片类型
-            fileAddress.append("image" + File.separator);
+            fileAddress.append("image").append(File.separator);
         } else if (voiceList.contains(fileType)) {
             // 是音频类型
-            fileAddress.append("voice" + File.separator);
+            fileAddress.append("voice").append(File.separator);
+        } else if (videoList.contains(fileType)) {
+            // 是视频类型
+            fileAddress.append("video").append(File.separator);
         } else {
             // 上传的未知类型
-            return "fail";
+            return EnumResultStatus.FAIL.getValue();
         }
-        //} catch (IOException e) {
-        //    e.printStackTrace();
-        //}
         return fileAddress.toString();
+    }
+
+    /**
+     * 根据文件列表删除全部文件信息
+     *
+     * @param files 文件列表
+     * @return
+     */
+    public static void delFileList(List<String> files) {
+        // 文件列表为空删除列表
+        if (!files.isEmpty()) {
+            for (String file : files) {
+                // 如果文件为空
+                if (StringUtils.isEmpty(file)) {
+                    continue;
+                } else {
+                    FtpUtil.delFile(file);
+                }
+            }
+        }
     }
 
     /**
@@ -356,24 +381,19 @@ public class CclUtil {
      */
     public static String getFileUploadName(MultipartFile file) {
         StringBuffer fileAddress = new StringBuffer();
-        //try {
         fileAddress
                 .append(DateUtil.format(new Date(), "yyyyMMddHHmmss"))
                 .append("_")
                 .append(UUID.randomUUID().toString().replace("-", "").toLowerCase())
                 .append(".")
                 .append(FilenameUtils.getExtension(file.getOriginalFilename()));
-        //.append(FileTypeUtil.getType(file.getInputStream()));
-        //} catch (IOException e) {
-        //    e.printStackTrace();
-        //}
         return fileAddress.toString();
     }
 
     /**
      * 判断字符串是否是Base64编码
      *
-     * @param str
+     * @param str 需要判断的字符串
      * @return
      */
     public static boolean isBase64(String str) {
@@ -389,7 +409,7 @@ public class CclUtil {
      * @return
      */
     public static String listToString(List list, char separator) {
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             return "";
         }
         StringBuilder sb = new StringBuilder();

@@ -317,4 +317,8 @@
         from circle_info
         where circle_id=#{circleId,jdbcType=BIGINT} for update
     </select>
+    <update id="updateThemeNumberByCircleId">
+        update circle_info set theme_sum = theme_sum + #{value,jdbcType=INTEGER}
+        where circle_id = #{circleId,jdbcType=BIGINT}
+    </update>
 </mapper>

@@ -60,8 +60,8 @@ public interface CircleInfoMapper {
     /**
      * 更新圈子成员
      *
-     * @param circleId
-     * @param value    +1 -1
+     * @param circleId 圈子id
+     * @param value    需要加或者减的值 + value - value
      * @return
      */
     int updateCircleMemberByCircleId(@Param("circleId") Long circleId, @Param("value") Integer value);
@@ -73,4 +73,13 @@ public interface CircleInfoMapper {
      * @return
      */
     List<CircleInfo> selectByCircleId(@Param("circleId") Long circleId);
+
+    /**
+     * 根据圈子id更新圈子主题总数
+     *
+     * @param circleId 圈子id
+     * @param value    需要加或者减的值 + value - value
+     * @return
+     */
+    Integer updateThemeNumberByCircleId(@Param("circleId") Long circleId, @Param("value") Integer value);
 }

@@ -94,13 +94,4 @@ public interface TodayContentMapper {
      * @return
      */
     List<TodayContent> selectAllByCircleIdOrderByCreateTimeDesc(@Param("circleId") Long circleId, @Param("start") Integer start, @Param("pageNumber") Integer pageNumber);
-
-    /**
-     * 获取圈子今日的打卡人数
-     *
-     * @param themeId  主题id
-     * @param circleId 圈子id
-     * @return
-     */
-    Integer countTodayCircleClockIn(@Param("themeId") Integer themeId, @Param("circleId") Long circleId);
 }

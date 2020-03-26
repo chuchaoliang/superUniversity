@@ -41,25 +41,28 @@ public interface TodayContentService {
     String getTodayContentById(Long id);
 
     /**
-     * 保存今日内容
+     * 保存圈子主题内容
      *
-     * @param todayContent
+     * @param todayContent 今日内容
+     * @param userId       用户id
+     * @param image        图片地址
      * @return
      */
-    String saveCircleTheme(TodayContent todayContent);
+    String saveCircleThemeContent(TodayContent todayContent, String userId, MultipartFile image);
 
     /**
      * 根据圈子主题id删除主题信息
      *
-     * @param themeId 主题id
+     * @param themeId  主题id
+     * @param circleId 圈子id
      * @return
      */
-    String deleteCircleTheme(Long themeId);
+    String deleteCircleTheme(Long circleId, Long themeId);
 
     /**
      * 获取圈子全部主题
      *
-     * @param circleId
+     * @param circleId 圈子id
      * @param sign
      * @return
      */
@@ -85,35 +88,44 @@ public interface TodayContentService {
     void addCircleThemeBrowse(String userId, Long themeId);
 
     /**
-     * 根据圈子id删除状态为删除状态的圈子主题
+     * 删除全部主题状态为删除状态的主题
      */
     void deleteCircleThemeFormDatabase();
 
     /**
      * 根据圈子id 和！=主题状态查找存在的主题总数
      *
-     * @param circleId
-     * @param status
+     * @param circleId 圈子id
+     * @param status   状态值
      * @return
      */
     int countByCircleIdAndContentStatus(Long circleId, Integer status);
 
     /**
-     * 根据圈子id获取全部主题信息
+     * 根据圈子id分页获取全部主题信息
      *
-     * @param circleId
+     * @param circleId 圈子id
      * @return
      */
     String selectAllThemeByCircleIdPage(Long circleId, String userId, Integer page);
 
     /**
-     * 根据圈子id获取全部主题id 不分页
+     * 根据圈子id获取全部主题信息
      *
-     * @param circleId
-     * @param userId
+     * @param circleId 圈子id
+     * @param userId   用户id
      * @return
      */
     String selectAllThemeByCircleId(Long circleId, String userId);
+
+    /**
+     * 根据圈子id获取全部主题id 装饰得到用户是否打卡此主题
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    String selectAllThemeByCircleIdDecorate(Long circleId, String userId);
 }
 
 

@@ -79,6 +79,11 @@ public class UserDiaryServiceImpl implements UserDiaryService {
     }
 
     @Override
+    public List<Long> selectIdByDiaryStatus(Integer value) {
+        return userDiaryMapper.selectIdByDiaryStatus(value);
+    }
+
+    @Override
     public int updateByPrimaryKey(UserDiary record) {
         return userDiaryMapper.updateByPrimaryKey(record);
     }
@@ -97,6 +102,11 @@ public class UserDiaryServiceImpl implements UserDiaryService {
     public int countThemeUserNumberByDate(Long circleId, Date date) {
         String formatDate = DateUtil.format(date, DatePattern.PURE_DATE_PATTERN);
         return userDiaryMapper.countThemeUserNumberByDate(circleId, formatDate);
+    }
+
+    @Override
+    public int countByThemeIdAndDiaryStatus(Integer themeId) {
+        return userDiaryMapper.countByThemeIdAndDiaryStatus(themeId);
     }
 
     @Override

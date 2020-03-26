@@ -1,15 +1,14 @@
 package com.ccl.wx.mapper;
 
 import com.ccl.wx.entity.Comment;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
+import org.apache.ibatis.annotations.Mapper;import org.apache.ibatis.annotations.Param;import java.util.List;
 
 /**
  * @author 褚超亮
- * @date 2020/1/18 12:37
+ * @date 2020/3/25 19:51
  */
 
+@Mapper
 public interface CommentMapper {
     int deleteByPrimaryKey(Long id);
 
@@ -60,8 +59,9 @@ public interface CommentMapper {
 
     /**
      * 根据日记id查询存在多少评论
+     *
      * @param diaryId
      * @return
      */
-    Long countByDiaryId(@Param("diaryId")Long diaryId);
+    Long countByDiaryId(@Param("diaryId") Long diaryId);
 }

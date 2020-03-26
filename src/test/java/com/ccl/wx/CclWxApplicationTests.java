@@ -60,6 +60,11 @@ public class CclWxApplicationTests {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Test
+    public void test1() {
+        todayContentService.deleteCircleThemeFormDatabase();
+    }
+
     @SneakyThrows
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Test

@@ -1,176 +1,187 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ccl.wx.mapper.CommentMapper">
-    <resultMap id="BaseResultMap" type="com.ccl.wx.entity.Comment">
-        <!--@mbg.generated-->
-        <!--@Table comment-->
-        <id column="id" jdbcType="BIGINT" property="id"/>
-        <result column="diary_id" jdbcType="BIGINT" property="diaryId"/>
-        <result column="comment_content" jdbcType="VARCHAR" property="commentContent"/>
-        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
-        <result column="comment_createtime" jdbcType="TIMESTAMP" property="commentCreatetime"/>
-        <result column="comment_deltime" jdbcType="TIMESTAMP" property="commentDeltime"/>
-        <result column="comment_status" jdbcType="INTEGER" property="commentStatus"/>
-        <result column="comment_like" jdbcType="BIGINT" property="commentLike"/>
-        <result column="comment_type" jdbcType="INTEGER" property="commentType"/>
-        <result column="circle_id" jdbcType="BIGINT" property="circleId"/>
-        <result column="comment_image" jdbcType="VARCHAR" property="commentImage"/>
-    </resultMap>
-    <sql id="Base_Column_List">
-        <!--@mbg.generated-->
-        id, diary_id, comment_content, user_id, comment_createtime, comment_deltime, comment_status,
-        comment_like, comment_type, circle_id, comment_image
-    </sql>
-    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-        <!--@mbg.generated-->
-        select
-        <include refid="Base_Column_List"/>
-        from comment
-        where id = #{id,jdbcType=BIGINT}
-    </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        <!--@mbg.generated-->
-        delete from comment
-        where id = #{id,jdbcType=BIGINT}
-    </delete>
-    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.Comment"
-            useGeneratedKeys="true">
-        <!--@mbg.generated-->
-        insert into comment (diary_id, comment_content, user_id,
-        comment_createtime, comment_deltime,
-        comment_status, comment_like, comment_type,
-        circle_id, comment_image)
-        values (#{diaryId,jdbcType=BIGINT}, #{commentContent,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR},
-        #{commentCreatetime,jdbcType=TIMESTAMP}, #{commentDeltime,jdbcType=TIMESTAMP},
-        #{commentStatus,jdbcType=INTEGER}, #{commentLike,jdbcType=BIGINT}, #{commentType,jdbcType=INTEGER},
-        #{circleId,jdbcType=BIGINT}, #{commentImage,jdbcType=VARCHAR})
-    </insert>
-    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.Comment"
-            useGeneratedKeys="true">
-        <!--@mbg.generated-->
-        insert into comment
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="diaryId != null">
-                diary_id,
-            </if>
-            <if test="commentContent != null">
-                comment_content,
-            </if>
-            <if test="userId != null">
-                user_id,
-            </if>
-            <if test="commentCreatetime != null">
-                comment_createtime,
-            </if>
-            <if test="commentDeltime != null">
-                comment_deltime,
-            </if>
-            <if test="commentStatus != null">
-                comment_status,
-            </if>
-            <if test="commentLike != null">
-                comment_like,
-            </if>
-            <if test="commentType != null">
-                comment_type,
-            </if>
-            <if test="circleId != null">
-                circle_id,
-            </if>
-            <if test="commentImage != null">
-                comment_image,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="diaryId != null">
-                #{diaryId,jdbcType=BIGINT},
-            </if>
-            <if test="commentContent != null">
-                #{commentContent,jdbcType=VARCHAR},
-            </if>
-            <if test="userId != null">
-                #{userId,jdbcType=VARCHAR},
-            </if>
-            <if test="commentCreatetime != null">
-                #{commentCreatetime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="commentDeltime != null">
-                #{commentDeltime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="commentStatus != null">
-                #{commentStatus,jdbcType=INTEGER},
-            </if>
-            <if test="commentLike != null">
-                #{commentLike,jdbcType=BIGINT},
-            </if>
-            <if test="commentType != null">
-                #{commentType,jdbcType=INTEGER},
-            </if>
-            <if test="circleId != null">
-                #{circleId,jdbcType=BIGINT},
-            </if>
-            <if test="commentImage != null">
-                #{commentImage,jdbcType=VARCHAR},
-            </if>
-        </trim>
-    </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.ccl.wx.entity.Comment">
-        <!--@mbg.generated-->
-        update comment
-        <set>
-            <if test="diaryId != null">
-                diary_id = #{diaryId,jdbcType=BIGINT},
-            </if>
-            <if test="commentContent != null">
-                comment_content = #{commentContent,jdbcType=VARCHAR},
-            </if>
-            <if test="userId != null">
-                user_id = #{userId,jdbcType=VARCHAR},
-            </if>
-            <if test="commentCreatetime != null">
-                comment_createtime = #{commentCreatetime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="commentDeltime != null">
-                comment_deltime = #{commentDeltime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="commentStatus != null">
-                comment_status = #{commentStatus,jdbcType=INTEGER},
-            </if>
-            <if test="commentLike != null">
-                comment_like = #{commentLike,jdbcType=BIGINT},
-            </if>
-            <if test="commentType != null">
-                comment_type = #{commentType,jdbcType=INTEGER},
-            </if>
-            <if test="circleId != null">
-                circle_id = #{circleId,jdbcType=BIGINT},
-            </if>
-            <if test="commentImage != null">
-                comment_image = #{commentImage,jdbcType=VARCHAR},
-            </if>
-        </set>
-        where id = #{id,jdbcType=BIGINT}
-    </update>
-    <update id="updateByPrimaryKey" parameterType="com.ccl.wx.entity.Comment">
-        <!--@mbg.generated-->
-        update comment
-        set diary_id = #{diaryId,jdbcType=BIGINT},
+  <resultMap id="BaseResultMap" type="com.ccl.wx.entity.Comment">
+    <!--@mbg.generated-->
+    <!--@Table comment-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="diary_id" jdbcType="BIGINT" property="diaryId" />
+    <result column="comment_content" jdbcType="VARCHAR" property="commentContent" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="comment_createtime" jdbcType="TIMESTAMP" property="commentCreatetime" />
+    <result column="comment_deltime" jdbcType="TIMESTAMP" property="commentDeltime" />
+    <result column="comment_status" jdbcType="INTEGER" property="commentStatus" />
+    <result column="comment_like" jdbcType="BIGINT" property="commentLike" />
+    <result column="comment_type" jdbcType="INTEGER" property="commentType" />
+    <result column="comment_circle" jdbcType="BIGINT" property="commentCircle" />
+    <result column="circle_id" jdbcType="BIGINT" property="circleId" />
+    <result column="comment_image" jdbcType="VARCHAR" property="commentImage" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, diary_id, comment_content, user_id, comment_createtime, comment_deltime, comment_status, 
+    comment_like, comment_type, comment_circle, circle_id, comment_image
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from comment
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    <!--@mbg.generated-->
+    delete from comment
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.Comment" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into comment (diary_id, comment_content, user_id, 
+      comment_createtime, comment_deltime, 
+      comment_status, comment_like, comment_type, 
+      comment_circle, circle_id, comment_image
+      )
+    values (#{diaryId,jdbcType=BIGINT}, #{commentContent,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, 
+      #{commentCreatetime,jdbcType=TIMESTAMP}, #{commentDeltime,jdbcType=TIMESTAMP}, 
+      #{commentStatus,jdbcType=INTEGER}, #{commentLike,jdbcType=BIGINT}, #{commentType,jdbcType=INTEGER}, 
+      #{commentCircle,jdbcType=BIGINT}, #{circleId,jdbcType=BIGINT}, #{commentImage,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.Comment" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into comment
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="diaryId != null">
+        diary_id,
+      </if>
+      <if test="commentContent != null">
+        comment_content,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="commentCreatetime != null">
+        comment_createtime,
+      </if>
+      <if test="commentDeltime != null">
+        comment_deltime,
+      </if>
+      <if test="commentStatus != null">
+        comment_status,
+      </if>
+      <if test="commentLike != null">
+        comment_like,
+      </if>
+      <if test="commentType != null">
+        comment_type,
+      </if>
+      <if test="commentCircle != null">
+        comment_circle,
+      </if>
+      <if test="circleId != null">
+        circle_id,
+      </if>
+      <if test="commentImage != null">
+        comment_image,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="diaryId != null">
+        #{diaryId,jdbcType=BIGINT},
+      </if>
+      <if test="commentContent != null">
+        #{commentContent,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="commentCreatetime != null">
+        #{commentCreatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="commentDeltime != null">
+        #{commentDeltime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="commentStatus != null">
+        #{commentStatus,jdbcType=INTEGER},
+      </if>
+      <if test="commentLike != null">
+        #{commentLike,jdbcType=BIGINT},
+      </if>
+      <if test="commentType != null">
+        #{commentType,jdbcType=INTEGER},
+      </if>
+      <if test="commentCircle != null">
+        #{commentCircle,jdbcType=BIGINT},
+      </if>
+      <if test="circleId != null">
+        #{circleId,jdbcType=BIGINT},
+      </if>
+      <if test="commentImage != null">
+        #{commentImage,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ccl.wx.entity.Comment">
+    <!--@mbg.generated-->
+    update comment
+    <set>
+      <if test="diaryId != null">
+        diary_id = #{diaryId,jdbcType=BIGINT},
+      </if>
+      <if test="commentContent != null">
         comment_content = #{commentContent,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
         user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="commentCreatetime != null">
         comment_createtime = #{commentCreatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="commentDeltime != null">
         comment_deltime = #{commentDeltime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="commentStatus != null">
         comment_status = #{commentStatus,jdbcType=INTEGER},
+      </if>
+      <if test="commentLike != null">
         comment_like = #{commentLike,jdbcType=BIGINT},
+      </if>
+      <if test="commentType != null">
         comment_type = #{commentType,jdbcType=INTEGER},
+      </if>
+      <if test="commentCircle != null">
+        comment_circle = #{commentCircle,jdbcType=BIGINT},
+      </if>
+      <if test="circleId != null">
         circle_id = #{circleId,jdbcType=BIGINT},
-        comment_image = #{commentImage,jdbcType=VARCHAR}
-        where id = #{id,jdbcType=BIGINT}
-    </update>
+      </if>
+      <if test="commentImage != null">
+        comment_image = #{commentImage,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ccl.wx.entity.Comment">
+    <!--@mbg.generated-->
+    update comment
+    set diary_id = #{diaryId,jdbcType=BIGINT},
+      comment_content = #{commentContent,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=VARCHAR},
+      comment_createtime = #{commentCreatetime,jdbcType=TIMESTAMP},
+      comment_deltime = #{commentDeltime,jdbcType=TIMESTAMP},
+      comment_status = #{commentStatus,jdbcType=INTEGER},
+      comment_like = #{commentLike,jdbcType=BIGINT},
+      comment_type = #{commentType,jdbcType=INTEGER},
+      comment_circle = #{commentCircle,jdbcType=BIGINT},
+      circle_id = #{circleId,jdbcType=BIGINT},
+      comment_image = #{commentImage,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
 
     <!--auto generated by MybatisCodeHelper on 2020-01-18-->
     <select id="selectAllByDiaryId" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List" />
         from comment
         where diary_id=#{diaryId,jdbcType=BIGINT}
     </select>
@@ -178,7 +189,7 @@
     <!--auto generated by MybatisCodeHelper on 2020-01-18-->
     <select id="selectAllByDiaryIdAndCommentTypeOrderByCommentCreatetimeDesc" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List" />
         from comment
         where diary_id=#{diaryId,jdbcType=BIGINT} and comment_type=#{commentType,jdbcType=INTEGER} order by
         comment_createtime desc limit #{start,jdbcType=INTEGER},#{end,jdbcType=INTEGER}
@@ -187,7 +198,7 @@
     <!--auto generated by MybatisCodeHelper on 2020-01-21-->
     <select id="selectAllByCircleId" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List" />
         from comment
         where circle_id=#{circleId,jdbcType=BIGINT}
     </select>

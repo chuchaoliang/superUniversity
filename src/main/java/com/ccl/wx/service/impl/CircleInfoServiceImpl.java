@@ -1,10 +1,11 @@
 package com.ccl.wx.service.impl;
 
-import org.springframework.stereotype.Service;
-import javax.annotation.Resource;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.mapper.CircleInfoMapper;
 import com.ccl.wx.service.CircleInfoService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
  * @author 褚超亮
@@ -47,5 +48,9 @@ public class CircleInfoServiceImpl implements CircleInfoService {
         return circleInfoMapper.updateByPrimaryKey(record);
     }
 
+    @Override
+    public int updateThemeNumberByCircleId(Long circleId, Integer value) {
+        return circleInfoMapper.updateThemeNumberByCircleId(circleId, value);
+    }
 }
 

@@ -10,10 +10,11 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
 
 /**
  * 圈子今日内容相关
@@ -23,13 +24,13 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Api(tags = {"CircleThemeController【圈子主题相关操作信息】"})
 @RestController
-@RequestMapping("/wx")
+@RequestMapping("/wx/circle")
 public class CircleThemeController {
 
-    @Autowired
+    @Resource
     private UserDiaryService circleDiaryService;
 
-    @Autowired
+    @Resource
     private TodayContentService todayContentService;
 
     /**
@@ -47,6 +48,26 @@ public class CircleThemeController {
         return todayContentService.getTodayContentById(id);
     }
 
+
+    @GetMapping("/theme/user/signin")
+    public String getThemeUserSignInInfo() {
+        return "";
+    }
+
+    /**
+     * 根据圈子id获取圈子的主题信息
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/theme/get/all")
+    public String getAllThemeByCircle(@RequestParam(value = "circleId", required = false) Long circleId,
+                                      @RequestParam(value = "userId", required = false) String userId) {
+        return todayContentService.selectAllThemeByCircleIdDecorate(circleId, userId);
+    }
+
     /**
      * 根据圈子id获取主题信息
      *
@@ -60,24 +81,12 @@ public class CircleThemeController {
             @ApiImplicitParam(name = "circleId", value = "圈子Id", dataType = "long", example = "5"),
             @ApiImplicitParam(name = "page", value = "第几页", dataType = "int", example = "0")
     })
-    @GetMapping("/getallthemepage")
-    public String getAllThemeByCircleIdPage(@ParamCheck @RequestParam(value = "circleId", required = false) Long circleId,
-                                            @ParamCheck @RequestParam(value = "userId", required = false) String userId,
-                                            @ParamCheck @RequestParam(value = "page", required = false) Integer page) {
+    @ParamCheck
+    @GetMapping("/theme/get/all/page")
+    public String getAllThemeByCircleIdPage(@RequestParam(value = "circleId", required = false) Long circleId,
+                                            @RequestParam(value = "userId", required = false) String userId,
+                                            @RequestParam(value = "page", required = false) Integer page) {
         return todayContentService.selectAllThemeByCircleIdPage(circleId, userId, page);
-    }
-
-    /**
-     * 根据圈子id获取圈子的主题信息
-     *
-     * @param circleId 圈子id
-     * @param userId   用户id
-     * @return
-     */
-    @GetMapping("/getalltheme")
-    public String getAllThemeByCircle(@ParamCheck @RequestParam(value = "circleId", required = false) Long circleId,
-                                      @ParamCheck @RequestParam(value = "userId", required = false) String userId) {
-        return todayContentService.selectAllThemeByCircleId(circleId, userId);
     }
 
     /**
@@ -95,7 +104,8 @@ public class CircleThemeController {
     })
     @SneakyThrows
     @GetMapping("/getallcontent")
-    public String getAllTodayAllContent(@ParamCheck @RequestParam(value = "circleId", required = false) Long circleId, @RequestParam(value = "sign", required = false) String sign) {
+    public String getAllTodayAllContent(@ParamCheck @RequestParam(value = "circleId", required = false) Long circleId,
+                                        @RequestParam(value = "sign", required = false) String sign) {
         return todayContentService.getCircleTheme(circleId, sign);
     }
 
@@ -107,10 +117,12 @@ public class CircleThemeController {
      * @return
      */
     @ApiOperation(value = "根据id删除主题")
+    @ParamCheck
     @ApiImplicitParam(name = "contentId", value = "圈子主题Id", dataType = "Long", example = "1")
-    @GetMapping("/delcontentbyid")
-    public String deleteTodayContentById(@ParamCheck @RequestParam(value = "contentId", required = false) Long contentId) {
-        return todayContentService.deleteCircleTheme(contentId);
+    @GetMapping("/theme/del")
+    public String deleteTodayContentById(@RequestParam(value = "circleId", required = false) Long circleId,
+                                         @RequestParam(value = "contentId", required = false) Long contentId) {
+        return todayContentService.deleteCircleTheme(circleId, contentId);
     }
 
     /**
@@ -123,10 +135,12 @@ public class CircleThemeController {
      * @param todayContent 每日内容对象
      * @return
      */
-    @ApiOperation(value = "添加圈子主题")
-    @PostMapping("/savetodaycontent")
-    public String saveTodayContent(@RequestBody(required = false) TodayContent todayContent) {
-        return todayContentService.saveCircleTheme(todayContent);
+    @ApiOperation(value = "添加圈子主题内容和标题")
+    @PostMapping("/theme/add/content")
+    public String saveTodayContent(TodayContent todayContent,
+                                   @RequestParam(value = "userId", required = false) String userId,
+                                   @RequestPart(value = "image", required = false) MultipartFile image) {
+        return todayContentService.saveCircleThemeContent(todayContent, userId, image);
     }
 
     /**
