@@ -144,6 +144,34 @@ public class CircleThemeController {
     }
 
     /**
+     * @param userId 用户id
+     * @param id     圈子主题id
+     * @param voice  音频文件
+     * @return
+     */
+    @ApiOperation(value = "保存圈子主题的音频")
+    @PostMapping("/theme/add/voice")
+    public String saveCircleThemeVoice(@RequestParam(value = "userId", required = false) String userId,
+                                       @RequestParam(value = "id", required = false) Integer id,
+                                       @RequestPart(value = "voice", required = false) MultipartFile voice) {
+        return todayContentService.saveCircleThemeVoice(userId, id, voice);
+    }
+
+    /**
+     * @param userId 用户id
+     * @param id     主题id
+     * @param video  视频文件
+     * @return
+     */
+    @ApiOperation(value = "保存圈子主题的视频")
+    @PostMapping("/theme/add/video")
+    public String saveCircleThemeVideo(@RequestParam(value = "userId", required = false) String userId,
+                                       @RequestParam(value = "id", required = false) Integer id,
+                                       @RequestPart(value = "video", required = false) MultipartFile video) {
+        return todayContentService.saveCircleThemeVideo(userId, id, video);
+    }
+
+    /**
      * TODO
      * 上传每日内容的图片
      *
@@ -153,26 +181,11 @@ public class CircleThemeController {
      * @return success fail
      */
     @ApiOperation(value = "保存圈子主题图片")
-    @PostMapping("/savetodayimage")
+    @PostMapping("/theme/add/image")
     public String saveTodayImage(@RequestPart(value = "image", required = false) MultipartFile image,
-                                 @ParamCheck @RequestParam(value = "userid", required = false) String userId,
+                                 @ParamCheck @RequestParam(value = "userId", required = false) String userId,
                                  @ParamCheck @RequestParam(value = "id", required = false) Long id) {
         return todayContentService.saveEverydayImage(image, userId, id);
-    }
-
-    /**
-     * 保存圈子标题图片
-     *
-     * @param image
-     * @param userId
-     * @param id
-     * @return
-     */
-    @PostMapping("/savethemehimage")
-    public String saveThemeHeadImage(@RequestPart(value = "image", required = false) MultipartFile image,
-                                     @ParamCheck @RequestParam(value = "userId", required = false) String userId,
-                                     @ParamCheck @RequestParam(value = "id", required = false) Long id) {
-        return todayContentService.saveThemeHeadImage(image, userId, id);
     }
 
     /**

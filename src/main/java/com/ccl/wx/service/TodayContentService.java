@@ -69,16 +69,6 @@ public interface TodayContentService {
     String getCircleTheme(Long circleId, String sign);
 
     /**
-     * 保存圈子主题标题图片
-     *
-     * @param image
-     * @param userId
-     * @param id
-     * @return
-     */
-    String saveThemeHeadImage(MultipartFile image, String userId, Long id);
-
-    /**
      * 增加圈子主题浏览量
      *
      * @param userId
@@ -126,6 +116,26 @@ public interface TodayContentService {
      * @return
      */
     String selectAllThemeByCircleIdDecorate(Long circleId, String userId);
+
+    /**
+     * 保存主题音频文件
+     *
+     * @param userId 用户id
+     * @param id     主题id
+     * @param voice  音频文件
+     * @return
+     */
+    String saveCircleThemeVoice(String userId, Integer id, MultipartFile voice);
+
+    /**
+     * 保存主题视频文件
+     *
+     * @param userId 用户id
+     * @param id     主题id
+     * @param video  视频文件
+     * @return
+     */
+    String saveCircleThemeVideo(String userId, Integer id, MultipartFile video);
 }
 
 
