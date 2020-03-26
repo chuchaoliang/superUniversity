@@ -185,10 +185,11 @@ public interface UserDiaryMapper {
     List<String> selectUserSignInIdByDate(@Param("circleId") Long circleId, @Param("date") String date);
 
     /**
-     * 查询主题id下的全部日志总数
+     * 查询主题id和圈子id下的全部日志总数
      *
-     * @param themeId 主题id
+     * @param themeId  主题id
+     * @param circleId 圈子id
      * @return
      */
-    int countByThemeIdAndDiaryStatus(@Param("themeId") Integer themeId);
+    int countByThemeIdAndDiaryStatus(@Param("themeId") Integer themeId, @Param("circleId") Integer circleId);
 }

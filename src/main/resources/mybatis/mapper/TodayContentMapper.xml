@@ -271,7 +271,7 @@
         select
         <include refid="Base_Column_List"/>
         from today_content
-        where circle_id=#{circleId,jdbcType=BIGINT} order by create_time desc
+        where circle_id=#{circleId,jdbcType=BIGINT} and content_status = #{contentStatus,jdbcType=INTEGER} order by create_time desc
         limit #{start,jdbcType=INTEGER},#{pageNumber,jdbcType=INTEGER}
     </select>
 </mapper>

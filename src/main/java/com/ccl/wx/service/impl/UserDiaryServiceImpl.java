@@ -105,8 +105,8 @@ public class UserDiaryServiceImpl implements UserDiaryService {
     }
 
     @Override
-    public int countByThemeIdAndDiaryStatus(Integer themeId) {
-        return userDiaryMapper.countByThemeIdAndDiaryStatus(themeId);
+    public int countByThemeIdAndDiaryStatus(Integer themeId, Integer userId) {
+        return userDiaryMapper.countByThemeIdAndDiaryStatus(themeId, userId);
     }
 
     @Override

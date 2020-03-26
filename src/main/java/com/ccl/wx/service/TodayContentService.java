@@ -35,10 +35,11 @@ public interface TodayContentService {
     /**
      * 根据圈子主题的id获取主题信息
      *
-     * @param id
+     * @param themeId  主题id
+     * @param circleId 圈子id
      * @return
      */
-    String getTodayContentById(Long id);
+    String selectCircleThemeInfoById(Long themeId, Long circleId);
 
     /**
      * 保存圈子主题内容
@@ -100,24 +101,6 @@ public interface TodayContentService {
     String selectAllThemeByCircleIdPage(Long circleId, String userId, Integer page);
 
     /**
-     * 根据圈子id获取全部主题信息
-     *
-     * @param circleId 圈子id
-     * @param userId   用户id
-     * @return
-     */
-    String selectAllThemeByCircleId(Long circleId, String userId);
-
-    /**
-     * 根据圈子id获取全部主题id 装饰得到用户是否打卡此主题
-     *
-     * @param circleId 圈子id
-     * @param userId   用户id
-     * @return
-     */
-    String selectAllThemeByCircleIdDecorate(Long circleId, String userId);
-
-    /**
      * 保存主题音频文件
      *
      * @param userId 用户id
@@ -136,6 +119,23 @@ public interface TodayContentService {
      * @return
      */
     String saveCircleThemeVideo(String userId, Integer id, MultipartFile video);
+
+    /**
+     * 获取圈子默认主题
+     *
+     * @param circleId 圈子id
+     * @return
+     */
+    TodayContent selectCircleDefaultThemeInfo(Long circleId);
+
+    /**
+     * 获取圈子首页主题相关信息
+     *
+     * @param userId   用户id
+     * @param circleId 圈子id
+     * @return
+     */
+    String selectAllThemeByCircleHome(String userId, Long circleId);
 }
 
 

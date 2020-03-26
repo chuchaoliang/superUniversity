@@ -12,7 +12,7 @@ import java.util.Date;
  */
 @ApiModel(value = "com-ccl-wx-dto-CircleThemeDTO")
 @Data
-public class CircleThemeDTO {
+public class circleThemeDTO {
     /**
      * 今日内容主键
      */

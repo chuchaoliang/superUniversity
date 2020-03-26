@@ -12,6 +12,11 @@ public enum EnumPage {
     PAGE_NUMBER(10),
 
     /**
+     * 圈子主页展示的主题总数
+     */
+    CIRCLE_HOME_THEME(5),
+
+    /**
      * 作用于用户排名，只计算前200名，如果超过200名，变成9999
      */
     LAST_NUMBER(200);

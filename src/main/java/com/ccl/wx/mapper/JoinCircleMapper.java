@@ -285,4 +285,12 @@ public interface JoinCircleMapper {
      * @return
      */
     List<Map> getUserFailSignInByDate(@Param("circleId") Long circleId, @Param("date") String date, @Param("start") Integer start, @Param("page") Integer page);
+
+    /**
+     * 获取圈子中所有的管理人员信息
+     * TODO 用户管理员待修改
+     * @param userPermission 用户权限
+     * @return
+     */
+    List<String> getUserIdByUserPermission(@Param("userPermission") Integer userPermission);
 }
