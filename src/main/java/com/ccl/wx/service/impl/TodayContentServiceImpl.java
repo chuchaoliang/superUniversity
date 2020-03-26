@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.dto.CircleThemeDTO;
 import com.ccl.wx.dto.CircleTodayContentDTO;
+import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.entity.JoinCircle;
 import com.ccl.wx.entity.TodayContent;
 import com.ccl.wx.enums.*;
@@ -84,9 +85,13 @@ public class TodayContentServiceImpl implements TodayContentService {
         boolean flag;
         flag = "".equals(todayContent.getTodayImage());
         String imagePath = FtpUtil.uploadFile(userId, image);
+        if (imagePath.equals(EnumResultStatus.FAIL.getValue())) {
+            // 文件上传失败
+            return EnumResultStatus.FAIL.getValue();
+        }
         // 拼接字符串
         todayContentMapper.concatImage(id, imagePath, flag);
-        return "success";
+        return EnumResultStatus.SUCCESS.getValue();
     }
 
     @Override
@@ -141,11 +146,14 @@ public class TodayContentServiceImpl implements TodayContentService {
         // 查找此主题
         TodayContent todayContent = todayContentMapper.selectByPrimaryKey(themeId);
         // 要删除的主题不存在？？
-        if (todayContent == null) {
-            return EnumResultStatus.UNMEANING.getValue();
+        if (todayContent == null || EnumThemeStatus.DELETE_STATUS.getValue() == todayContent.getContentStatus()) {
+            return EnumResultStatus.UNKNOWN.getValue();
         }
-        // 圈子主题-1
-        circleInfoService.updateThemeNumberByCircleId(circleId, Integer.parseInt(EnumCommon.UPDATE_SUB.getValue()));
+        CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
+        if (circleInfo.getThemeSum() > 1) {
+            // 圈子主题-1
+            circleInfoService.updateThemeNumberByCircleId(circleId, Integer.parseInt(EnumCommon.UPDATE_SUB.getValue()));
+        }
         // 设置删除主题后，更新全部主题状态为主题删除状态并且仅仅自己可见
         userDiaryService.updateDiaryStatusByThemeId(themeId.intValue(), EnumUserDiary.USER_DIARY_THEME_DELETE.getValue());
         // 主题设置为删除状态
@@ -183,24 +191,6 @@ public class TodayContentServiceImpl implements TodayContentService {
     }
 
     @Override
-    public String saveThemeHeadImage(MultipartFile image, String userId, Long id) {
-        TodayContent todayContent = todayContentMapper.selectByPrimaryKey(id);
-        if (StringUtils.isEmpty(todayContent.getHeadImage())) {
-            // 圈子主题头像为空
-            String imagePath = FtpUtil.uploadFile(userId, image);
-            todayContent.setHeadImage(imagePath);
-            todayContentMapper.updateByPrimaryKeySelective(todayContent);
-        } else {
-            // 删除图片之后在更新图片
-            FtpUtil.delFile(todayContent.getHeadImage());
-            String imagePath = FtpUtil.uploadFile(userId, image);
-            todayContent.setHeadImage(imagePath);
-            todayContentMapper.updateByPrimaryKeySelective(todayContent);
-        }
-        return "success";
-    }
-
-    @Override
     public void addCircleThemeBrowse(String userId, Long themeId) {
         // 增加浏览量 TODO
         TodayContent todayContent = todayContentMapper.selectByPrimaryKey(themeId);
@@ -231,7 +221,8 @@ public class TodayContentServiceImpl implements TodayContentService {
             }
             // 删除此主题的头像、视频、和音频信息
             String headImage = todayContent.getHeadImage();
-            if (!StringUtils.isEmpty(headImage)) {
+            // 判断圈子标题是否等于默认图片，并且判断是否为空
+            if (!StringUtils.isEmpty(headImage) && !defaultProperties.getDefaultImage().equals(headImage)) {
                 FtpUtil.delFile(headImage);
             }
             String themeVideo = todayContent.getThemeVideo();
@@ -299,6 +290,50 @@ public class TodayContentServiceImpl implements TodayContentService {
             circleThemeDTOS.add(circleThemeDTO);
         }
         return JSON.toJSONStringWithDateFormat(circleThemeDTOS, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+    }
+
+    @Override
+    public String saveCircleThemeVoice(String userId, Integer id, MultipartFile voice) {
+        if (voice != null) {
+            TodayContent todayContent = todayContentMapper.selectByPrimaryKey(id.longValue());
+            if (StringUtils.isEmpty(todayContent.getThemeVoice())) {
+                String voicePath = FtpUtil.uploadFile(userId, voice);
+                if (!EnumResultStatus.FAIL.getValue().equals(voicePath)) {
+                    // 上传成功
+                    todayContent.setThemeVoice(voicePath);
+                    todayContentMapper.updateByPrimaryKeySelective(todayContent);
+                } else {
+                    // 上传失败
+                    return EnumResultStatus.FAIL.getValue();
+                }
+            } else {
+                return EnumResultStatus.UNKNOWN.getValue();
+            }
+        }
+        // voice文件为空出现未知错误
+        return EnumResultStatus.UNKNOWN.getValue();
+    }
+
+    @Override
+    public String saveCircleThemeVideo(String userId, Integer id, MultipartFile video) {
+        if (video != null) {
+            TodayContent todayContent = todayContentMapper.selectByPrimaryKey(id.longValue());
+            if (StringUtils.isEmpty(todayContent.getThemeVideo())) {
+                String videoPath = FtpUtil.uploadFile(userId, video);
+                if (!EnumResultStatus.FAIL.getValue().equals(videoPath)) {
+                    // 上传成功
+                    todayContent.setThemeVideo(videoPath);
+                    todayContentMapper.updateByPrimaryKeySelective(todayContent);
+                } else {
+                    // 上传失败
+                    return EnumResultStatus.FAIL.getValue();
+                }
+            } else {
+                return EnumResultStatus.UNKNOWN.getValue();
+            }
+        }
+        // video文件为空出现未知错误
+        return EnumResultStatus.UNKNOWN.getValue();
     }
 }
 
