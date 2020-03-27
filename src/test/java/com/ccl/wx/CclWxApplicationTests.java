@@ -18,6 +18,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.IntSummaryStatistics;
+import java.util.List;
+
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -62,7 +66,11 @@ public class CclWxApplicationTests {
 
     @Test
     public void test1() {
-        System.out.println(defaultProperties.toString());
+        List<Integer> its = Arrays.asList(1, 2, 3, 4, 5);
+        IntSummaryStatistics intSummaryStatistics = its.stream().mapToInt((x) -> x).summaryStatistics();
+        System.out.println(intSummaryStatistics.getMax());
+        System.out.println(intSummaryStatistics.getCount());
+        System.out.println(intSummaryStatistics.getMin());
     }
 
     @SneakyThrows

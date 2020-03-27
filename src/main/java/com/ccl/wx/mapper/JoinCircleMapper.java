@@ -288,9 +288,10 @@ public interface JoinCircleMapper {
 
     /**
      * 获取圈子中所有的管理人员信息
-     * TODO 用户管理员待修改
-     * @param userPermission 用户权限
+     *
+     * @param circleId       圈子id
+     * @param userPermission 用户权限列表
      * @return
      */
-    List<String> getUserIdByUserPermission(@Param("userPermission") Integer userPermission);
+    List<JoinCircle> selectUserIdByUserPermission(@Param("circleId") Integer circleId, @Param("userPermission") List<Integer> userPermission);
 }

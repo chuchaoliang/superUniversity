@@ -249,7 +249,7 @@ public class TodayContentServiceImpl implements TodayContentService {
     }
 
     @Override
-    public String selectAllThemeByCircleIdPage(Long circleId, String userId, Integer page) {
+    public String selectAllThemeByCircleIdPage(Long circleId, String userId, Integer page, Boolean signIn) {
         // 查询用户加入圈子的信息
         JoinCircle joinCircle = joinCircleService.selectByPrimaryKey(circleId, userId);
         // 判断此用户今日打卡主题是否为空
@@ -284,11 +284,6 @@ public class TodayContentServiceImpl implements TodayContentService {
                     circleThemeVO.setSignInSuccess(true);
                 }
             }
-            circleThemeVO.setCircleMaster(false);
-            // 判断是否为圈主
-            if (userId.equals(circleInfo.getCircleUserid())) {
-                circleThemeVO.setCircleMaster(true);
-            }
             circleThemeVO.setDefaultTheme(false);
             // 判断是否为默认主题
             if (defaultProperties.getDefaultThemeId().equals(todayContent.getId().intValue())) {
@@ -299,6 +294,14 @@ public class TodayContentServiceImpl implements TodayContentService {
         List<Object> themeList = new ArrayList<>();
         themeList.add(circleThemeVOS);
         themeList.add(nextPage);
+        if (!signIn) {
+            // 获取圈子的管理人员信息
+            List<Integer> permissionList = new ArrayList<>();
+            permissionList.add(EnumUserPermission.ADMIN_USER.getValue());
+            permissionList.add(EnumUserPermission.MASTER_USER.getValue());
+            // 判断是否为圈子管理人员（管理员、圈主）
+            themeList.add(joinCircleService.judgeUserIsCircleManage(circleId.intValue(), permissionList, userId));
+        }
         return JSON.toJSONStringWithDateFormat(themeList, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
     }
 

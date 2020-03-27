@@ -58,11 +58,12 @@ public class CircleThemeController {
      * @return
      */
     @ParamCheck
+    @ApiOperation(value = "用户打卡获取主题相关信息")
     @GetMapping("/theme/user/signin")
     public String getThemeUserSignInInfo(@RequestParam(value = "userId", required = false) String userId,
                                          @RequestParam(value = "circleId", required = false) Long circleId,
                                          @RequestParam(value = "page", required = false) Integer page) {
-        return todayContentService.selectAllThemeByCircleIdPage(circleId, userId, page);
+        return todayContentService.selectAllThemeByCircleIdPage(circleId, userId, page, true);
     }
 
     /**
@@ -73,6 +74,7 @@ public class CircleThemeController {
      * @return
      */
     @ParamCheck
+    @ApiOperation(value = "获取圈子首页的主题")
     @GetMapping("/theme/get/home")
     public String getAllCircleHomeTheme(@RequestParam(value = "circleId", required = false) Long circleId,
                                         @RequestParam(value = "userId", required = false) String userId) {
@@ -98,7 +100,7 @@ public class CircleThemeController {
     public String getAllThemeByCircleIdPage(@RequestParam(value = "circleId", required = false) Long circleId,
                                             @RequestParam(value = "userId", required = false) String userId,
                                             @RequestParam(value = "page", required = false) Integer page) {
-        return todayContentService.selectAllThemeByCircleIdPage(circleId, userId, page);
+        return todayContentService.selectAllThemeByCircleIdPage(circleId, userId, page, false);
     }
 
     /**

@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author 褚超亮
@@ -105,6 +106,21 @@ public class JoinCircleServiceImpl implements JoinCircleService {
     @Override
     public List<Map> getUserSignInInfo(Long circleId, String userId) {
         return joinCircleMapper.getUserSignInInfo(circleId, userId);
+    }
+
+    @Override
+    public List<JoinCircle> selectUserIdByUserPermission(Integer circleId, List<Integer> userPermission) {
+        return joinCircleMapper.selectUserIdByUserPermission(circleId, userPermission);
+    }
+
+    @Override
+    public Boolean judgeUserIsCircleManage(Integer circleId, List<Integer> userPermission, String userId) {
+        List<JoinCircle> joinCircles = joinCircleMapper.selectUserIdByUserPermission(circleId, userPermission);
+        List<String> userIds = joinCircles.stream().map(JoinCircle::getUserId).collect(Collectors.toList());
+        if (userIds.contains(userId)) {
+            return true;
+        }
+        return false;
     }
 
     /**
