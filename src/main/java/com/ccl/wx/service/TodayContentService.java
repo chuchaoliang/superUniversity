@@ -96,9 +96,12 @@ public interface TodayContentService {
      * 根据圈子id分页获取全部主题信息
      *
      * @param circleId 圈子id
+     * @param userId   用户id
+     * @param page     第几页
+     * @param signIn   是否为打卡 是打卡（true）否（false）
      * @return
      */
-    String selectAllThemeByCircleIdPage(Long circleId, String userId, Integer page);
+    String selectAllThemeByCircleIdPage(Long circleId, String userId, Integer page, Boolean signIn);
 
     /**
      * 保存主题音频文件

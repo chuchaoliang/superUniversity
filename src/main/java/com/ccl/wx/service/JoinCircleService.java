@@ -29,9 +29,9 @@ public interface JoinCircleService {
     /**
      * 拼接圈子id
      *
-     * @param circleId
-     * @param userId
-     * @param themeId
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param themeId  主题id
      * @param flag
      * @return
      */
@@ -50,8 +50,8 @@ public interface JoinCircleService {
     /**
      * 更新圈子全部成员打卡状态
      *
-     * @param circleId
-     * @param signInStatus
+     * @param circleId     圈子id
+     * @param signInStatus 打卡状态
      * @return
      */
     int updateCircleSignInStatus(Long circleId, Integer signInStatus);
@@ -117,10 +117,10 @@ public interface JoinCircleService {
     /**
      * 获取某人的连续打卡排名信息
      *
-     * @param circleId
-     * @param userId
-     * @param start
-     * @param pageNumber
+     * @param circleId   圈子id
+     * @param userId     用户id
+     * @param start      开始数目
+     * @param pageNumber 页数
      * @return
      */
     List<Map> getUserSignInRankingInfo(Long circleId, String userId, Integer start, Integer pageNumber);
@@ -173,4 +173,23 @@ public interface JoinCircleService {
      * @return
      */
     String getUserSignStatisticsFailInfo(Long circleId, String userId, Date date, Integer page);
+
+    /**
+     * 根据用户加入圈子状态和圈子id查找用户
+     *
+     * @param circleId       圈子id
+     * @param userPermission 用户加入圈子状态
+     * @return
+     */
+    List<JoinCircle> selectUserIdByUserPermission(Integer circleId, List<Integer> userPermission);
+
+    /**
+     * 判断某位用户是否为圈子管理人员
+     *
+     * @param circleId       圈子id
+     * @param userPermission 用户权限
+     * @param userId         用户id
+     * @return
+     */
+    Boolean judgeUserIsCircleManage(Integer circleId, List<Integer> userPermission, String userId);
 }
