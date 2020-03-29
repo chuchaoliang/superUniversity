@@ -294,4 +294,13 @@ public interface JoinCircleMapper {
      * @return
      */
     List<JoinCircle> selectUserIdByUserPermission(@Param("circleId") Integer circleId, @Param("userPermission") List<Integer> userPermission);
+
+    /**
+     * 根据圈子id和用户状态得到用户圈子总活跃度
+     *
+     * @param circleId   圈子id
+     * @param userStatus 用户状态
+     * @return
+     */
+    Long sumUserVitalityByCircleIdAndUserStatus(@Param("circleId") Long circleId, @Param("userStatus") Integer userStatus);
 }

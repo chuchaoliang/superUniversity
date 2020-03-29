@@ -108,6 +108,11 @@ public class UserDiaryServiceImpl implements UserDiaryService {
     }
 
     @Override
+    public List<UserDiary> selectAllByCircleIdAndDiaryStatus(Long circleId, List<Integer> diaryStatus) {
+        return userDiaryMapper.selectAllByCircleIdAndDiaryStatus(circleId, diaryStatus);
+    }
+
+    @Override
     public String updateCircleDiaryContent(UserDiaryDTO userDiaryDTO) {
         // 根据id查询日记内容
         UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(userDiaryDTO.getId());

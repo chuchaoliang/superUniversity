@@ -467,4 +467,9 @@
             </foreach>
         </where>
     </select>
+    <select id="sumUserVitalityByCircleIdAndUserStatus" resultType="java.lang.Long">
+        select sum(user_vitality)
+        from join_circle
+        where circle_id = #{circleId,jdbcType=BIGINT} and user_status = #{userStatus,jdbcType=INTEGER}
+    </select>
 </mapper>

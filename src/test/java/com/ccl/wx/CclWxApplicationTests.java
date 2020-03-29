@@ -1,20 +1,20 @@
 package com.ccl.wx;
 
-import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.mapper.*;
 import com.ccl.wx.properties.DefaultProperties;
 import com.ccl.wx.service.CircleScheduleService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.TodayContentService;
 import com.ccl.wx.service.UserDiaryService;
-import com.ccl.wx.util.CclUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +24,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 
 @Slf4j
-//@RunWith(SpringRunner.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest
 public class CclWxApplicationTests {
 
@@ -65,20 +65,16 @@ public class CclWxApplicationTests {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    private UserDiaryMapper userDiaryMapper;
+
     @Test
     public void test1() {
-        UserInfo userInfo = new UserInfo();
-        userInfo.setId("aa");
-        userInfo.setNickname("aa");
-        userInfo.setAvatarurl("aa");
-        userInfo.setGender("1");
-        userInfo.setProvince("1");
-        //userInfo.setCity();
-        //userInfo.setCountry();
-        ArrayList<String> str = new ArrayList<>();
-        str.add("city");
-        str.add("country");
-        System.out.println(CclUtil.classPropertyIsNullReturn(userInfo, str));
+        ArrayList<Integer> ite = new ArrayList<>();
+        ite.add(0);
+        ite.add(1);
+        int size = userDiaryMapper.selectAllByCircleIdAndDiaryStatus(5L, ite).size();
+        System.out.println(size);
     }
 
     @SneakyThrows

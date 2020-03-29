@@ -2,7 +2,10 @@ package com.ccl.wx.service;
 
 import com.ccl.wx.dto.CircleTodayContentDTO;
 import com.ccl.wx.entity.TodayContent;
+import com.ccl.wx.vo.CircleThemeVO;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * @author 褚超亮
@@ -139,7 +142,7 @@ public interface TodayContentService {
      * @param circleId 圈子id
      * @return
      */
-    String selectAllThemeByCircleHome(String userId, Long circleId);
+    List<CircleThemeVO> selectAllThemeByCircleHome(String userId, Long circleId);
 
     /**
      * 编辑更新圈子每日内容

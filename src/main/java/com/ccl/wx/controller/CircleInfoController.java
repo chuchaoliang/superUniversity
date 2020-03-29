@@ -1,20 +1,21 @@
 package com.ccl.wx.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.ccl.wx.entity.JoinCircle;
-import com.ccl.wx.mapper.CircleInfoMapper;
-import com.ccl.wx.mapper.JoinCircleMapper;
-import com.ccl.wx.service.impl.CircleServiceImpl;
+import com.ccl.wx.annotation.ParamCheck;
 import com.ccl.wx.entity.CircleInfo;
+import com.ccl.wx.entity.JoinCircle;
+import com.ccl.wx.service.CircleInfoService;
+import com.ccl.wx.service.JoinCircleService;
+import com.ccl.wx.service.impl.CircleServiceImpl;
 import com.ccl.wx.util.CclUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,14 +30,14 @@ import java.util.List;
 @RequestMapping("/wx/circle")
 public class CircleInfoController {
 
-    @Autowired
-    private CircleInfoMapper circleInfoMapper;
+    @Resource
+    private JoinCircleService joinCircleService;
 
-    @Autowired
-    private JoinCircleMapper joinCircleMapper;
-
-    @Autowired
+    @Resource
     private CircleServiceImpl circleService;
+
+    @Resource
+    private CircleInfoService circleInfoService;
 
     /**
      * 创建圈子 将圈子活力设置为0 等等。。。
@@ -74,7 +75,8 @@ public class CircleInfoController {
      */
     @GetMapping("/checkqzname")
     public String checkCircleNameRepetition(@RequestParam(value = "circlename", required = false) String circlename) {
-        List<String> circleNames = circleInfoMapper.selectAllCircleName();
+        // TODO 将圈子所有名称存储到缓存中比较好待解决
+        List<String> circleNames = circleInfoService.selectAllCircleName();
         if (circleNames.contains(circlename)) {
             return "fail";
         } else {
@@ -85,7 +87,7 @@ public class CircleInfoController {
     /**
      * 根据圈子id查找圈子数据
      *
-     * @param id 圈子id
+     * @param circleId 圈子id
      * @return
      */
     @ApiOperation(value = "根据圈子id查找圈子数据")
@@ -93,20 +95,11 @@ public class CircleInfoController {
             @ApiImplicitParam(name = "id", value = "圈子id", dataType = "String", example = "3"),
             @ApiImplicitParam(name = "userId", value = "用户id", dataType = "String", example = "o1x2q5czO_xCH9eemeEfL41_gvMk")
     })
-    @GetMapping("/getcircle")
-    public String getCircle(@RequestParam(value = "id", required = false) String id,
+    @ParamCheck
+    @GetMapping("/home")
+    public String getCircle(@RequestParam(value = "circleId", required = false) Long circleId,
                             @RequestParam(value = "userId", required = false) String userId) {
-        if (StringUtils.isEmpty(id) || StringUtils.isEmpty(userId)) {
-            return "fail";
-        } else {
-            return circleService.getCircleIndexAllContent(userId, id);
-        }
-    }
-
-    @GetMapping("/test")
-    public String test(@RequestHeader(value = "token") String token) {
-        System.out.println(token);
-        return "test";
+        return circleInfoService.getCircleIndexAllContent(userId, circleId.intValue());
     }
 
     /**
@@ -120,7 +113,7 @@ public class CircleInfoController {
         if (StringUtils.isEmpty(tid)) {
             return "fail";
         } else {
-            List<CircleInfo> circles = circleInfoMapper.findAllByCircleLocation(Integer.parseInt(tid));
+            List<CircleInfo> circles = circleInfoService.findAllByCircleLocation(Integer.parseInt(tid));
             String circlesDTO = circleService.selectCircleDTO(circles);
             return circlesDTO;
         }
@@ -137,7 +130,7 @@ public class CircleInfoController {
         if (StringUtils.isEmpty(keyword)) {
             return "fail";
         } else {
-            List<CircleInfo> circles = circleInfoMapper.selectAllLikeAndCircleName(keyword);
+            List<CircleInfo> circles = circleInfoService.selectAllLikeAndCircleName(keyword);
             String circlesDTO = circleService.selectCircleDTO(circles);
             return circlesDTO;
         }
@@ -156,7 +149,7 @@ public class CircleInfoController {
         if (StringUtils.isEmpty(keyword) || StringUtils.isEmpty(ctype)) {
             return "fail";
         }
-        List<CircleInfo> circles = circleInfoMapper.selectAllByCircleNameLikeAndCircleLocation(keyword, Integer.parseInt(ctype));
+        List<CircleInfo> circles = circleInfoService.selectAllByCircleNameLikeAndCircleLocation(keyword, Integer.parseInt(ctype));
         String circlesDTO = circleService.selectCircleDTO(circles);
         return circlesDTO;
     }
@@ -175,12 +168,12 @@ public class CircleInfoController {
         } else {
             ArrayList<Long> circleids = new ArrayList<>();
             ArrayList<CircleInfo> circleInfos = new ArrayList<>();
-            List<JoinCircle> circles = joinCircleMapper.selectAllByUserIdAndUserPermission(userid, 0);
+            List<JoinCircle> circles = joinCircleService.selectAllByUserIdAndUserPermission(userid, 0);
             for (JoinCircle circle : circles) {
                 circleids.add(circle.getCircleId());
             }
             for (Long circleid : circleids) {
-                CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleid);
+                CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleid);
                 circleInfos.add(circleInfo);
             }
             String circlesDTO = circleService.selectCircleDTO(circleInfos);
@@ -202,12 +195,12 @@ public class CircleInfoController {
         } else {
             ArrayList<Long> circleids = new ArrayList<>();
             ArrayList<CircleInfo> circleInfos = new ArrayList<>();
-            List<JoinCircle> circles = joinCircleMapper.selectAllByUserIdAndUserPermission(userid, 2);
+            List<JoinCircle> circles = joinCircleService.selectAllByUserIdAndUserPermission(userid, 2);
             for (JoinCircle circle : circles) {
                 circleids.add(circle.getCircleId());
             }
             for (Long circleid : circleids) {
-                CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleid);
+                CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleid);
                 circleInfos.add(circleInfo);
             }
             String circlesDTO = circleService.selectCircleDTO(circleInfos);
@@ -229,14 +222,14 @@ public class CircleInfoController {
         } else {
             ArrayList<Long> circleids = new ArrayList<>();
             ArrayList<CircleInfo> circleInfos = new ArrayList<>();
-            List<JoinCircle> circles = joinCircleMapper.selectAllByUserIdAndUserPermission(userid, 0);
-            List<JoinCircle> foundCircles = joinCircleMapper.selectAllByUserIdAndUserPermission(userid, 2);
+            List<JoinCircle> circles = joinCircleService.selectAllByUserIdAndUserPermission(userid, 0);
+            List<JoinCircle> foundCircles = joinCircleService.selectAllByUserIdAndUserPermission(userid, 2);
             circles.addAll(foundCircles);
             for (JoinCircle circle : circles) {
                 circleids.add(circle.getCircleId());
             }
             for (Long circleid : circleids) {
-                CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleid);
+                CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleid);
                 circleInfos.add(circleInfo);
             }
             String circlesDTO = circleService.selectCircleDTO(circleInfos);
@@ -256,7 +249,7 @@ public class CircleInfoController {
         if (StringUtils.isEmpty(circleid)) {
             return "fail";
         } else {
-            CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(Long.valueOf(circleid));
+            CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(Long.valueOf(circleid));
             return JSON.toJSONString(circleInfo);
         }
     }
@@ -276,16 +269,16 @@ public class CircleInfoController {
         if (StringUtils.isEmpty(circleid)) {
             return "fail";
         } else {
-            CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(Long.valueOf(circleid));
+            CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(Long.valueOf(circleid));
             if (nullStr.equals(circlelabel) || "".equals(circlelabel) || circlelabel == null) {
                 // 删除圈子标签
                 circleInfo.setCircleLabel("");
-                circleInfoMapper.updateByPrimaryKeySelective(circleInfo);
+                circleInfoService.updateByPrimaryKeySelective(circleInfo);
                 return "success";
             } else {
                 // 添加或者修改圈子标签
                 circleInfo.setCircleLabel(circlelabel);
-                circleInfoMapper.updateByPrimaryKeySelective(circleInfo);
+                circleInfoService.updateByPrimaryKeySelective(circleInfo);
                 return "success";
             }
         }

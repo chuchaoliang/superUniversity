@@ -192,4 +192,13 @@ public interface UserDiaryMapper {
      * @return
      */
     int countByThemeIdAndDiaryStatus(@Param("themeId") Integer themeId, @Param("circleId") Integer circleId);
+
+    /**
+     * 根据圈子id和日记状态查询全部日志信息
+     *
+     * @param circleId    圈子id
+     * @param diaryStatus 日志状态
+     * @return
+     */
+    List<UserDiary> selectAllByCircleIdAndDiaryStatus(@Param("circleId") Long circleId, @Param("diaryStatusList") List<Integer> diaryStatus);
 }

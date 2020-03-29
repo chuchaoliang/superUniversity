@@ -306,7 +306,7 @@ public class TodayContentServiceImpl implements TodayContentService {
     }
 
     @Override
-    public String selectAllThemeByCircleHome(String userId, Long circleId) {
+    public List<CircleThemeVO> selectAllThemeByCircleHome(String userId, Long circleId) {
         List<TodayContent> todayContents = todayContentMapper.selectAllByCircleIdOrderByCreateTimeDesc(circleId, EnumThemeStatus.USE_STATUS.getValue(), 0, EnumPage.CIRCLE_HOME_THEME.getValue());
         todayContents.add(selectCircleDefaultThemeInfo(circleId));
         List<CircleThemeVO> circleThemeVOS = new ArrayList<>();
@@ -321,7 +321,7 @@ public class TodayContentServiceImpl implements TodayContentService {
             circleThemeVO.setDiaryNumber(diaryNumber);
             circleThemeVOS.add(circleThemeVO);
         }
-        return JSON.toJSONStringWithDateFormat(circleThemeVOS, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+        return circleThemeVOS;
     }
 
     @Override
