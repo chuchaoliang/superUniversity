@@ -385,6 +385,38 @@ public class TodayContentServiceImpl implements TodayContentService {
         // video文件为空出现未知错误
         return EnumResultStatus.UNKNOWN.getValue();
     }
+
+    @Override
+    public String updateCircleTodayContent(CircleTodayContentDTO circleTodayContentDTO) {
+        if (StringUtils.isEmpty(circleTodayContentDTO.getId())) {
+            // 此主题的id为空 理论上不存在这种情况，存在则出现错误！！
+            return EnumResultStatus.UNKNOWN.getValue();
+        } else {
+            // 根据id查询每日内容的数据
+            TodayContent todayContent = todayContentMapper.selectByPrimaryKey(circleTodayContentDTO.getId());
+            // 要更新的今日内容为空
+            if (todayContent == null) {
+                // 未知错误
+                return EnumResultStatus.UNKNOWN.getValue();
+            }
+            // 对象不空 1. 查看此今日内容是否存在图片
+            // 设置更新时间
+            todayContent.setTodayContent(circleTodayContentDTO.getTodayContent());
+            todayContent.setUpdateTime(new Date());
+            if (StringUtils.isEmpty(todayContent.getTodayImage())) {
+                //    图片为空，更新文本内容，返回此今日内容的id，上传图片
+                todayContentMapper.updateByPrimaryKeySelective(todayContent);
+            } else {
+                //    图片不为空，删除之前的图片，并且更新文本内容，返回此今日内容的id，上传图片
+                List<String> images = Arrays.asList(todayContent.getTodayImage().split(","));
+                // 对图片的处理
+                todayContent.setTodayImage(CclUtil.fileListDispose(circleTodayContentDTO.getTodayImages(), images));
+                // 更新数据
+                todayContentMapper.updateByPrimaryKeySelective(todayContent);
+            }
+            return String.valueOf(circleTodayContentDTO.getId());
+        }
+    }
 }
 
 

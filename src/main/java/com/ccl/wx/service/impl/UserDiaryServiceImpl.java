@@ -3,10 +3,8 @@ package com.ccl.wx.service.impl;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
-import com.ccl.wx.dto.CircleTodayContentDTO;
 import com.ccl.wx.dto.UserDiaryDTO;
 import com.ccl.wx.entity.JoinCircle;
-import com.ccl.wx.entity.TodayContent;
 import com.ccl.wx.entity.UserDiary;
 import com.ccl.wx.enums.*;
 import com.ccl.wx.mapper.UserDiaryMapper;
@@ -110,33 +108,6 @@ public class UserDiaryServiceImpl implements UserDiaryService {
     }
 
     @Override
-    public String updateCircleTodayContent(CircleTodayContentDTO circleTodayContentDTO) {
-        // 根据id查询每日内容的数据
-        TodayContent todayContent = todayContentService.selectByPrimaryKey(circleTodayContentDTO.getId());
-        if (StringUtils.isEmpty(todayContent)) {
-            // 对象为空 理论上不存在这种情况，存在则出现错误！！
-            return "-1";
-        } else {
-            // 对象不空 1. 查看此今日内容是否存在图片
-            // 设置更新时间
-            todayContent.setTodayContent(circleTodayContentDTO.getTodayContent());
-            todayContent.setUpdateTime(new Date());
-            if (StringUtils.isEmpty(todayContent.getTodayImage())) {
-                //    图片为空，更新文本内容，返回此今日内容的id，上传图片
-                todayContentService.updateByPrimaryKeySelective(todayContent);
-            } else {
-                //    图片不为空，删除之前的图片，并且更新文本内容，返回此今日内容的id，上传图片
-                List<String> images = Arrays.asList(todayContent.getTodayImage().split(","));
-                // 对图片的处理
-                todayContent.setTodayImage(imageDispose(circleTodayContentDTO.getTodayImages(), images));
-                // 更新数据
-                todayContentService.updateByPrimaryKeySelective(todayContent);
-            }
-            return String.valueOf(circleTodayContentDTO.getId());
-        }
-    }
-
-    @Override
     public String updateCircleDiaryContent(UserDiaryDTO userDiaryDTO) {
         // 根据id查询日记内容
         UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(userDiaryDTO.getId());
@@ -157,47 +128,14 @@ public class UserDiaryServiceImpl implements UserDiaryService {
                 historyImages = Arrays.asList(diaryImage.split(","));
             }
             // 设置处理后的图片列表
-            userDiary.setDiaryImage(imageDispose(userDiaryDTO.getImages(), historyImages));
+            userDiary.setDiaryImage(CclUtil.fileListDispose(userDiaryDTO.getImages(), historyImages));
             // 更新日志信息
             userDiaryMapper.updateByPrimaryKeySelective(userDiary);
             // 返回此日志id
             return String.valueOf(userDiaryDTO.getId());
         } else {
-            // 理论上不存在这种情况 TODO 未处理
+            // 理论上不存在这种情况
             return "-1";
-        }
-    }
-
-    @Override
-    public String imageDispose(List<String> images, List<String> historyImages) {
-        if (images.size() == 0) {
-            // 前端传输的图片列表为空，删除全部历史图片
-            if (historyImages.size() != 0) {
-                for (String image : historyImages) {
-                    FtpUtil.delFile(image);
-                }
-            }
-            // 返回空字符串
-            return "";
-        } else {
-            // 新图片不为空
-            ArrayList<String> finImages = new ArrayList<>();
-            for (String image : images) {
-                if (historyImages.contains(image)) {
-                    // 判断历史图片列表中是否存在新的图片,存在不删除
-                    finImages.add(image);
-                } else {
-                    if (image.startsWith("https")) {
-                        // 是https开头则为不存在的历史图片，删除
-                        FtpUtil.delFile(image);
-                    }
-                }
-            }
-            if (finImages.size() == 0) {
-                return "";
-            } else {
-                return CclUtil.listToString(finImages, ',');
-            }
         }
     }
 

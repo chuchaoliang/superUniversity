@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Api(tags = {"CircleInfoController【圈子信息相关的数据信息】"})
 @RestController
-@RequestMapping("/wx")
+@RequestMapping("/wx/circle")
 public class CircleInfoController {
 
     @Autowired
@@ -101,6 +101,12 @@ public class CircleInfoController {
         } else {
             return circleService.getCircleIndexAllContent(userId, id);
         }
+    }
+
+    @GetMapping("/test")
+    public String test(@RequestHeader(value = "token") String token) {
+        System.out.println(token);
+        return "test";
     }
 
     /**

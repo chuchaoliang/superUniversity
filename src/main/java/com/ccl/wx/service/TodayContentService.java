@@ -1,5 +1,6 @@
 package com.ccl.wx.service;
 
+import com.ccl.wx.dto.CircleTodayContentDTO;
 import com.ccl.wx.entity.TodayContent;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -139,6 +140,15 @@ public interface TodayContentService {
      * @return
      */
     String selectAllThemeByCircleHome(String userId, Long circleId);
+
+    /**
+     * 编辑更新圈子每日内容
+     * 每日内容id，内容，图片路径
+     *
+     * @param circleTodayContentDTO 圈子每日内容
+     * @return
+     */
+    String updateCircleTodayContent(CircleTodayContentDTO circleTodayContentDTO);
 }
 
 

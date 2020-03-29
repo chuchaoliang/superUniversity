@@ -1,6 +1,5 @@
 package com.ccl.wx.service;
 
-import com.ccl.wx.dto.CircleTodayContentDTO;
 import com.ccl.wx.dto.UserDiaryDTO;
 import com.ccl.wx.entity.UserDiary;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,15 +62,6 @@ public interface UserDiaryService {
     int updateByPrimaryKey(UserDiary record);
 
     /**
-     * 编辑更新圈子每日内容
-     * 每日内容id，内容，图片路径
-     *
-     * @param circleTodayContentDTO
-     * @return
-     */
-    String updateCircleTodayContent(CircleTodayContentDTO circleTodayContentDTO);
-
-    /**
      * 编辑更新圈子日记
      * 日记id，日记内容，日记图片，日记权限，日记地址
      *
@@ -79,15 +69,6 @@ public interface UserDiaryService {
      * @return
      */
     String updateCircleDiaryContent(UserDiaryDTO userDiaryDTO);
-
-    /**
-     * 处理新的图片 和历史图片
-     *
-     * @param images        前端传输来的图片列表
-     * @param historyImages 日志原有的图片
-     * @return
-     */
-    String imageDispose(List<String> images, List<String> historyImages);
 
     /**
      * 删除用户日志信息

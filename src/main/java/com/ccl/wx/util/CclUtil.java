@@ -26,6 +26,11 @@ public class CclUtil {
     private final static String FILEWEBPATH = "http://localhost:8080/fileSuffix/";
 
     /**
+     * web网址前缀图片访问前缀
+     */
+    private final static String WEB_PREFIX = "https";
+
+    /**
      * 常见的图片类型
      */
     private final static String IMAGE_TYPE = "jpeg,png,gif,bmp,jpg";
@@ -221,6 +226,33 @@ public class CclUtil {
             e.printStackTrace();
         }
         return true;
+    }
+
+    /**
+     * 检测一个类中的指定属性是否为空
+     *
+     * @param obj1            待检测的类
+     * @param inspectProperty 需要检测的列表
+     * @return
+     */
+    public static String classPropertyIsNullReturn(Object obj1, List<String> inspectProperty) {
+        try {
+            Class clazz = obj1.getClass();
+            PropertyDescriptor[] pds = Introspector.getBeanInfo(clazz, Object.class).getPropertyDescriptors();
+            for (PropertyDescriptor pd : pds) {
+                String name = pd.getName();
+                if (inspectProperty.contains(name)) {
+                    Method readMethod = pd.getReadMethod();
+                    Object o1 = readMethod.invoke(obj1);
+                    if (StringUtils.isEmpty(o1)) {
+                        return String.valueOf(name);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return EnumResultStatus.SUCCESS.getValue();
     }
 
     /**
@@ -503,5 +535,82 @@ public class CclUtil {
         } else {
             return false;
         }
+    }
+
+    /**
+     * 文件列表的处理
+     *
+     * @param newFileLists     新的文件列表
+     * @param historyFileLists 历史文件列表
+     * @return
+     */
+    public static String fileListDispose(List<String> newFileLists, List<String> historyFileLists) {
+        if (newFileLists.isEmpty()) {
+            // 前端传输的文件列表为空，删除全部历史文件
+            if (!historyFileLists.isEmpty()) {
+                for (String historyFile : historyFileLists) {
+                    FtpUtil.delFile(historyFile);
+                }
+            }
+            // 返回空字符串
+            return "";
+        } else {
+            // 新文件列表不为空
+            ArrayList<String> finImages = new ArrayList<>();
+            for (String newFile : newFileLists) {
+                if (historyFileLists.contains(newFile)) {
+                    // 判断历史文件列表中是否存在新的文件,存在不删除
+                    finImages.add(newFile);
+                } else {
+                    if (newFile.startsWith(WEB_PREFIX)) {
+                        // 是https开头则为不存在的历史文件，删除
+                        FtpUtil.delFile(newFile);
+                    }
+                }
+            }
+            if (finImages.isEmpty()) {
+                return "";
+            } else {
+                return listToString(finImages, ',');
+            }
+        }
+    }
+
+    /**
+     * 单个文件的处理
+     *
+     * @param newFile     新的文件地址
+     * @param historyFile 历史文件地址
+     * @return
+     */
+    public static String fileDispose(String newFile, String historyFile) {
+        if (StringUtils.isEmpty(newFile)) {
+            // 新的文件为空
+            if (!StringUtils.isEmpty(historyFile)) {
+                // 判断历史文件地址是不为空，删除文件
+                FtpUtil.delFile(historyFile);
+            }
+            return "";
+        } else {
+            // 新的文件不为空
+            if (newFile.startsWith(WEB_PREFIX)) {
+                // 是https开头的文件地址，文件未发生变化
+                return historyFile;
+            } else {
+                // 不是https开头的文件地址 TODO.................
+            }
+        }
+        return "";
+    }
+
+    /**
+     * 语音文件的处理
+     *
+     * @param voice        前端传输的音频地址
+     * @param historyVoice 历史音频地址
+     * @return
+     */
+    public static String voiceDispose(String voice, String historyVoice) {
+        return "";
     }
 }
