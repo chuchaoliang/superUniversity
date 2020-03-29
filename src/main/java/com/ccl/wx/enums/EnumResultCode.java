@@ -28,15 +28,30 @@ public enum EnumResultCode {
     /**
      * 出现错误
      */
-    INTERNAL_SERVER_ERROR(500);
+    INTERNAL_SERVER_ERROR(500),
+
+    USER_LOGIN_FAIL(1000, "token为空，或者用户未登录"),
+
+    USER_NONENTITY(1001, "登陆过期请重新登录，或者此用户不存在");
 
     private final int code;
+
+    private String message;
 
     EnumResultCode(int code) {
         this.code = code;
     }
 
+    EnumResultCode(int code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
     public int getCode() {
         return code;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

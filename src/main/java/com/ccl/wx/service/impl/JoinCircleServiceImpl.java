@@ -123,6 +123,26 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         return false;
     }
 
+    @Override
+    public Boolean judgeUserInCircle(Integer circleId, String userId) {
+        List<String> userIds = joinCircleMapper.selectUserIdByCircleId(Long.valueOf(circleId));
+        JoinCircle circleInfo = joinCircleMapper.selectByPrimaryKey(Long.valueOf(circleId), userId);
+        if (userIds.contains(userId) && circleInfo.getUserStatus().equals(EnumUserCircle.USER_NORMAL_STATUS.getValue())) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public List<JoinCircle> selectAllByUserIdAndUserPermission(String userId, int userPermission) {
+        return joinCircleMapper.selectAllByUserIdAndUserPermission(userId, userPermission);
+    }
+
+    @Override
+    public Long sumUserVitalityByCircleIdAndUserStatus(Long circleId, Integer userStatus) {
+        return joinCircleMapper.sumUserVitalityByCircleIdAndUserStatus(circleId, userStatus);
+    }
+
     /**
      * @param circleId   圈子id
      * @param userId     用户id

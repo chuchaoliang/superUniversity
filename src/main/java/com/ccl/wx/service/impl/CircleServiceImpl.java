@@ -8,15 +8,14 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.dto.*;
 import com.ccl.wx.entity.*;
 import com.ccl.wx.enums.EnumUserCircle;
-import com.ccl.wx.enums.EnumUserClockIn;
 import com.ccl.wx.enums.EnumUserDiary;
 import com.ccl.wx.enums.EnumUserVitality;
 import com.ccl.wx.mapper.*;
 import com.ccl.wx.pojo.DiaryHideComment;
-import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.service.CircleRedisService;
 import com.ccl.wx.service.CircleService;
 import com.ccl.wx.service.CommentService;
+import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.util.CclDateUtil;
 import com.ccl.wx.util.CclUtil;
 import com.ccl.wx.util.FtpUtil;
@@ -751,52 +750,6 @@ public class CircleServiceImpl implements CircleService {
         userDiaryDTO.setMasterComments(masterComment);
         userDiaryDTO.setComments(allComment);
         return userDiaryDTO;
-    }
-
-    /**
-     * TODO 获取加入圈子人数并不准确、已修改但是效率不高。
-     *
-     * @param userid   用户id
-     * @param circleid 圈子id
-     * @return
-     */
-    @SneakyThrows
-    @Override
-    public String getCircleIndexAllContent(String userid, String circleid) {
-        CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(Long.valueOf(circleid));
-        // 创建circleInfoDTO对象
-        CircleInfoDTO circleInfoDTO = new CircleInfoDTO();
-        BeanUtils.copyProperties(circleInfo, circleInfoDTO);
-        // 判断用户是否加入圈子
-        Boolean userJoin = circleService.judgeUserInCircle(circleid, userid);
-        // 判断用户是否为圈主
-        Boolean userMaster = circleService.judgeUserCircleMaster(circleid, userid);
-        // 获取用户今日打卡人数
-        Integer clockInSum = joinCircleMapper.countByCircleIdAndUserSignStatus(Long.valueOf(circleid), EnumUserClockIn.USER_CLOCK_IN_SUCCESS.getValue());
-        // 获取圈子中的总人数
-        Integer sumMember = joinCircleMapper.countByCircleIdAndUserStatus(Long.valueOf(circleid), EnumUserCircle.USER_NORMAL_STATUS.getValue());
-        // 设置圈子中总人数
-        circleInfoDTO.setCircleMember(sumMember);
-        // 设置用户在此圈子中的状态
-        circleInfoDTO.setUserJoin(userJoin);
-        // 设置是否为圈主
-        circleInfoDTO.setUserMaster(userMaster);
-        // 设置用户打卡总人数
-        circleInfoDTO.setCircleSignin(Long.valueOf(clockInSum));
-        // 查看今日内容是否为空
-        if (!StringUtils.isEmpty(circleInfo.getCircleTask())) {
-            // 圈子存在今日内容,查询圈子今日内容
-            TodayContent todayContent = todayContentMapper.selectByPrimaryKey(Long.valueOf(circleInfo.getCircleTask()));
-            // 设置打卡内容
-            circleInfoDTO.setTodayContent(todayContent.getTodayContent());
-            // 设置打卡内容创建时间
-            circleInfoDTO.setTodayCreateTime(todayContent.getCreateTime());
-            if (!StringUtils.isEmpty(todayContent.getTodayImage())) {
-                List<String> images = Arrays.asList(todayContent.getTodayImage().split(","));
-                circleInfoDTO.setTodayImages(images);
-            }
-        }
-        return JSON.toJSONStringWithDateFormat(circleInfoDTO, "yyyy-MM-dd", SerializerFeature.WriteDateUseDateFormat);
     }
 
     @Override

@@ -148,15 +148,6 @@ public interface CircleService {
     String getCircleDiaryInfo(List<UserDiary> userDiaries, String loginUserid, Boolean nextPage);
 
     /**
-     * 获取圈子内的主页面加载的全部内容
-     *
-     * @param circleid 圈子id
-     * @param userid   用户id
-     * @return 圈子全部内容json字符串
-     */
-    String getCircleIndexAllContent(String userid, String circleid);
-
-    /**
      * 获取全部的日志评论
      *
      * @param diaryid 日志id

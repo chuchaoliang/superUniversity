@@ -49,11 +49,6 @@ public class CircleInfoDTO {
     private Date circleUpdatetime;
 
     /**
-     * 圈子每日任务id
-     */
-    private String circleTask;
-
-    /**
      * 圈子中的图片地址
      */
     private String circleImage;
@@ -109,7 +104,7 @@ public class CircleInfoDTO {
     private Boolean userJoin;
 
     /**
-     * 用户是否为圈子主人
+     * 用户是否为圈子管理员
      */
     private Boolean userMaster;
 
@@ -132,4 +127,19 @@ public class CircleInfoDTO {
      * 每日打卡总人数
      */
     private Integer clockInSum;
+
+    /**
+     * 圈子中日志总数
+     */
+    private Integer diaryNumber;
+
+    /**
+     * 圈子是否存在通知
+     */
+    private Boolean circleNotice;
+
+    /**
+     * 圈子通知内容
+     */
+    private String circleNoticeContent;
 }

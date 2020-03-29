@@ -2,6 +2,7 @@ package com.ccl.wx.service;
 
 import com.ccl.wx.dto.UserDiaryDTO;
 import com.ccl.wx.entity.UserDiary;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
@@ -69,6 +70,15 @@ public interface UserDiaryService {
      * @return
      */
     String updateCircleDiaryContent(UserDiaryDTO userDiaryDTO);
+
+    /**
+     * 根据圈子id和日记状态查询全部日志信息
+     *
+     * @param circleId    圈子id
+     * @param diaryStatus 日志状态
+     * @return
+     */
+    List<UserDiary> selectAllByCircleIdAndDiaryStatus(@Param("circleId") Long circleId, @Param("diaryStatusList") List<Integer> diaryStatus);
 
     /**
      * 删除用户日志信息

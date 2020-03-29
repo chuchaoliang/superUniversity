@@ -1,10 +1,14 @@
 package com.ccl.wx.controller;
 
+import cn.hutool.core.date.DatePattern;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.annotation.ParamCheck;
 import com.ccl.wx.dto.CircleTodayContentDTO;
 import com.ccl.wx.entity.TodayContent;
 import com.ccl.wx.service.TodayContentService;
 import com.ccl.wx.service.UserDiaryService;
+import com.ccl.wx.vo.CircleThemeVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 圈子今日内容相关
@@ -78,7 +83,8 @@ public class CircleThemeController {
     @GetMapping("/theme/get/home")
     public String getAllCircleHomeTheme(@RequestParam(value = "circleId", required = false) Long circleId,
                                         @RequestParam(value = "userId", required = false) String userId) {
-        return todayContentService.selectAllThemeByCircleHome(userId, circleId);
+        List<CircleThemeVO> circleThemeVOS = todayContentService.selectAllThemeByCircleHome(userId, circleId);
+        return JSON.toJSONStringWithDateFormat(circleThemeVOS, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
     }
 
     /**

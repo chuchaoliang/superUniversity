@@ -192,4 +192,31 @@ public interface JoinCircleService {
      * @return
      */
     Boolean judgeUserIsCircleManage(Integer circleId, List<Integer> userPermission, String userId);
+
+    /**
+     * 判断用户是否为圈子成员
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    Boolean judgeUserInCircle(Integer circleId, String userId);
+
+    /**
+     * 查找用户加入的圈子
+     *
+     * @param userId         用户id
+     * @param userPermission 圈子状态
+     * @return
+     */
+    List<JoinCircle> selectAllByUserIdAndUserPermission(String userId, int userPermission);
+
+    /**
+     * 根据圈子id和用户状态得到用户圈子总活跃度
+     *
+     * @param circleId   圈子id
+     * @param userStatus 用户状态
+     * @return
+     */
+    Long sumUserVitalityByCircleIdAndUserStatus(Long circleId, Integer userStatus);
 }
