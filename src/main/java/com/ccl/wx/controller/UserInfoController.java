@@ -12,12 +12,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
 
 /**
  * @author 褚超亮
@@ -25,17 +25,18 @@ import org.springframework.web.bind.annotation.RestController;
  * 获取用户的相关信息
  */
 @Api(tags = {"UserBasicController【用户的基本信息】"})
+@Slf4j
 @RestController
-@RequestMapping("/wx")
-public class UserBasicController {
+@RequestMapping("/wx/person")
+public class UserInfoController {
 
-    @Autowired
+    @Resource
     private JoinCircleMapper joinCircleMapper;
 
-    @Autowired
+    @Resource
     private CircleService circleService;
 
-    @Autowired
+    @Resource
     private UserInfoService userInfoService;
 
     /**
@@ -109,6 +110,29 @@ public class UserBasicController {
             return EnumResultStatus.FAIL.getValue();
         }
         return EnumResultStatus.SUCCESS.getValue();
+    }
+
+    /**
+     * 获取登录态
+     *
+     * @param code 登录code 前端传输
+     * @return
+     */
+    @GetMapping("/user/login")
+    public String userLogin(@RequestParam(value = "code", required = false) String code) {
+        // 拼接url字符串
+        return userInfoService.userLogin(code);
+    }
+
+    /**
+     * 插入用户数据，若重复则不进行插入，每次校检用户是否更改了数据
+     *
+     * @param userInfo 用户信息
+     * @return
+     */
+    @PostMapping("/user/save")
+    public String setUserInfo(@Validated(UserInfo.Default.class) @RequestBody UserInfo userInfo) {
+        return userInfoService.saveUserInfo(userInfo);
     }
 }
 

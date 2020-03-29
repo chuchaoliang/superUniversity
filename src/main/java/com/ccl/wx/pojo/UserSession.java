@@ -17,5 +17,5 @@ public class UserSession {
     /**
      * 处理后的sessionKey
      */
-    private String finalSessionKey;
+    private String encryptSessionKey;
 }

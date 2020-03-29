@@ -1,6 +1,8 @@
 package com.ccl.wx.mapper;
 
-import com.ccl.wx.entity.UserInfo;import org.apache.ibatis.annotations.Param;import java.util.List;
+import com.ccl.wx.entity.UserInfo;
+
+import java.util.List;
 
 /**
  * @author 褚超亮
@@ -21,12 +23,4 @@ public interface UserInfoMapper {
     int updateByPrimaryKey(UserInfo record);
 
     List<UserInfo> findByAll(UserInfo userInfo);
-
-    /**
-     * 根据openid查询用户信息
-     *
-     * @param openid
-     * @return
-     */
-    UserInfo findByOpenid(@Param("openid") String openid);
 }

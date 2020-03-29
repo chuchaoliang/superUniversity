@@ -1,16 +1,16 @@
 package com.ccl.wx.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.ccl.wx.mapper.PlanMapper;
-import com.ccl.wx.service.impl.PlanServiceImpl;
 import com.ccl.wx.dto.PlanDTO;
 import com.ccl.wx.entity.Plan;
+import com.ccl.wx.mapper.PlanMapper;
+import com.ccl.wx.service.impl.PlanServiceImpl;
 import com.ccl.wx.util.CclUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -24,10 +24,10 @@ import java.util.List;
 @RequestMapping("/wx")
 public class PlanController {
 
-    @Autowired
+    @Resource
     private PlanMapper planMapper;
 
-    @Autowired
+    @Resource
     private PlanServiceImpl planService;
 
 

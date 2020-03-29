@@ -195,14 +195,14 @@ public class CircleThemeController {
      */
     @ApiOperation(value = "更新圈子主题信息")
     @SneakyThrows
-    @PostMapping("/updatetodaycontent")
+    @PostMapping("/theme/update")
     public String updateTodayContent(@RequestBody(required = false) CircleTodayContentDTO circleTodayContentDTO) {
         // id 图片列表：TodayImages 每日内容： TodayContent
         if (StringUtils.isEmpty(circleTodayContentDTO.getId())) {
             // 如果前端传输来的id为空,失败！
             return "fail";
         } else {
-            return circleDiaryService.updateCircleTodayContent(circleTodayContentDTO);
+            return todayContentService.updateCircleTodayContent(circleTodayContentDTO);
         }
     }
 }
