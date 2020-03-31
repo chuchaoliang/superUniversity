@@ -40,7 +40,7 @@ public class ParamCheckAop {
     private CircleInfoService circleInfoService;
 
     // && @annotation(org.springframework.web.bind.annotation.GetMapping
-    @Pointcut("execution(public * com.ccl.wx.controller..*.*(..)))")
+    @Pointcut("execution(public * com.ccl.wx.controller..*.*(..)) && !execution(* com.ccl.wx.controller.CircleScheduleController.*(..))")
     public void pointcut() {
     }
 
@@ -75,11 +75,12 @@ public class ParamCheckAop {
         ParamCheck paramCheck = signature.getMethod().getAnnotation(ParamCheck.class);
         for (int i = 0; i < parameterAnnotations.length; i++) {
             for (int j = 0; j < parameterAnnotations[i].length; j++) {
-                if ("userid".equals(paramNames[i]) || "userId".equals(paramNames[i])) {
-                    userIsNull((String) paramValues[i], value[0]);
-                }
+                // token 中已经检测无需检测
+                //if ("userid".equals(paramNames[i]) || "userId".equals(paramNames[i])) {
+                //    userIsNull((String) paramValues[i], value[0]);
+                //}
                 if ("circleid".equals(paramNames[i]) || "circleId".equals(paramNames[i])) {
-                    circleIsNull((Long) paramValues[i], value[0]);
+                    circleIsNull(Long.valueOf(String.valueOf(paramValues[i])), value[0]);
                 }
                 if (paramCheck != null) {
                     // 说明该注解在方法上

@@ -1,17 +1,18 @@
-package com.ccl.wx.dto;
+package com.ccl.wx.vo;
 
-import com.ccl.wx.vo.CircleHomeThemeVO;
-import com.ccl.wx.vo.DiaryLikeVO;
+import com.ccl.wx.entity.UserInfo;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author 褚超亮
- * @date 2019/12/12 20:03
+ * @date 2020/3/30 13:14
  */
 @Data
-public class UserDiaryDTO {
+public class CircleHomeDiaryVO implements Serializable {
+
     /**
      * 日志id
      */
@@ -31,11 +32,6 @@ public class UserDiaryDTO {
      * 日志点赞数
      */
     private Integer diaryLike;
-
-    /**
-     * 日志状态（0 全部人员可见 1仅圈子内成员可见 2仅管理员可见）
-     */
-    private Integer diaryStatus;
 
     /**
      * 日志评论数
@@ -88,16 +84,6 @@ public class UserDiaryDTO {
     private Long userSignNumber;
 
     /**
-     * 用户连续打卡天数
-     */
-    private Integer userSignin;
-
-    /**
-     * 格式化日期时间
-     */
-    private String formatCreateTime;
-
-    /**
      * 日志点赞状态
      */
     private Boolean likeStatus;
@@ -105,27 +91,22 @@ public class UserDiaryDTO {
     /**
      * 全部评论
      */
-    private List<CommentDTO> comments;
+    private List<CircleHomeCommentVO> comments;
 
     /**
      * 全部点评
      */
-    private List<CommentDTO> masterComments;
+    private List<CircleHomeCommentVO> masterComments;
 
     /**
      * 点赞用户的信息 userid::userNickname
      */
-    private List<DiaryLikeVO> likeUserInfos;
+    private List<UserInfo> likeUserInfos;
 
     /**
      * 点赞用户全部昵称
      */
     private String likeUserInfosStr;
-
-    /**
-     * 是否还有更多数据
-     */
-    private Boolean hasMoreData;
 
     /**
      * 是否省略文本内容
@@ -151,9 +132,4 @@ public class UserDiaryDTO {
      * 是否隐藏点赞信息
      */
     private Boolean likeComment;
-
-    /**
-     * 圈子主题
-     */
-    private CircleHomeThemeVO themeInfo;
 }

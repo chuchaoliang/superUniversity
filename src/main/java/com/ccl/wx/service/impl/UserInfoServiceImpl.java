@@ -79,6 +79,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                     .append("&secret=").append(loginData.getSecret())
                     .append("&js_code=").append(code)
                     .append("&grant_type=authorization_code");
+            System.out.println(loginStringBuilder.toString());
             // 发送get请求获得session_key,openid
             RestTemplate restTemplate = new RestTemplate();
             String responseData = restTemplate.getForObject(new String(loginStringBuilder), String.class);

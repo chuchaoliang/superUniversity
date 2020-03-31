@@ -16,7 +16,17 @@ public enum EnumComment {
     /**
      * 圈主评论
      */
-    COMMENT_MASTER(1);
+    COMMENT_MASTER(1),
+
+    /**
+     * 评论正常状态
+     */
+    COMMENT_NORMAL(0),
+
+    /**
+     * 评论删除状态
+     */
+    COMMENT_DELETE_STATUS(1);
 
     public Integer value;
 
@@ -24,7 +34,7 @@ public enum EnumComment {
         this.value = value;
     }
 
-    public void setValue(Integer value) {
-        this.value = value;
+    public Integer getValue() {
+        return value;
     }
 }

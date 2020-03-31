@@ -2,10 +2,9 @@ package com.ccl.wx.service;
 
 import com.ccl.wx.dto.CommentDTO;
 import com.ccl.wx.dto.UserDiaryDTO;
-import com.ccl.wx.entity.JoinCircle;
-import com.ccl.wx.entity.UserDiary;
-import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.entity.CircleInfo;
+import com.ccl.wx.entity.JoinCircle;
+import com.ccl.wx.entity.UserInfo;
 
 import java.util.List;
 
@@ -14,24 +13,6 @@ import java.util.List;
  * @date 2019/10/30 20:47
  */
 public interface CircleService {
-
-    /**
-     * 检测用户是否在加入圈子中, 过滤淘汰状态的用户
-     * 加入： true
-     * 未加入： false
-     *
-     * @param circleId 圈子id
-     * @param userid   用户id
-     * @return
-     */
-    Boolean judgeUserInCircle(String circleId, String userid);
-
-    /**
-     * 更新用户打卡数据
-     *
-     * @param userDiary 用户打卡数据
-     */
-    String updateSignInData(UserDiary userDiary);
 
     /**
      * 判断用户是否为圈主
@@ -118,36 +99,6 @@ public interface CircleService {
     List<String> getCircleAllMember(String circleid);
 
     /**
-     * 获取全部的日志信息
-     *
-     * @param circleid 圈子id
-     * @param userid   用户id
-     * @param page     页数
-     * @return
-     */
-    String getAllDiaryInfo(String circleid, String userid, Integer page);
-
-    /**
-     * 获取部分的日志信息
-     *
-     * @param circleid 圈子id
-     * @param userid   用户id
-     * @param page     页数
-     * @return
-     */
-    String getAssignDiaryInfo(String circleid, String userid, Integer page);
-
-    /**
-     * 获取圈子中日志信息
-     *
-     * @param userDiaries 用户日志
-     * @param loginUserid 登录的用户id
-     * @param nextPage    是否还有下一页
-     * @return
-     */
-    String getCircleDiaryInfo(List<UserDiary> userDiaries, String loginUserid, Boolean nextPage);
-
-    /**
      * 获取全部的日志评论
      *
      * @param diaryid 日志id
@@ -185,12 +136,12 @@ public interface CircleService {
      * 获取全部点赞用户昵称或者信息
      * userid::userNickname
      *
-     * @param diaryid
-     * @param circleid
-     * @param userid
+     * @param diaryId
+     * @param circleId
+     * @param userId
      * @return
      */
-    List<UserInfo> getAllLikeUserNickName(String userid, String circleid, Long diaryid);
+    List<UserInfo> getAllLikeUserNickName(String userId, String circleId, Long diaryId);
 
     /**
      * 根据点赞用户昵称拼接其昵称

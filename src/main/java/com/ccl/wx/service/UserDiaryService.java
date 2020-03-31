@@ -222,4 +222,43 @@ public interface UserDiaryService {
      * @return
      */
     List<Long> selectIdByDiaryStatus(Integer value);
+
+    /**
+     * 获取全部的日志信息
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param page     页数
+     * @return
+     */
+    String getAllDiaryInfo(Long circleId, String userId, Integer page);
+
+    /**
+     * 获取圈子中某位用户的日志信息
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param page     页数
+     * @return
+     */
+    String getAssignDiaryInfo(Long circleId, String userId, Integer page);
+
+    /**
+     * 获取圈子中日志信息
+     *
+     * @param userDiaries 用户日志
+     * @param loginUserId 登录的用户id
+     * @param nextPage    是否还有下一页
+     * @return
+     */
+    String getCircleDiaryInfo(List<UserDiary> userDiaries, String loginUserId, Boolean nextPage);
+
+    /**
+     * 根据圈子id 和日志状态获取日志总数
+     *
+     * @param circleId    圈子id
+     * @param diaryStatus 日志状态
+     * @return
+     */
+    Long countByCircleIdAndDiaryStatus(Long circleId, List<Integer> diaryStatus);
 }

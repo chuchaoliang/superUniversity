@@ -31,7 +31,7 @@ import java.util.ArrayList;
 @Slf4j
 @Api(tags = {"CircleDiaryController【圈子用户日志信息】"})
 @RestController
-@RequestMapping("/wx")
+@RequestMapping("/wx/circle")
 public class UserDiaryController {
 
     @Resource
@@ -133,44 +133,41 @@ public class UserDiaryController {
     }
 
     /**
-     * TODO API
      * 获取圈子全部用户的全部日志信息
      *
-     * @param circleid 圈子id
-     * @param userid
-     * @param page
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param page     当前页数
      * @return
      */
     @ApiOperation(value = "获取圈子中的全部日志信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "circleid", value = "圈子id", dataType = "String"),
-            @ApiImplicitParam(name = "userid", value = "用户id", dataType = "String"),
+            @ApiImplicitParam(name = "circleId", value = "圈子id", dataType = "String"),
+            @ApiImplicitParam(name = "userId", value = "用户id", dataType = "String"),
             @ApiImplicitParam(name = "page", value = "第几页", dataType = "int", example = "1"),
     })
-    @GetMapping("/getalldiaryinfo")
-    public String getDiaryInfo(@ParamCheck @RequestParam(value = "circleid", required = false) String circleid,
-                               @ParamCheck @RequestParam(value = "userid", required = false) String userid,
-                               @ParamCheck @RequestParam(value = "page", required = false) Integer page) {
-        return circleService.getAllDiaryInfo(circleid, userid, page);
+    @ParamCheck
+    @GetMapping("/diary/get/all")
+    public String getDiaryInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                               @RequestParam(value = "userId", required = false) String userId,
+                               @RequestParam(value = "page", required = false) Integer page) {
+        return userDiaryService.getAllDiaryInfo(circleId, userId, page);
     }
 
     /**
      * 获取某个用户的全部日志信息
      *
-     * @param circleid
-     * @param userid
-     * @param page
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param page     页数
      * @return
      */
-    @GetMapping("/getassigndiaryinfo")
-    public String getAssignDiaryInfo(@RequestParam(value = "circleid", required = false) String circleid,
-                                     @RequestParam(value = "userid", required = false) String userid,
+    @ParamCheck
+    @GetMapping("/diary/get/user")
+    public String getAssignDiaryInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                                     @RequestParam(value = "userId", required = false) String userId,
                                      @RequestParam(value = "page", required = false) Integer page) {
-        if (StringUtils.isEmpty(circleid) || StringUtils.isEmpty(userid) || StringUtils.isEmpty(page)) {
-            return "fail";
-        } else {
-            return circleService.getAssignDiaryInfo(circleid, userid, page);
-        }
+        return userDiaryService.getAssignDiaryInfo(circleId, userId, page);
     }
 
     /**

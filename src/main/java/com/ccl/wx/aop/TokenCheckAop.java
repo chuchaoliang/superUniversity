@@ -38,17 +38,18 @@ public class TokenCheckAop {
      */
     public static final String HEAD_TOKEN = "userId";
 
-    @Pointcut("@annotation(org.springframework.web.bind.annotation.RequestMapping) || " +
+    @Pointcut("(@annotation(org.springframework.web.bind.annotation.RequestMapping) || " +
             "@annotation(org.springframework.web.bind.annotation.GetMapping) || " +
-            "@annotation(org.springframework.web.bind.annotation.PostMapping)")
+            "@annotation(org.springframework.web.bind.annotation.PostMapping)) && !execution(* com.ccl.wx.controller.UserInfoController.user*(..))")
     void pointcut() {
     }
 
-    @Pointcut("execution(public * com.ccl.wx.controller..*.*(..)))")
+    @Pointcut("execution(public * com.ccl.wx.controller..*.*(..)) && !execution(* com.ccl.wx.controller.UserInfoController.user*(..))")
     void allPointcut() {
     }
 
     @Around("pointcut()")
+    //@Around("allPointcut()")
     public Object doAround(ProceedingJoinPoint pjp) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
         String userId = request.getHeader(HEAD_TOKEN);

@@ -1,23 +1,16 @@
 package com.ccl.wx.service.impl;
 
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateUnit;
-import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.dto.*;
 import com.ccl.wx.entity.*;
 import com.ccl.wx.enums.EnumUserCircle;
 import com.ccl.wx.enums.EnumUserDiary;
-import com.ccl.wx.enums.EnumUserVitality;
 import com.ccl.wx.mapper.*;
-import com.ccl.wx.pojo.DiaryHideComment;
 import com.ccl.wx.service.CircleRedisService;
 import com.ccl.wx.service.CircleService;
 import com.ccl.wx.service.CommentService;
 import com.ccl.wx.service.UserDiaryService;
-import com.ccl.wx.util.CclDateUtil;
-import com.ccl.wx.util.CclUtil;
 import com.ccl.wx.util.FtpUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -76,6 +70,9 @@ public class CircleServiceImpl implements CircleService {
 
     @Autowired
     private CommentService commentService;
+
+    @Resource
+    private UserDiaryService userDiaryService;
 
     /**
      * 文件上传路径
@@ -316,76 +313,6 @@ public class CircleServiceImpl implements CircleService {
         }
     }
 
-    /**
-     * @param userDiary 用户打卡数据
-     * @return
-     * @deprecated 弃用此方法，{@link UserDiaryService}
-     */
-    @Deprecated
-    @Override
-    public String updateSignInData(UserDiary userDiary) {
-        ArrayList<String> strs = new ArrayList<>();
-        strs.add("userId");
-        strs.add("diaryStatus");
-        strs.add("circleId");
-        if (CclUtil.classPropertyIsNull(userDiary, strs)) {
-            // 设置日志创建时间
-            userDiary.setDiaryCreatetime(new Date());
-            JoinCircle circleInfo = joinCircleMapper.selectByPrimaryKey(userDiary.getCircleId(), userDiary.getUserId());
-            if (circleInfo.getUserSignStatus().equals(0)) {
-                // 设置打卡状态
-                circleInfo.setUserSignStatus(1);
-                // 打卡天数+1
-                circleInfo.setUserSigninDay(circleInfo.getUserSigninDay() + 1);
-                // 今天未打卡
-                String signInTime = DateUtil.format(new Date(), "yyyy-MM-dd");
-                // 检测用户是否从未打卡
-                boolean userClockin = (circleInfo.getClockinCalendar() == null || StringUtils.isEmpty(circleInfo.getClockinCalendar()))
-                        && StringUtils.isEmpty(circleInfo.getUserSignTime());
-                if (userClockin) {
-                    // 用户从未打卡 （设置连续打卡天数为1，活跃度积分+1，打卡天数设置为1）
-                    circleInfo.setClockinCalendar(signInTime);
-                    // 设置打卡时间
-                    circleInfo.setUserSignTime(new Date());
-                    // 设置连续打卡数为1
-                    circleInfo.setUserSignin(1);
-                    // 设置用户积分为1
-                    circleInfo.setUserVitality(1L);
-                } else {
-                    // 用户曾经打卡
-                    String dSignInTime = "," + signInTime;
-                    circleInfo.setClockinCalendar(circleInfo.getClockinCalendar() + dSignInTime);
-                    long day = DateUtil.between(new Date(), circleInfo.getUserSignTime(), DateUnit.DAY);
-                    // 设置打卡时间
-                    circleInfo.setUserSignTime(new Date());
-                    if (day == 1 || day == 0) {
-                        // 是连续签到（检测连续打卡是否为7的倍数）
-                        circleInfo.setUserSignin(circleInfo.getUserSignin() + 1);
-                        if (circleInfo.getUserSignin() % EnumUserVitality.INTEGRATION_PERIOD.getValue() == 0) {
-                            // 是7的倍数积分+5
-                            circleInfo.setUserVitality(circleInfo.getUserVitality() + EnumUserVitality.USER_CONTINUOUS_CLOCK_IN.getValue());
-                        } else {
-                            // 不是7的倍数积分+1
-                            circleInfo.setUserVitality(circleInfo.getUserVitality() + EnumUserVitality.USER_NO_CONTINUOUS_CLOCK_IN.getValue());
-                        }
-                    } else {
-                        // 不是连续签到（将连续签到设置为1,积分+1）
-                        circleInfo.setUserSignin(1);
-                        circleInfo.setUserVitality(circleInfo.getUserVitality() + EnumUserVitality.USER_NO_CONTINUOUS_CLOCK_IN.getValue());
-                    }
-                }
-                joinCircleMapper.updateByPrimaryKeySelective(circleInfo);
-                userDiaryMapper.insertSelective(userDiary);
-                return String.valueOf(userDiary.getId());
-            } else {
-                // 今天已经打卡
-                return "success";
-            }
-        } else {
-            return "fail";
-        }
-    }
-
     @Override
     public String selectCircleDTO(List<CircleInfo> circles) {
         // 正常查询 热门查询 最新查询
@@ -395,7 +322,11 @@ public class CircleServiceImpl implements CircleService {
             CirclesDTO circlesDTO = new CirclesDTO();
             // 查询圈子中正常状态的用户
             Integer sumperson = joinCircleMapper.countByCircleIdAndUserStatus(circle.getCircleId(), EnumUserCircle.USER_NORMAL_STATUS.getValue());
-            Long sumdiary = userDiaryMapper.countByCircleId(circle.getCircleId(), null);
+            // 根据日志状态查询日志信息
+            ArrayList<Integer> diaryStatus = new ArrayList<>();
+            diaryStatus.add(EnumUserDiary.USER_DIARY_NORMAL.getValue());
+            diaryStatus.add(EnumUserDiary.USER_DIARY_PERMISSION.getValue());
+            Long sumdiary = userDiaryService.countByCircleIdAndDiaryStatus(circle.getCircleId(), diaryStatus);
             BeanUtils.copyProperties(circle, circlesDTO);
             circlesDTO.setJoinPerson(sumperson);
             circlesDTO.setSumDiary(sumdiary);
@@ -423,16 +354,6 @@ public class CircleServiceImpl implements CircleService {
         } else {
             return false;
         }
-    }
-
-    @Override
-    public Boolean judgeUserInCircle(String circleId, String userid) {
-        List<String> userids = joinCircleMapper.selectUserIdByCircleId(Long.valueOf(circleId));
-        JoinCircle circleInfo = joinCircleMapper.selectByPrimaryKey(Long.valueOf(circleId), userid);
-        if (userids.contains(userid) && circleInfo.getUserStatus().equals(EnumUserCircle.USER_NORMAL_STATUS.getValue())) {
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -467,111 +388,6 @@ public class CircleServiceImpl implements CircleService {
         circleAllMember.add(str2);
         circleAllMember.add(str3);
         return circleAllMember;
-    }
-
-    /**
-     * @param circleid 圈子id
-     * @param userid   用户id
-     * @param page     页数
-     * @return
-     */
-    @Override
-    public String getAllDiaryInfo(String circleid, String userid, Integer page) {
-        boolean nextPage = false;
-        // 用户是否为圈子成员
-        Boolean userJoinStatus = circleService.judgeUserInCircle(circleid, userid);
-        Integer flag = null;
-        if (!userJoinStatus) {
-            // 不是圈子成员
-            flag = EnumUserDiary.USER_DIARY_PERMISSION.getValue();
-        }
-        // 获取日志总数,是否过滤掉不是此圈子的日志
-        long diarySum = userDiaryMapper.countByCircleId(Long.valueOf(circleid), flag);
-        // 获取总页数
-        long allPageNumber = diarySum % PAGE_AMOUNT == 0 ? diarySum / PAGE_AMOUNT : diarySum / PAGE_AMOUNT + 1;
-        // 用户日志信息
-        List<UserDiary> userDiaries = userDiaryMapper.selectAllByCircleIdAndLimit(Long.valueOf(circleid), page * PAGE_AMOUNT, PAGE_AMOUNT, flag);
-        if ((allPageNumber - 1) != page) {
-            nextPage = true;
-        }
-        return circleService.getCircleDiaryInfo(userDiaries, userid, nextPage);
-    }
-
-    @Override
-    public String getAssignDiaryInfo(String circleid, String userid, Integer page) {
-        boolean nextPage = false;
-        // 获取日志总数
-        Long diarySum = userDiaryMapper.countByCircleIdAndUserId(Long.valueOf(circleid), userid);
-        // 获取总页数
-        long allPageNumber = diarySum % PAGE_AMOUNT == 0 ? diarySum / PAGE_AMOUNT : diarySum / PAGE_AMOUNT + 1;
-        // 用户日志信息
-        List<UserDiary> userDiaries = userDiaryMapper.selectAllByCircleIdAndUserIdAndLimit(Long.valueOf(circleid), userid, page * PAGE_AMOUNT, PAGE_AMOUNT);
-        if ((allPageNumber - 1) != page) {
-            nextPage = true;
-        }
-        return circleService.getCircleDiaryInfo(userDiaries, userid, nextPage);
-    }
-
-    @SneakyThrows
-    @Override
-    public String getCircleDiaryInfo(List<UserDiary> userDiaries, String loginUserid, Boolean nextPage) {
-        List<UserDiaryDTO> userDiaryDTOS = new ArrayList<>();
-        for (UserDiary userDiary : userDiaries) {
-            UserDiaryDTO userDiaryDTO = new UserDiaryDTO();
-            BeanUtils.copyProperties(userDiary, userDiaryDTO);
-            // 设置是否还有下一页
-            userDiaryDTO.setHasMoreData(nextPage);
-            Boolean ellipsis = CclUtil.judgeTextEllipsis(userDiary.getDiaryContent());
-            userDiaryDTO.setEllipsis(ellipsis);
-            userDiaryDTO.setJudgeEllipsis(ellipsis);
-            if (StringUtils.isEmpty(userDiary.getDiaryImage())) {
-                userDiaryDTO.setImages(null);
-            } else {
-                userDiaryDTO.setImages(Arrays.asList(userDiary.getDiaryImage().split(",")));
-            }
-            // 判断是否需要隐藏评论
-            DiaryHideComment diaryHideComment = commentService.judgeHideCommentById(userDiary.getId());
-            userDiaryDTO.setHideComment(diaryHideComment.getHideComment());
-            // 设置日记评论和回复的总数
-            userDiaryDTO.setCommentSum(diaryHideComment.getCommentSum());
-            // 查找日志点赞人，点赞人信息
-            List<UserInfo> allLikeUserNickName = circleService.getAllLikeUserNickName(loginUserid, String.valueOf(userDiary.getCircleId()), userDiary.getId());
-            // 查找全部的评论
-            List<CommentDTO> diaryComment = commentService.getOneDiaryCommentInfoById(userDiary.getId());
-            // 查找全部的点评
-            List<CommentDTO> masterComment = circleService.getMasterComment(userDiary.getId());
-            // 查找拼接的字符串
-            String allLikeUserNickname = circleService.getAllLikeUserNickName(allLikeUserNickName);
-            // 设置拼接的字符串
-            userDiaryDTO.setLikeUserInfosStr(allLikeUserNickname);
-            // 设置评论
-            userDiaryDTO.setComments(diaryComment);
-            // 设置点评
-            userDiaryDTO.setMasterComments(masterComment);
-            // 设置点赞人信息
-            userDiaryDTO.setLikeUserInfos(allLikeUserNickName);
-            // 设置点赞状态
-            userDiaryDTO.setLikeStatus(circleService.judgeDiaryLikeStatus(loginUserid, String.valueOf(userDiary.getCircleId()), userDiary.getId()));
-            // 获取用户信息
-            UserInfo userInfo = userInfoMapper.selectByPrimaryKey(userDiary.getUserId());
-            JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(userDiary.getCircleId(), userDiary.getUserId());
-            // 设置创建时间
-            userDiaryDTO.setFormatCreateTime(DateUtil.format(userDiary.getDiaryCreatetime(), DatePattern.NORM_DATETIME_PATTERN));
-            // 设置用户头像
-            userDiaryDTO.setUserHeadImage(userInfo.getAvatarurl());
-            // 设置用户昵称
-            userDiaryDTO.setUserNickName(userInfo.getNickname());
-            // 设置用户性别
-            userDiaryDTO.setUserGender(userInfo.getGender());
-            // 设置用户打卡天数
-            userDiaryDTO.setUserSignNumber(joinCircle.getUserSigninDay());
-            // 设置用户连续打卡天数
-            userDiaryDTO.setUserSignin(joinCircle.getUserSignin());
-            // 设置用户处理后的创建时间 （几天前）
-            userDiaryDTO.setCreateTimeRelative(CclDateUtil.todayDate(userDiary.getDiaryCreatetime()));
-            userDiaryDTOS.add(userDiaryDTO);
-        }
-        return JSON.toJSONStringWithDateFormat(userDiaryDTOS, DatePattern.NORM_DATE_PATTERN, SerializerFeature.DisableCircularReferenceDetect);
     }
 
     @Override
