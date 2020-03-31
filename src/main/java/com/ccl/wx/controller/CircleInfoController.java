@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -40,13 +41,14 @@ public class CircleInfoController {
     private CircleInfoService circleInfoService;
 
     /**
-     * 创建圈子 将圈子活力设置为0 等等。。。
+     * 创建圈子
      *
      * @param circleInfo 圈子信息数据
      * @return
      */
-    @PostMapping("/foundqz")
-    public String foundCircle(@RequestBody(required = false) CircleInfo circleInfo) {
+    @PostMapping("/found")
+    public String foundCircle(@RequestBody(required = false) CircleInfo circleInfo,
+                              @RequestParam(value = "image", required = false) MultipartFile image) {
         ArrayList<String> strs = new ArrayList<>();
         // 圈主id
         strs.add("circleUserid");

@@ -49,5 +49,13 @@ public interface CommentService {
     int updateByPrimaryKey(Comment record);
 
     List<Long> selectIdByDiaryId(Long diaryId);
+
+    /**
+     * 获取全部的日志点评
+     *
+     * @param diaryId 日志id
+     * @return
+     */
+    List<CommentDTO> getMasterComment(Long diaryId);
 }
 

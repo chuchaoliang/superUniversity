@@ -5,6 +5,7 @@ import com.ccl.wx.dto.ReplyDTO;
 import com.ccl.wx.entity.Comment;
 import com.ccl.wx.entity.Reply;
 import com.ccl.wx.entity.UserInfo;
+import com.ccl.wx.enums.EnumComment;
 import com.ccl.wx.mapper.CommentMapper;
 import com.ccl.wx.mapper.ReplyMapper;
 import com.ccl.wx.pojo.DiaryHideComment;
@@ -46,6 +47,41 @@ public class CommentServiceImpl implements CommentService {
      * 评论的回复数量
      */
     public static final Integer COMMENT_REPLY_NUMBER = 3;
+
+    @Override
+    public int deleteByPrimaryKey(Long id) {
+        return commentMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public int insert(Comment record) {
+        return commentMapper.insert(record);
+    }
+
+    @Override
+    public int insertSelective(Comment record) {
+        return commentMapper.insertSelective(record);
+    }
+
+    @Override
+    public Comment selectByPrimaryKey(Long id) {
+        return commentMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public int updateByPrimaryKeySelective(Comment record) {
+        return commentMapper.updateByPrimaryKeySelective(record);
+    }
+
+    @Override
+    public int updateByPrimaryKey(Comment record) {
+        return commentMapper.updateByPrimaryKey(record);
+    }
+
+    @Override
+    public List<Long> selectIdByDiaryId(Long diaryId) {
+        return commentMapper.selectIdByDiaryId(diaryId);
+    }
 
     @Override
     public List<CommentDTO> getOneDiaryCommentInfoById(Long diaryId) {
@@ -119,38 +155,27 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public int deleteByPrimaryKey(Long id) {
-        return commentMapper.deleteByPrimaryKey(id);
-    }
-
-    @Override
-    public int insert(Comment record) {
-        return commentMapper.insert(record);
-    }
-
-    @Override
-    public int insertSelective(Comment record) {
-        return commentMapper.insertSelective(record);
-    }
-
-    @Override
-    public Comment selectByPrimaryKey(Long id) {
-        return commentMapper.selectByPrimaryKey(id);
-    }
-
-    @Override
-    public int updateByPrimaryKeySelective(Comment record) {
-        return commentMapper.updateByPrimaryKeySelective(record);
-    }
-
-    @Override
-    public int updateByPrimaryKey(Comment record) {
-        return commentMapper.updateByPrimaryKey(record);
-    }
-
-    @Override
-    public List<Long> selectIdByDiaryId(Long diaryId) {
-        return commentMapper.selectIdByDiaryId(diaryId);
+    public List<CommentDTO> getMasterComment(Long diaryId) {
+        // 获取日记的点评 TODO ----------------------------
+        List<Comment> comments = commentMapper.selectAllByDiaryIdAndCommentTypeOrderByCommentCreatetimeDesc(diaryId, 1, 0, 5);
+        ArrayList<CommentDTO> commentDTOS = new ArrayList<>();
+        for (Comment comment : comments) {
+            if (EnumComment.COMMENT_DELETE_STATUS.getValue().equals(comment.getCommentStatus())) {
+                // 点评为删除状态
+                continue;
+            }
+            CommentDTO commentDTO = new CommentDTO();
+            UserInfo userInfo = userInfoService.selectByPrimaryKey(comment.getUserId());
+            BeanUtils.copyProperties(comment, commentDTO);
+            // 设置用户昵称
+            commentDTO.setNickName(userInfo.getNickname());
+            // 设置用户头像
+            commentDTO.setHeadImage(userInfo.getAvatarurl());
+            // 设置用户性别
+            commentDTO.setGender(userInfo.getGender());
+            commentDTOS.add(commentDTO);
+        }
+        return commentDTOS;
     }
 }
 

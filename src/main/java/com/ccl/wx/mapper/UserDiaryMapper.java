@@ -26,22 +26,23 @@ public interface UserDiaryMapper {
     int updateByPrimaryKey(UserDiary record);
 
     /**
-     * 获取圈子内所有的日志总数
+     * 根据圈子id 和日志状态获取日志总数
      *
-     * @param circleId
-     * @param flag
+     * @param circleId    圈子id
+     * @param diaryStatus 日志状态
      * @return
      */
-    Long countByCircleId(@Param("circleId") Long circleId, @Param("flag") Integer flag);
+    Long countByCircleIdAndDiaryStatus(@Param("circleId") Long circleId, @Param("diaryStatus") List<Integer> diaryStatus);
 
     /**
      * 根据圈子id 和用户id 获取所有的日志总数
      *
-     * @param circleId
-     * @param userId
+     * @param circleId    圈子id
+     * @param userId      用户id
+     * @param diaryStatus 日记状态列表
      * @return
      */
-    Long countByCircleIdAndUserId(@Param("circleId") Long circleId, @Param("userId") String userId);
+    Long countByCircleIdAndUserId(@Param("circleId") Long circleId, @Param("userId") String userId, @Param("diaryStatus") List<Integer> diaryStatus);
 
     /**
      * 拼接日记图片字符串
@@ -67,10 +68,9 @@ public interface UserDiaryMapper {
      * @param circleId   圈子id
      * @param start      起始数
      * @param pageNumber 每一页的数据
-     * @param flag
      * @return
      */
-    List<UserDiary> selectAllByCircleIdAndLimit(@Param("circleId") Long circleId, @Param("start") Integer start, @Param("pageNumber") Integer pageNumber, @Param("flag") Integer flag);
+    List<UserDiary> selectAllByCircleIdAndLimit(@Param("circleId") Long circleId, @Param("start") Integer start, @Param("pageNumber") Integer pageNumber, @Param("diaryStatus") List<Integer> diaryStatus);
 
     /**
      * 根据圈子id和用户id查找日记信息 分页

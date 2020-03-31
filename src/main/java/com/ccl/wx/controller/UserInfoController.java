@@ -131,7 +131,7 @@ public class UserInfoController {
      * @return
      */
     @PostMapping("/user/save")
-    public String setUserInfo(@Validated(UserInfo.Default.class) @RequestBody UserInfo userInfo) {
+    public String userInfo(@Validated(UserInfo.Default.class) @RequestBody UserInfo userInfo) {
         return userInfoService.saveUserInfo(userInfo);
     }
 }
