@@ -8,12 +8,15 @@ public class UserIsNullException extends RuntimeException {
 
     private final String userId;
 
-    private final String url;
+    private String path;
 
-    public UserIsNullException(String userId, String url) {
-        super("");
+    public UserIsNullException(String userId, String path) {
         this.userId = userId;
-        this.url = url;
+        this.path = path;
+    }
+
+    public UserIsNullException(String userId) {
+        this.userId = userId;
     }
 
     @Override
@@ -21,8 +24,8 @@ public class UserIsNullException extends RuntimeException {
         return "查询不到此用户的相关信息:\'" + this.userId + "\'";
     }
 
-    public String getUrl() {
-        return url;
+    public String getPath() {
+        return path;
     }
 
     public String getUserId() {

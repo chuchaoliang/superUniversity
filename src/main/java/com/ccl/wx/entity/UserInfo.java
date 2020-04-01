@@ -27,16 +27,19 @@ public class UserInfo {
     /**
      * 用户的昵称
      */
+    @NotBlank(message = "用户昵称不能为空！", groups = {Default.class})
     private String nickname;
 
     /**
      * 头像地址
      */
+    @NotBlank(message = "头像地址不能为空！", groups = {Default.class})
     private String avatarurl;
 
     /**
      * 性别（1男2女）
      */
+    @NotBlank(message = "用户性别不能为空", groups = {Default.class})
     private String gender;
 
     /**

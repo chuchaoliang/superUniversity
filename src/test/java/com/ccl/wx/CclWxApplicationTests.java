@@ -1,5 +1,8 @@
 package com.ccl.wx;
 
+import com.ccl.wx.common.EnumResultCode;
+import com.ccl.wx.common.IResultCode;
+import com.ccl.wx.common.Result;
 import com.ccl.wx.mapper.*;
 import com.ccl.wx.properties.DefaultProperties;
 import com.ccl.wx.service.CircleScheduleService;
@@ -21,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 
 @Slf4j
 @RunWith(SpringRunner.class)
@@ -70,11 +72,14 @@ public class CclWxApplicationTests {
 
     @Test
     public void test1() {
-        ArrayList<Integer> ite = new ArrayList<>();
-        ite.add(0);
-        ite.add(1);
-        int size = userDiaryMapper.selectAllByCircleIdAndDiaryStatus(5L, ite).size();
-        System.out.println(size);
+        Result<Object> objectResult = test3(EnumResultCode.USER_LOGIN_FAIL);
+        System.out.println(objectResult.toString());
+    }
+
+    public <T> Result<T> test3(IResultCode iResultCode) {
+        String message = iResultCode.getMessage();
+        Integer status = iResultCode.getStatus();
+        return new Result<T>(status, message);
     }
 
     @SneakyThrows

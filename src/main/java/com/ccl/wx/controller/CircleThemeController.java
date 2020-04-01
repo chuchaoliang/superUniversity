@@ -4,10 +4,12 @@ import cn.hutool.core.date.DatePattern;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.annotation.ParamCheck;
+import com.ccl.wx.common.Result;
 import com.ccl.wx.dto.CircleTodayContentDTO;
 import com.ccl.wx.entity.TodayContent;
 import com.ccl.wx.service.TodayContentService;
 import com.ccl.wx.service.UserDiaryService;
+import com.ccl.wx.util.ResponseMsgUtil;
 import com.ccl.wx.vo.CircleThemeVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -46,9 +48,9 @@ public class CircleThemeController {
     @SneakyThrows
     @ParamCheck
     @GetMapping("/theme/get/one")
-    public String getCircleTodayContentById(@RequestParam(value = "themeId", required = false) Long themeId,
+    public Result<String> getCircleTodayContentById(@RequestParam(value = "themeId", required = false) Long themeId,
                                             @RequestParam(value = "circleId", required = false) Long circleId) {
-        return todayContentService.selectCircleThemeInfoById(themeId, circleId);
+        return ResponseMsgUtil.success(todayContentService.selectCircleThemeInfoById(themeId, circleId));
     }
 
     @Resource

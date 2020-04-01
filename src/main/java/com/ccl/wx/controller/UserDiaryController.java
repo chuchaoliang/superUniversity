@@ -3,12 +3,14 @@ package com.ccl.wx.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.annotation.ParamCheck;
+import com.ccl.wx.common.Result;
 import com.ccl.wx.dto.UserDiaryDTO;
 import com.ccl.wx.entity.UserDiary;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.service.CircleService;
 import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.util.CclUtil;
+import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -148,10 +150,10 @@ public class UserDiaryController {
     })
     @ParamCheck
     @GetMapping("/diary/get/all")
-    public String getDiaryInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+    public Result<String> getDiaryInfo(@RequestParam(value = "circleId", required = false) Long circleId,
                                @RequestParam(value = "userId", required = false) String userId,
                                @RequestParam(value = "page", required = false) Integer page) {
-        return userDiaryService.getAllDiaryInfo(circleId, userId, page);
+        return ResponseMsgUtil.success(userDiaryService.getAllDiaryInfo(circleId, userId, page));
     }
 
     /**

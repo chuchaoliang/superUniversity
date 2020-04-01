@@ -2,12 +2,14 @@ package com.ccl.wx.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.ccl.wx.annotation.ParamCheck;
+import com.ccl.wx.common.Result;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.entity.JoinCircle;
 import com.ccl.wx.service.CircleInfoService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.impl.CircleServiceImpl;
 import com.ccl.wx.util.CclUtil;
+import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -99,9 +101,9 @@ public class CircleInfoController {
     })
     @ParamCheck
     @GetMapping("/home")
-    public String getCircle(@RequestParam(value = "circleId", required = false) Long circleId,
+    public Result<String> getCircle(@RequestParam(value = "circleId", required = false) Long circleId,
                             @RequestParam(value = "userId", required = false) String userId) {
-        return circleInfoService.getCircleIndexAllContent(userId, circleId.intValue());
+        return ResponseMsgUtil.success(circleInfoService.getCircleIndexAllContent(userId, circleId.intValue()));
     }
 
     /**

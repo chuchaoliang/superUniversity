@@ -3,6 +3,7 @@ package com.ccl.wx.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
  * @date 2020/1/12 10:31
  */
 @Data
-public class CircleTodayContentDTO {
+public class CircleTodayContentDTO implements Serializable {
 
     /**
      * 圈子主题主键
@@ -29,11 +30,6 @@ public class CircleTodayContentDTO {
      * 今日内容
      */
     private String todayContent;
-
-    /**
-     * 今日内容图片地址
-     */
-    private String todayImage;
 
     /**
      * 创建时间
