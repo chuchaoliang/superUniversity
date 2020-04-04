@@ -14,11 +14,12 @@
         <result column="createtime" jdbcType="TIMESTAMP" property="createtime"/>
         <result column="updatetime" jdbcType="TIMESTAMP" property="updatetime"/>
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="uid" jdbcType="VARCHAR" property="uid"/>
     </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         id, nickName, avatarUrl, gender, province, city, country, createtime, updatetime,
-        user_id
+        user_id, `uid`
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
         <!--@mbg.generated-->
@@ -37,13 +38,14 @@
         insert into user_info (id, nickName, avatarUrl,
         gender, province, city,
         country, createtime, updatetime,
-        user_id)
+        user_id, `uid`)
         values (#{id,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, #{avatarurl,jdbcType=VARCHAR},
         #{gender,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR},
         #{country,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP}, #{updatetime,jdbcType=TIMESTAMP},
-        #{userId,jdbcType=BIGINT})
+        #{userId,jdbcType=BIGINT}, #{uid,jdbcType=VARCHAR})
     </insert>
-    <insert id="insertSelective" parameterType="com.ccl.wx.entity.UserInfo">
+    <insert id="insertSelective" parameterType="com.ccl.wx.entity.UserInfo" useGeneratedKeys="true" keyProperty="userId"
+            keyColumn="userId">
         <!--@mbg.generated-->
         insert into user_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -77,6 +79,9 @@
             <if test="userId != null">
                 user_id,
             </if>
+            <if test="uid != null">
+                `uid`,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -108,6 +113,9 @@
             </if>
             <if test="userId != null">
                 #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="uid != null">
+                #{uid,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -142,6 +150,9 @@
             <if test="userId != null">
                 user_id = #{userId,jdbcType=BIGINT},
             </if>
+            <if test="uid != null">
+                `uid` = #{uid,jdbcType=VARCHAR},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
@@ -156,7 +167,8 @@
         country = #{country,jdbcType=VARCHAR},
         createtime = #{createtime,jdbcType=TIMESTAMP},
         updatetime = #{updatetime,jdbcType=TIMESTAMP},
-        user_id = #{userId,jdbcType=BIGINT}
+        user_id = #{userId,jdbcType=BIGINT},
+        `uid` = #{uid,jdbcType=VARCHAR}
         where id = #{id,jdbcType=VARCHAR}
     </update>
 
@@ -193,5 +205,9 @@
         <if test="updatetime != null">
             and updatetime=#{updatetime,jdbcType=TIMESTAMP}
         </if>
+    </select>
+    <select id="selectMaxUserId" resultType="java.lang.Integer">
+        select max(user_id)
+        from user_info
     </select>
 </mapper>

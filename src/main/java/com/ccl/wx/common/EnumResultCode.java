@@ -24,7 +24,9 @@ public enum EnumResultCode implements IResultCode {
 
     USER_JOIN_CIRCLE_NULL(1003, "用户不存在此圈子中，或者被淘汰！"),
 
-    THEME_IS_NULL(1004, "此主题已经过期，或者不存在了！");
+    THEME_IS_NULL(1004, "此主题已经过期，或者不存在了！"),
+
+    CIRCLE_NAME_REPETITION(1005, "圈子昵称重复！");
 
     private final int status;
 

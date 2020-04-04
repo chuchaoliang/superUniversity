@@ -151,8 +151,8 @@ public class UserDiaryController {
     @ParamCheck
     @GetMapping("/diary/get/all")
     public Result<String> getDiaryInfo(@RequestParam(value = "circleId", required = false) Long circleId,
-                               @RequestParam(value = "userId", required = false) String userId,
-                               @RequestParam(value = "page", required = false) Integer page) {
+                                       @RequestParam(value = "userId", required = false) String userId,
+                                       @RequestParam(value = "page", required = false) Integer page) {
         return ResponseMsgUtil.success(userDiaryService.getAllDiaryInfo(circleId, userId, page));
     }
 

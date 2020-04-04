@@ -56,7 +56,6 @@ public class Result<T> {
     public Result(Integer status, String message, T data) {
         this.status = status;
         this.message = message;
-        //this.data = data;
         this.data = (T) JSON.parse((String) data);
     }
 

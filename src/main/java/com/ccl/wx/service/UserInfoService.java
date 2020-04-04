@@ -20,7 +20,15 @@ public interface UserInfoService {
 
     int updateByPrimaryKey(UserInfo record);
 
-    String userLogin(String code);
+    /**
+     * 用户登录操作
+     *
+     * @param code
+     * @param encryptedData
+     * @param iv
+     * @return
+     */
+    String userLogin(String code, String encryptedData, String iv);
 
     /**
      * 将session_key，openid字符串处理后 转为json对象返回
@@ -38,3 +46,4 @@ public interface UserInfoService {
      */
     String saveUserInfo(UserInfo userInfo);
 }
+

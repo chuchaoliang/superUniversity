@@ -49,7 +49,7 @@ public class CircleThemeController {
     @ParamCheck
     @GetMapping("/theme/get/one")
     public Result<String> getCircleTodayContentById(@RequestParam(value = "themeId", required = false) Long themeId,
-                                            @RequestParam(value = "circleId", required = false) Long circleId) {
+                                                    @RequestParam(value = "circleId", required = false) Long circleId) {
         return ResponseMsgUtil.success(todayContentService.selectCircleThemeInfoById(themeId, circleId));
     }
 

@@ -1,20 +1,14 @@
 package com.ccl.wx.util;
 
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateUtil;
+import com.ccl.wx.common.EnumResultCode;
 import com.ccl.wx.common.IResultCode;
 import com.ccl.wx.common.Result;
-import com.ccl.wx.common.EnumResultCode;
-
-import java.util.Date;
 
 /**
  * @author 褚超亮
  * @date 2020/3/2 17:57
  */
 public class ResponseMsgUtil {
-
-    public static final String TIMESTAMP = DateUtil.format(new Date(), DatePattern.NORM_DATETIME_PATTERN);
 
     private ResponseMsgUtil() {
     }
@@ -74,6 +68,17 @@ public class ResponseMsgUtil {
      */
     public static <T> Result<T> fail(String message) {
         return new Result<>(EnumResultCode.FAIL.getStatus(), message);
+    }
+
+    /**
+     * 失败请求
+     *
+     * @param iResultCode
+     * @param <T>
+     * @return
+     */
+    public static <T> Result<T> fail(IResultCode iResultCode) {
+        return new Result<>(iResultCode.getStatus(), iResultCode.getMessage());
     }
 
     /**

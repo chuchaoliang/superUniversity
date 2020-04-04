@@ -136,10 +136,13 @@ public class UserInfoController {
      * @param code 登录code 前端传输
      * @return
      */
+    @ParamCheck
     @GetMapping("/user/login")
-    public Result<String> userLogin(@ParamCheck @RequestParam(value = "code", required = false) String code) {
+    public Result<String> userLogin(@RequestParam(value = "code", required = false) String code,
+                                    @RequestParam(value = "encryptedData", required = false) String encryptedData,
+                                    @RequestParam(value = "iv", required = false) String iv) {
         // 拼接url字符串
-        String result = userInfoService.userLogin(code);
+        String result = userInfoService.userLogin(code, encryptedData, iv);
         if (result.equals(EnumResultStatus.FAIL.getValue())) {
             // 登录失败
             return ResponseMsgUtil.fail(EnumResultCode.UNAUTHORIZED.getStatus(), "登录失败！");
@@ -155,7 +158,7 @@ public class UserInfoController {
      * @return
      */
     @PostMapping("/user/save")
-    public Result userInfo(@Validated(UserInfo.Default.class) @RequestBody UserInfo userInfo, BindingResult result) {
+    public Result userInfo(@Validated @RequestBody UserInfo userInfo, BindingResult result) {
         if (result.hasErrors()) {
             // 存在错误
             return ResponseMsgUtil.exception(EnumResultCode.FAIL.getStatus(), Objects.requireNonNull(result.getFieldError()).getDefaultMessage());

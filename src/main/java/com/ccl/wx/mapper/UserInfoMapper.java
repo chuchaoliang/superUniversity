@@ -1,14 +1,14 @@
 package com.ccl.wx.mapper;
 
 import com.ccl.wx.entity.UserInfo;
-
-import java.util.List;
+import org.apache.ibatis.annotations.Mapper;import java.util.List;
 
 /**
  * @author 褚超亮
- * @date 2020/3/5 12:13
+ * @date 2020/4/3 23:00
  */
 
+@Mapper
 public interface UserInfoMapper {
     int deleteByPrimaryKey(String id);
 
@@ -23,4 +23,10 @@ public interface UserInfoMapper {
     int updateByPrimaryKey(UserInfo record);
 
     List<UserInfo> findByAll(UserInfo userInfo);
+
+    /**
+     * 获取用户自增键最大值
+     * @return
+     */
+    Integer selectMaxUserId();
 }

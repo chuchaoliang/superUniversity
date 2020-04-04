@@ -4,7 +4,6 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import com.ccl.wx.enums.EnumResultStatus;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -386,6 +385,21 @@ public class CclUtil {
     }
 
     /**
+     * 获取上传地址
+     * @param userid 用户id
+     * @return
+     */
+    public static String getFileUploadAddress(String userid) {
+        StringBuilder fileAddress = new StringBuilder();
+        fileAddress
+                .append(FILE_LOCAL_PATH.replace("/", File.separator))
+                .append(userid).append(File.separator)
+                .append(cn.hutool.core.date.DateUtil.format(new Date(), DatePattern.PURE_DATE_PATTERN))
+                .append(File.separator);
+        return fileAddress.toString();
+    }
+
+    /**
      * 根据文件列表删除全部文件信息
      *
      * @param files 文件列表
@@ -420,6 +434,23 @@ public class CclUtil {
                 .append(UUID.randomUUID().toString().replace("-", "").toLowerCase())
                 .append(".")
                 .append(FilenameUtils.getExtension(file.getOriginalFilename()));
+        return fileAddress.toString();
+    }
+
+    /**
+     * 获取文件名
+     *
+     * @param suffix 文件后缀
+     * @return
+     */
+    public static String getFileUploadName(String suffix) {
+        StringBuffer fileAddress = new StringBuffer();
+        fileAddress
+                .append(DateUtil.format(new Date(), "yyyyMMddHHmmss"))
+                .append("_")
+                .append(UUID.randomUUID().toString().replace("-", "").toLowerCase())
+                .append(".")
+                .append(suffix);
         return fileAddress.toString();
     }
 
@@ -613,5 +644,15 @@ public class CclUtil {
      */
     public static String voiceDispose(String voice, String historyVoice) {
         return "";
+    }
+
+    /**
+     * 获取用户uid
+     *
+     * @param id 用户的主键
+     * @return
+     */
+    public static String getUid(int id) {
+        return String.valueOf(1000 + id);
     }
 }

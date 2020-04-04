@@ -3,6 +3,7 @@ package com.ccl.wx.util;
 import cn.hutool.extra.ftp.Ftp;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.properties.FtpProperties;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author CCL
@@ -50,6 +52,7 @@ public class FtpUtil {
         ftp = new Ftp(ftpProperties.getHost(), ftpProperties.getPort(), ftpProperties.getUser(), ftpProperties.getPassword());
     }
 
+    @SneakyThrows
     public static String uploadFile(String userid, MultipartFile file) {
         String filename = CclUtil.getFileUploadName(file);
         String fileaddress = CclUtil.getFileUploadAddress(userid, file).replace("\\", "/");
@@ -60,7 +63,7 @@ public class FtpUtil {
         log.info("文件名：" + filename);
         log.info("文件地址：" + fileaddress);
         log.info("处理后的文件地址：" + CclUtil.delStringPrefix(fileaddress, ftpProperties.getBasePath()));
-        boolean uploadStatus = upload(CclUtil.delStringPrefix(fileaddress, ftpProperties.getBasePath()), filename, file);
+        boolean uploadStatus = upload(CclUtil.delStringPrefix(fileaddress, ftpProperties.getBasePath()), filename, file.getInputStream());
         if (uploadStatus) {
             logger.info("文件：【" + file.getOriginalFilename() + "】上传成功");
             return ftpProperties.getHttpPath() + CclUtil.delStringPrefix(fileaddress, FILE_USELESS_PREFIX) + filename;
@@ -86,16 +89,15 @@ public class FtpUtil {
         }
     }
 
-
     /**
      * Description: 向FTP服务器上传文件
      *
-     * @param filePath FTP服务器文件存放路径。
-     * @param filename 上传到FTP服务器上的文件名
-     * @param file     文件
+     * @param filePath    FTP服务器文件存放路径。
+     * @param filename    上传到FTP服务器上的文件名
+     * @param inputStream 文件输入流
      * @return 成功返回true，否则返回false
      */
-    public static boolean upload(String filePath, String filename, MultipartFile file) {
+    public static boolean upload(String filePath, String filename, InputStream inputStream) {
         boolean result = false;
         FTPClient ftp = new FTPClient();
         try {
@@ -135,10 +137,10 @@ public class FtpUtil {
             // 设置为被动模式上传文件
             ftp.enterLocalPassiveMode();
             //上传文件
-            if (!ftp.storeFile(filename, file.getInputStream())) {
+            if (!ftp.storeFile(filename, inputStream)) {
                 return false;
             }
-            file.getInputStream().close();
+            inputStream.close();
             ftp.logout();
             result = true;
         } catch (IOException e) {
