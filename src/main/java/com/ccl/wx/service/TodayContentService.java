@@ -152,6 +152,24 @@ public interface TodayContentService {
      * @return
      */
     String updateCircleTodayContent(CircleTodayContentDTO circleTodayContentDTO);
+
+    /**
+     * 根据圈子id 和主题id获取主题信息
+     *
+     * @param circleId 圈子id
+     * @param id       主题id
+     * @return
+     */
+    TodayContent selectByCircleIdAndId(Long circleId, Long id);
+
+    /**
+     * 保存主题头像
+     * @param image
+     * @param userId
+     * @param id
+     * @return
+     */
+    String saveThemeHeadImage(MultipartFile image, String userId, Long id);
 }
 
 

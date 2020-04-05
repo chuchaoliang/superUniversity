@@ -58,7 +58,7 @@ public class FtpUtil {
         String fileaddress = CclUtil.getFileUploadAddress(userid, file).replace("\\", "/");
         if (EnumResultStatus.FAIL.getValue().equals(fileaddress)) {
             // 上传文件类型不支持
-            return EnumResultStatus.UNKNOWN.getValue();
+            return EnumResultStatus.FAIL.getValue();
         }
         log.info("文件名：" + filename);
         log.info("文件地址：" + fileaddress);
