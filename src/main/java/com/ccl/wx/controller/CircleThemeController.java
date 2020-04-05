@@ -4,6 +4,7 @@ import cn.hutool.core.date.DatePattern;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.annotation.ParamCheck;
+import com.ccl.wx.common.EnumResultCode;
 import com.ccl.wx.common.Result;
 import com.ccl.wx.dto.CircleTodayContentDTO;
 import com.ccl.wx.entity.TodayContent;
@@ -45,12 +46,15 @@ public class CircleThemeController {
      * @return
      */
     @ApiOperation(value = "根据主题id获取主题相关信息")
-    @SneakyThrows
     @ParamCheck
     @GetMapping("/theme/get/one")
     public Result<String> getCircleTodayContentById(@RequestParam(value = "themeId", required = false) Long themeId,
                                                     @RequestParam(value = "circleId", required = false) Long circleId) {
-        return ResponseMsgUtil.success(todayContentService.selectCircleThemeInfoById(themeId, circleId));
+        String result = todayContentService.selectCircleThemeInfoById(themeId, circleId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("此主题不存在，可能被删除了！");
+        }
+        return ResponseMsgUtil.success(result);
     }
 
     @Resource
@@ -67,10 +71,14 @@ public class CircleThemeController {
     @ParamCheck
     @ApiOperation(value = "用户打卡获取主题相关信息")
     @GetMapping("/theme/user/signin")
-    public String getThemeUserSignInInfo(@RequestParam(value = "userId", required = false) String userId,
-                                         @RequestParam(value = "circleId", required = false) Long circleId,
-                                         @RequestParam(value = "page", required = false) Integer page) {
-        return todayContentService.selectAllThemeByCircleIdPage(circleId, userId, page, true);
+    public Result<String> getThemeUserSignInInfo(@RequestParam(value = "userId", required = false) String userId,
+                                                 @RequestParam(value = "circleId", required = false) Long circleId,
+                                                 @RequestParam(value = "page", required = false) Integer page) {
+        String result = todayContentService.selectAllThemeByCircleIdPage(circleId, userId, page, true);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("此用户未加入此圈子，或者被淘汰，状态异常！");
+        }
+        return ResponseMsgUtil.success(result);
     }
 
     /**
@@ -83,10 +91,10 @@ public class CircleThemeController {
     @ParamCheck
     @ApiOperation(value = "获取圈子首页的主题")
     @GetMapping("/theme/get/home")
-    public String getAllCircleHomeTheme(@RequestParam(value = "circleId", required = false) Long circleId,
-                                        @RequestParam(value = "userId", required = false) String userId) {
+    public Result<String> getAllCircleHomeTheme(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                @RequestParam(value = "userId", required = false) String userId) {
         List<CircleThemeVO> circleThemeVOS = todayContentService.selectAllThemeByCircleHome(userId, circleId);
-        return JSON.toJSONStringWithDateFormat(circleThemeVOS, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+        return ResponseMsgUtil.success(JSON.toJSONStringWithDateFormat(circleThemeVOS, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat));
     }
 
     /**
@@ -105,10 +113,14 @@ public class CircleThemeController {
     })
     @ParamCheck
     @GetMapping("/theme/get/all/page")
-    public String getAllThemeByCircleIdPage(@RequestParam(value = "circleId", required = false) Long circleId,
-                                            @RequestParam(value = "userId", required = false) String userId,
-                                            @RequestParam(value = "page", required = false) Integer page) {
-        return todayContentService.selectAllThemeByCircleIdPage(circleId, userId, page, false);
+    public Result<String> getAllThemeByCircleIdPage(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                    @RequestParam(value = "userId", required = false) String userId,
+                                                    @RequestParam(value = "page", required = false) Integer page) {
+        String result = todayContentService.selectAllThemeByCircleIdPage(circleId, userId, page, false);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("此用户未加入此圈子，或者被淘汰，状态异常！");
+        }
+        return ResponseMsgUtil.success(result);
     }
 
     /**
@@ -122,9 +134,13 @@ public class CircleThemeController {
     @ParamCheck
     @ApiImplicitParam(name = "contentId", value = "圈子主题Id", dataType = "Long", example = "1")
     @GetMapping("/theme/del")
-    public String deleteTodayContentById(@RequestParam(value = "circleId", required = false) Long circleId,
-                                         @RequestParam(value = "contentId", required = false) Long contentId) {
-        return todayContentService.deleteCircleTheme(circleId, contentId);
+    public Result<String> deleteTodayContentById(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                 @RequestParam(value = "themeId", required = false) Long contentId) {
+        String result = todayContentService.deleteCircleTheme(circleId, contentId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("该主题可能已经被删除了！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
     }
 
     /**

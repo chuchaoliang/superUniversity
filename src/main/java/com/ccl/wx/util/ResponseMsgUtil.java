@@ -27,6 +27,17 @@ public class ResponseMsgUtil {
     }
 
     /**
+     * 操作成功 无返回值
+     *
+     * @param iResultCode
+     * @param <T>
+     * @return
+     */
+    public static <T> Result<T> success(IResultCode iResultCode) {
+        return new Result<>(iResultCode.getStatus(), iResultCode.getMessage());
+    }
+
+    /**
      * 成功返回数据
      *
      * @param iResultCode

@@ -73,17 +73,15 @@ public class ParamCheckAop {
         ParamCheck paramCheck = signature.getMethod().getAnnotation(ParamCheck.class);
         for (int i = 0; i < parameterAnnotations.length; i++) {
             for (int j = 0; j < parameterAnnotations[i].length; j++) {
-                if ("circleid".equals(paramNames[i]) || "circleId".equals(paramNames[i])) {
-                    circleIsNull(Long.valueOf(String.valueOf(paramValues[i])), value[0]);
-                }
                 if (paramCheck != null) {
                     // 说明该注解在方法上
                     paramIsNull(paramNames[i], paramValues[i], parameterTypes[i] == null ? null : parameterTypes[i].getName(), value[0]);
-                    break;
                 }
                 if (parameterAnnotations[i][j] instanceof ParamCheck && ((ParamCheck) parameterAnnotations[i][j]).notNull()) {
                     paramIsNull(paramNames[i], paramValues[i], parameterTypes[i] == null ? null : parameterTypes[i].getName(), value[0]);
-                    break;
+                }
+                if ("circleid".equals(paramNames[i]) || "circleId".equals(paramNames[i])) {
+                    circleIsNull(Long.valueOf(String.valueOf(paramValues[i])), value[0]);
                 }
             }
         }

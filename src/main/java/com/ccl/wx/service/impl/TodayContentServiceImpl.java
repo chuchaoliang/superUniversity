@@ -108,9 +108,9 @@ public class TodayContentServiceImpl implements TodayContentService {
         TodayContent todayContent = todayContentMapper.selectByPrimaryKey(themeId);
         CircleTodayContentDTO circleTodayContentDTO = new CircleTodayContentDTO();
         // 判断是否有此今日内容 一般肯定不为空
-        if (StringUtils.isEmpty(todayContent)) {
-            // 出错今日内容为空，出现未知错误
-            return EnumResultStatus.UNKNOWN.getValue();
+        if (todayContent == null || todayContent.getContentStatus().equals(EnumThemeStatus.DELETE_STATUS.getValue())) {
+            // 此主题被删除
+            return EnumResultStatus.FAIL.getValue();
         } else {
             // 今日内容不为空
             BeanUtils.copyProperties(todayContent, circleTodayContentDTO);
@@ -166,7 +166,7 @@ public class TodayContentServiceImpl implements TodayContentService {
         TodayContent todayContent = todayContentMapper.selectByPrimaryKey(themeId);
         // 要删除的主题不存在？？
         if (todayContent == null || EnumThemeStatus.DELETE_STATUS.getValue() == todayContent.getContentStatus()) {
-            return EnumResultStatus.UNKNOWN.getValue();
+            return EnumResultStatus.FAIL.getValue();
         }
         CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
         if (circleInfo.getThemeSum() > 1) {
@@ -177,6 +177,7 @@ public class TodayContentServiceImpl implements TodayContentService {
         userDiaryService.updateDiaryStatusByThemeId(themeId.intValue(), EnumUserDiary.USER_DIARY_THEME_DELETE.getValue());
         // 主题设置为删除状态
         todayContent.setContentStatus(EnumThemeStatus.DELETE_STATUS.getValue());
+        todayContent.setDeleteTime(new Date());
         todayContentMapper.updateByPrimaryKeySelective(todayContent);
         return EnumResultStatus.SUCCESS.getValue();
     }
@@ -267,6 +268,10 @@ public class TodayContentServiceImpl implements TodayContentService {
     public String selectAllThemeByCircleIdPage(Long circleId, String userId, Integer page, Boolean signIn) {
         // 查询用户加入圈子的信息
         JoinCircle joinCircle = joinCircleService.selectByPrimaryKey(circleId, userId);
+        // 此用户未加入此圈子 或者被淘汰了
+        if (joinCircle == null || !joinCircle.getUserStatus().equals(EnumUserCircle.USER_NORMAL_STATUS.getValue())) {
+            return EnumResultStatus.FAIL.getValue();
+        }
         // 判断此用户今日打卡主题是否为空
         int pageNumber = EnumPage.PAGE_NUMBER.getValue();
         List<TodayContent> todayContents = todayContentMapper.selectAllByCircleIdOrderByCreateTimeDesc(circleId, EnumThemeStatus.USE_STATUS.getValue(), page * pageNumber, pageNumber);
