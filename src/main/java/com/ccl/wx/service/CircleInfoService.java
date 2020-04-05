@@ -1,6 +1,7 @@
 package com.ccl.wx.service;
 
 import com.ccl.wx.entity.CircleInfo;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -73,5 +74,22 @@ public interface CircleInfoService {
      * @return
      */
     List<CircleInfo> selectAllByCircleNameLikeAndCircleLocation(String keyword, int tid);
+
+    /**
+     * 创建圈子
+     *
+     * @param circleInfo 圈子信息
+     * @param image      圈子的头像
+     * @return
+     */
+    String fondCircle(CircleInfo circleInfo, MultipartFile image);
+
+    /**
+     * 检测圈子名称是否重复
+     * true 不重复 false 重复
+     * @param circleName 圈子名称
+     * @return
+     */
+    boolean checkCircleName(String circleName);
 }
 

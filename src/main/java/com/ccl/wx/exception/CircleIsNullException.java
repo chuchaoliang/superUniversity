@@ -8,11 +8,15 @@ public class CircleIsNullException extends RuntimeException {
 
     private final Long circleId;
 
-    private final String url;
+    private String path;
 
-    public CircleIsNullException(Long circleId, String url) {
+    public CircleIsNullException(Long circleId, String path) {
         this.circleId = circleId;
-        this.url = url;
+        this.path = path;
+    }
+
+    public CircleIsNullException(Long circleId) {
+        this.circleId = circleId;
     }
 
     @Override
@@ -24,7 +28,7 @@ public class CircleIsNullException extends RuntimeException {
         return circleId;
     }
 
-    public String getUrl() {
-        return url;
+    public String getPath() {
+        return path;
     }
 }

@@ -4,17 +4,19 @@ import cn.hutool.core.date.DatePattern;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.annotation.ParamCheck;
+import com.ccl.wx.common.Result;
 import com.ccl.wx.dto.CircleTodayContentDTO;
 import com.ccl.wx.entity.TodayContent;
+import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.service.TodayContentService;
 import com.ccl.wx.service.UserDiaryService;
+import com.ccl.wx.util.ResponseMsgUtil;
 import com.ccl.wx.vo.CircleThemeVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,9 +48,9 @@ public class CircleThemeController {
     @SneakyThrows
     @ParamCheck
     @GetMapping("/theme/get/one")
-    public String getCircleTodayContentById(@RequestParam(value = "themeId", required = false) Long themeId,
-                                            @RequestParam(value = "circleId", required = false) Long circleId) {
-        return todayContentService.selectCircleThemeInfoById(themeId, circleId);
+    public Result<String> getCircleTodayContentById(@RequestParam(value = "themeId", required = false) Long themeId,
+                                                    @RequestParam(value = "circleId", required = false) Long circleId) {
+        return ResponseMsgUtil.success(todayContentService.selectCircleThemeInfoById(themeId, circleId));
     }
 
     @Resource
@@ -137,10 +139,15 @@ public class CircleThemeController {
      */
     @ApiOperation(value = "添加圈子主题内容和标题")
     @PostMapping("/theme/add/content")
-    public String saveTodayContent(TodayContent todayContent,
-                                   @RequestParam(value = "userId", required = false) String userId,
-                                   @RequestPart(value = "image", required = false) MultipartFile image) {
-        return todayContentService.saveCircleThemeContent(todayContent, userId, image);
+    public Result<String> saveTodayContent(TodayContent todayContent,
+                                           @RequestParam(value = "userId", required = false) String userId,
+                                           @RequestPart(value = "image", required = false) MultipartFile image) {
+        String result = todayContentService.saveCircleThemeContent(todayContent, userId, image);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("添加主题失败！");
+        } else {
+            return ResponseMsgUtil.success(result);
+        }
     }
 
     /**
@@ -149,12 +156,17 @@ public class CircleThemeController {
      * @param voice  音频文件
      * @return
      */
+    @ParamCheck
     @ApiOperation(value = "保存圈子主题的音频")
     @PostMapping("/theme/add/voice")
-    public String saveCircleThemeVoice(@RequestParam(value = "userId", required = false) String userId,
-                                       @RequestParam(value = "id", required = false) Integer id,
-                                       @RequestPart(value = "voice", required = false) MultipartFile voice) {
-        return todayContentService.saveCircleThemeVoice(userId, id, voice);
+    public Result<String> saveCircleThemeVoice(@RequestParam(value = "userId", required = false) String userId,
+                                               @RequestParam(value = "id", required = false) Integer id,
+                                               @RequestPart(value = "voice", required = false) MultipartFile voice) {
+        String result = todayContentService.saveCircleThemeVoice(userId, id, voice);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("音频上传失败，重复上传，或者对应的主题被删除了！");
+        }
+        return ResponseMsgUtil.success(result);
     }
 
     /**
@@ -163,12 +175,17 @@ public class CircleThemeController {
      * @param video  视频文件
      * @return
      */
+    @ParamCheck
     @ApiOperation(value = "保存圈子主题的视频")
     @PostMapping("/theme/add/video")
-    public String saveCircleThemeVideo(@RequestParam(value = "userId", required = false) String userId,
-                                       @RequestParam(value = "id", required = false) Integer id,
-                                       @RequestPart(value = "video", required = false) MultipartFile video) {
-        return todayContentService.saveCircleThemeVideo(userId, id, video);
+    public Result<String> saveCircleThemeVideo(@RequestParam(value = "userId", required = false) String userId,
+                                               @RequestParam(value = "id", required = false) Integer id,
+                                               @RequestPart(value = "video", required = false) MultipartFile video) {
+        String result = todayContentService.saveCircleThemeVideo(userId, id, video);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("视频上传失败，重复上传，或者对应的主题被删除了！");
+        }
+        return ResponseMsgUtil.success(result);
     }
 
     /**
@@ -181,15 +198,41 @@ public class CircleThemeController {
      * @return success fail
      */
     @ApiOperation(value = "保存圈子主题图片")
+    @ParamCheck
     @PostMapping("/theme/add/image")
-    public String saveTodayImage(@RequestPart(value = "image", required = false) MultipartFile image,
-                                 @ParamCheck @RequestParam(value = "userId", required = false) String userId,
-                                 @ParamCheck @RequestParam(value = "id", required = false) Long id) {
-        return todayContentService.saveEverydayImage(image, userId, id);
+    public Result<String> saveTodayImage(@RequestPart(value = "image", required = false) MultipartFile image,
+                                         @RequestParam(value = "userId", required = false) String userId,
+                                         @RequestParam(value = "id", required = false) Long id) {
+        String result = todayContentService.saveEverydayImage(image, userId, id);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("图片上传失败！或者主题被删除了哦！");
+        } else {
+            return ResponseMsgUtil.success(result);
+        }
     }
 
     /**
-     * TODO
+     * 保存主题头像照片
+     *
+     * @param image  图片文件
+     * @param userId 用户id
+     * @param id     主题id
+     * @return
+     */
+    @ParamCheck
+    @PostMapping("/theme/add/image/head")
+    public Result<String> saveThemeHeadImage(@RequestPart(value = "image", required = false) MultipartFile image,
+                                             @RequestParam(value = "userId", required = false) String userId,
+                                             @RequestParam(value = "id", required = false) Long id) {
+        String result = todayContentService.saveThemeHeadImage(image, userId, id);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("图片上传失败！或者主题被删除了哦！");
+        } else {
+            return ResponseMsgUtil.success(result);
+        }
+    }
+
+    /**
      * 更新每日内容
      * 1. 获取每日内容的文本内容
      * 2. 获取图片地址，得到以前的图片地址，并且根据图片的网络地址删除图片地址
@@ -202,13 +245,11 @@ public class CircleThemeController {
     @ApiOperation(value = "更新圈子主题信息")
     @SneakyThrows
     @PostMapping("/theme/update")
-    public String updateTodayContent(@RequestBody(required = false) CircleTodayContentDTO circleTodayContentDTO) {
-        // id 图片列表：TodayImages 每日内容： TodayContent
-        if (StringUtils.isEmpty(circleTodayContentDTO.getId())) {
-            // 如果前端传输来的id为空,失败！
-            return "fail";
-        } else {
-            return todayContentService.updateCircleTodayContent(circleTodayContentDTO);
+    public Result<String> updateTodayContent(@RequestBody(required = false) CircleTodayContentDTO circleTodayContentDTO) {
+        String result = todayContentService.updateCircleTodayContent(circleTodayContentDTO);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("该主题不存在，可能被删除了！");
         }
+        return ResponseMsgUtil.success(result);
     }
 }

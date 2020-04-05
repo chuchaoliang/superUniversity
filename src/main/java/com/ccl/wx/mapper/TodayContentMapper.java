@@ -26,7 +26,7 @@ public interface TodayContentMapper {
     int updateByPrimaryKey(TodayContent record);
 
     /**
-     * 根据圈子id获取圈子数据
+     * 根据圈子id获取全部主题
      *
      * @param circleId 圈子id
      * @return
@@ -34,7 +34,7 @@ public interface TodayContentMapper {
     List<TodayContent> getAllByCircleId(@Param("circleId") Long circleId);
 
     /**
-     * 根据圈子id 和圈子状态查询圈子数据
+     * 根据圈子id和主题状态查询圈子数据
      *
      * @param circleId      圈子id
      * @param contentStatus 圈子状态
@@ -95,4 +95,13 @@ public interface TodayContentMapper {
      * @return
      */
     List<TodayContent> selectAllByCircleIdOrderByCreateTimeDesc(@Param("circleId") Long circleId, @Param("contentStatus") Integer contentStatus, @Param("start") Integer start, @Param("pageNumber") Integer pageNumber);
+
+    /**
+     * 根据圈子id 和主题id获取主题信息
+     *
+     * @param circleId
+     * @param id
+     * @return
+     */
+    TodayContent selectByCircleIdAndId(@Param("circleId") Long circleId, @Param("id") Long id);
 }

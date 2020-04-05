@@ -2,23 +2,29 @@ package com.ccl.wx.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.ccl.wx.annotation.ParamCheck;
+import com.ccl.wx.common.EnumResultCode;
+import com.ccl.wx.common.Result;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.entity.JoinCircle;
 import com.ccl.wx.service.CircleInfoService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.impl.CircleServiceImpl;
-import com.ccl.wx.util.CclUtil;
+import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 圈子信息相关
@@ -27,6 +33,7 @@ import java.util.List;
  * @date 2019/10/27 11:00
  */
 @Api(tags = {"CircleInfoController【圈子信息相关的数据信息】"})
+@Slf4j
 @RestController
 @RequestMapping("/wx/circle")
 public class CircleInfoController {
@@ -47,42 +54,31 @@ public class CircleInfoController {
      * @return
      */
     @PostMapping("/found")
-    public String foundCircle(@RequestBody(required = false) CircleInfo circleInfo,
-                              @RequestParam(value = "image", required = false) MultipartFile image) {
-        ArrayList<String> strs = new ArrayList<>();
-        // 圈主id
-        strs.add("circleUserid");
-        // 圈子名称
-        strs.add("circleName");
-        // 圈子位置
-        strs.add("circleLocation");
-        // 圈子设置
-        strs.add("circleSet");
-        if (CclUtil.classPropertyIsNull(circleInfo, strs)) {
-            // 检测圈子名字是否重复
-            return circleService.fondCircle(circleInfo);
+    public Result<String> foundCircle(@Validated @RequestBody(required = false) CircleInfo circleInfo,
+                                      @RequestParam(value = "image", required = false) MultipartFile image,
+                                      BindingResult result) {
+        if (result.hasErrors()) {
+            // 参数校检存在错误
+            return ResponseMsgUtil.fail(Objects.requireNonNull(result.getFieldError()).getDefaultMessage());
         } else {
-            // 前端数据有的为空
-            return "fail";
+            // 检测圈子名字是否重复
+            circleInfoService.fondCircle(circleInfo, image);
+            return ResponseMsgUtil.success("");
         }
     }
 
     /**
      * 检测圈子名称是否重复
-     * 圈子名字重复fail 否则success
-     * TODO API
      *
-     * @param circlename 圈子名称
+     * @param circleName 圈子名称
      * @return
      */
-    @GetMapping("/checkqzname")
-    public String checkCircleNameRepetition(@RequestParam(value = "circlename", required = false) String circlename) {
-        // TODO 将圈子所有名称存储到缓存中比较好待解决
-        List<String> circleNames = circleInfoService.selectAllCircleName();
-        if (circleNames.contains(circlename)) {
-            return "fail";
+    @GetMapping("/check/name")
+    public Result<String> checkCircleNameRepetition(@RequestParam(value = "circleName", required = false) String circleName) {
+        if (circleInfoService.checkCircleName(circleName)) {
+            return ResponseMsgUtil.success(EnumResultCode.SUCCESS.getStatus(),"昵称可以使用！",JSON.toJSONString(circleName));
         } else {
-            return "success";
+            return ResponseMsgUtil.fail(EnumResultCode.CIRCLE_NAME_REPETITION.getStatus(), "圈子昵称重复！-->" + circleName);
         }
     }
 
@@ -99,9 +95,9 @@ public class CircleInfoController {
     })
     @ParamCheck
     @GetMapping("/home")
-    public String getCircle(@RequestParam(value = "circleId", required = false) Long circleId,
-                            @RequestParam(value = "userId", required = false) String userId) {
-        return circleInfoService.getCircleIndexAllContent(userId, circleId.intValue());
+    public Result<String> getCircle(@RequestParam(value = "circleId", required = false) Long circleId,
+                                    @RequestParam(value = "userId", required = false) String userId) {
+        return ResponseMsgUtil.success(circleInfoService.getCircleIndexAllContent(userId, circleId.intValue()));
     }
 
     /**

@@ -5,21 +5,26 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.dto.CircleInfoDTO;
 import com.ccl.wx.entity.CircleInfo;
+import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.enums.EnumUserCircle;
 import com.ccl.wx.enums.EnumUserDiary;
 import com.ccl.wx.enums.EnumUserPermission;
 import com.ccl.wx.mapper.CircleInfoMapper;
+import com.ccl.wx.properties.DefaultProperties;
 import com.ccl.wx.service.CircleInfoService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.TodayContentService;
 import com.ccl.wx.service.UserDiaryService;
+import com.ccl.wx.util.FtpUtil;
 import com.ccl.wx.vo.CircleIndexVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,6 +46,9 @@ public class CircleInfoServiceImpl implements CircleInfoService {
 
     @Resource
     private TodayContentService todayContentService;
+
+    @Resource
+    private DefaultProperties defaultProperties;
 
     @Override
     public int deleteByPrimaryKey(Long circleId) {
@@ -140,6 +148,47 @@ public class CircleInfoServiceImpl implements CircleInfoService {
         // 设置圈子主题信息
         circleIndexVO.setCircleThemeList(todayContentService.selectAllThemeByCircleHome(userId, circleId.longValue()));
         return JSON.toJSONStringWithDateFormat(circleIndexVO, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+    }
+
+    @Override
+    public String fondCircle(CircleInfo circleInfo, MultipartFile image) {
+        // 检测圈子名称是否重复
+        if (checkCircleName(circleInfo.getCircleName())) {
+            CircleInfo finCircleInfo = new CircleInfo();
+            BeanUtils.copyProperties(circleInfo, finCircleInfo);
+            finCircleInfo.setCircleCreatetime(new Date());
+            finCircleInfo.setCircleHimage(defaultProperties.getDefaultImage());
+            finCircleInfo.setCircleLocation(circleInfo.getCircleLocation() + 1);
+
+            // 如果前端
+            if (StringUtils.isEmpty(circleInfo.getCircleHimage())) {
+                circleInfo.setCircleHimage(defaultProperties.getDefaultImage());
+            } else {
+                String imagePath = FtpUtil.uploadFile(circleInfo.getCircleUserid(), image);
+            }
+
+            int insert = circleInfoMapper.insertSelective(finCircleInfo);
+            if (insert == 1) {
+                // 插入成功返回圈子信息
+                return JSON.toJSONString(circleInfo);
+            } else {
+                // 返回值 1 失败
+                return EnumResultStatus.UNKNOWN.getValue();
+            }
+        } else {
+            // 圈子名字重复
+            return EnumResultStatus.FAIL.getValue();
+        }
+    }
+
+    @Override
+    public boolean checkCircleName(String circleName) {
+        List<CircleInfo> circleInfos = circleInfoMapper.selectByCircleName(circleName);
+        if (circleInfos.isEmpty()) {
+            // 如果不存在
+            return true;
+        }
+        return false;
     }
 }
 

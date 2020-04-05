@@ -21,6 +21,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -197,16 +198,6 @@ public class CircleServiceImpl implements CircleService {
     }
 
     @Override
-    public Boolean detectionCircleNameRepetition(String circleName) {
-        List<String> circleNames = circleInfoMapper.selectAllCircleName();
-        if (circleNames.contains(circleName)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
     public String joinCircle(String circleid, String userid) {
         String status = "success";
         JoinCircle joinCircle = new JoinCircle();
@@ -292,24 +283,6 @@ public class CircleServiceImpl implements CircleService {
                 // 密码错误
                 return "-1";
             }
-        }
-    }
-
-    @Override
-    public String fondCircle(CircleInfo circleInfo) {
-        // 检测圈子名称是否重复
-        if (detectionCircleNameRepetition(circleInfo.getCircleName())) {
-            // true 为空
-            return "-1";
-        } else {
-            // false 不为空
-            CircleInfo finCircleInfo = new CircleInfo();
-            BeanUtils.copyProperties(circleInfo, finCircleInfo);
-            finCircleInfo.setCircleCreatetime(new Date());
-            finCircleInfo.setCircleHimage(CIRCLE_HEAD_IMAGE);
-            finCircleInfo.setCircleLocation(circleInfo.getCircleLocation() + 1);
-            circleInfoMapper.insertSelective(finCircleInfo);
-            return String.valueOf(finCircleInfo.getCircleId());
         }
     }
 

@@ -2,9 +2,9 @@ package com.ccl.wx.util;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.http.HttpUtil;
 import com.ccl.wx.enums.EnumResultStatus;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -25,11 +25,6 @@ import java.util.regex.Pattern;
 public class CclUtil {
 
     private final static String FILEWEBPATH = "http://localhost:8080/fileSuffix/";
-
-    /**
-     * web网址前缀图片访问前缀
-     */
-    private final static String WEB_PREFIX = "https";
 
     /**
      * 常见的图片类型
@@ -386,6 +381,22 @@ public class CclUtil {
     }
 
     /**
+     * 获取上传地址
+     *
+     * @param userid 用户id
+     * @return
+     */
+    public static String getFileUploadAddress(String userid) {
+        StringBuilder fileAddress = new StringBuilder();
+        fileAddress
+                .append(FILE_LOCAL_PATH.replace("/", File.separator))
+                .append(userid).append(File.separator)
+                .append(cn.hutool.core.date.DateUtil.format(new Date(), DatePattern.PURE_DATE_PATTERN))
+                .append(File.separator);
+        return fileAddress.toString();
+    }
+
+    /**
      * 根据文件列表删除全部文件信息
      *
      * @param files 文件列表
@@ -420,6 +431,23 @@ public class CclUtil {
                 .append(UUID.randomUUID().toString().replace("-", "").toLowerCase())
                 .append(".")
                 .append(FilenameUtils.getExtension(file.getOriginalFilename()));
+        return fileAddress.toString();
+    }
+
+    /**
+     * 获取文件名
+     *
+     * @param suffix 文件后缀
+     * @return
+     */
+    public static String getFileUploadName(String suffix) {
+        StringBuffer fileAddress = new StringBuffer();
+        fileAddress
+                .append(DateUtil.format(new Date(), "yyyyMMddHHmmss"))
+                .append("_")
+                .append(UUID.randomUUID().toString().replace("-", "").toLowerCase())
+                .append(".")
+                .append(suffix);
         return fileAddress.toString();
     }
 
@@ -558,14 +586,14 @@ public class CclUtil {
         } else {
             // 新文件列表不为空
             ArrayList<String> finImages = new ArrayList<>();
-            for (String newFile : newFileLists) {
-                if (historyFileLists.contains(newFile)) {
+            for (String historyFile : historyFileLists) {
+                if (newFileLists.contains(historyFile)) {
                     // 判断历史文件列表中是否存在新的文件,存在不删除
-                    finImages.add(newFile);
+                    finImages.add(historyFile);
                 } else {
-                    if (newFile.startsWith(WEB_PREFIX)) {
+                    if (HttpUtil.isHttps(historyFile)) {
                         // 是https开头则为不存在的历史文件，删除
-                        FtpUtil.delFile(newFile);
+                        FtpUtil.delFile(historyFile);
                     }
                 }
             }
@@ -594,24 +622,26 @@ public class CclUtil {
             return "";
         } else {
             // 新的文件不为空
-            if (newFile.startsWith(WEB_PREFIX)) {
+            if (HttpUtil.isHttps(newFile)) {
                 // 是https开头的文件地址，文件未发生变化
                 return historyFile;
             } else {
-                // 不是https开头的文件地址 TODO.................
+                // 不是https开头的文件地址
+                if (!StringUtils.isEmpty(historyFile)) {
+                    FtpUtil.delFile(historyFile);
+                }
+                return "";
             }
         }
-        return "";
     }
 
     /**
-     * 语音文件的处理
+     * 获取用户uid
      *
-     * @param voice        前端传输的音频地址
-     * @param historyVoice 历史音频地址
+     * @param id 用户的主键
      * @return
      */
-    public static String voiceDispose(String voice, String historyVoice) {
-        return "";
+    public static String getUid(int id) {
+        return String.valueOf(1000 + id);
     }
 }

@@ -1,23 +1,30 @@
 package com.ccl.wx.controller;
 
+import cn.hutool.core.date.DatePattern;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.annotation.ParamCheck;
+import com.ccl.wx.common.EnumResultCode;
+import com.ccl.wx.common.Result;
 import com.ccl.wx.dto.UserBasicInfoDTO;
 import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.mapper.JoinCircleMapper;
 import com.ccl.wx.service.CircleService;
 import com.ccl.wx.service.UserInfoService;
+import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * @author 褚超亮
@@ -113,15 +120,35 @@ public class UserInfoController {
     }
 
     /**
+     * 获取用户的信息
+     *
+     * @param userId 用户id
+     * @return
+     */
+    @GetMapping("/user/get")
+    public Result<String> getUserInfo(@ParamCheck @RequestParam(value = "userId", required = false) String userId) {
+        return ResponseMsgUtil.success(JSON.toJSONStringWithDateFormat(userInfoService.selectByPrimaryKey(userId), DatePattern.NORM_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat));
+    }
+
+    /**
      * 获取登录态
      *
      * @param code 登录code 前端传输
      * @return
      */
+    @ParamCheck
     @GetMapping("/user/login")
-    public String userLogin(@RequestParam(value = "code", required = false) String code) {
+    public Result<String> userLogin(@RequestParam(value = "code", required = false) String code,
+                                    @RequestParam(value = "encryptedData", required = false) String encryptedData,
+                                    @RequestParam(value = "iv", required = false) String iv) {
         // 拼接url字符串
-        return userInfoService.userLogin(code);
+        String result = userInfoService.userLogin(code, encryptedData, iv);
+        if (result.equals(EnumResultStatus.FAIL.getValue())) {
+            // 登录失败
+            return ResponseMsgUtil.fail(EnumResultCode.UNAUTHORIZED.getStatus(), "登录失败！");
+        } else {
+            return ResponseMsgUtil.success(result);
+        }
     }
 
     /**
@@ -131,8 +158,14 @@ public class UserInfoController {
      * @return
      */
     @PostMapping("/user/save")
-    public String userInfo(@Validated(UserInfo.Default.class) @RequestBody UserInfo userInfo) {
-        return userInfoService.saveUserInfo(userInfo);
+    public Result userInfo(@Validated @RequestBody UserInfo userInfo, BindingResult result) {
+        if (result.hasErrors()) {
+            // 存在错误
+            return ResponseMsgUtil.exception(EnumResultCode.FAIL.getStatus(), Objects.requireNonNull(result.getFieldError()).getDefaultMessage());
+        } else {
+            userInfoService.saveUserInfo(userInfo);
+            return ResponseMsgUtil.success(JSON.toJSONString(userInfo));
+        }
     }
 }
 

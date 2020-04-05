@@ -28,10 +28,18 @@ public interface CircleInfoMapper {
     /**
      * 根据圈子类型查找圈子
      *
-     * @param circleLocation
+     * @param circleLocation 圈子所在位置
      * @return
      */
     List<CircleInfo> findAllByCircleLocation(@Param("circleLocation") Integer circleLocation);
+
+    /**
+     * 根据圈子名称查找圈子
+     *
+     * @param circleName 圈子名称
+     * @return
+     */
+    List<CircleInfo> selectByCircleName(@Param("circleName") String circleName);
 
     /**
      * 根据关键词模糊查询数据

@@ -9,8 +9,4 @@ public class UserJoinCircleException extends RuntimeException {
     public UserJoinCircleException(String message) {
         super(message);
     }
-
-    public UserJoinCircleException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

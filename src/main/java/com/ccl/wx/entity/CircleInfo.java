@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -25,6 +26,7 @@ public class CircleInfo implements Serializable {
      * 圈子名称
      */
     @ApiModelProperty(value = "圈子名称")
+    @NotBlank(message = "圈子名称不能为空！nickName")
     private String circleName;
 
     /**
@@ -73,6 +75,7 @@ public class CircleInfo implements Serializable {
      * 圈主id
      */
     @ApiModelProperty(value = "圈主id")
+    @NotBlank(message = "圈主id不能为空circleUserid")
     private String circleUserid;
 
     /**
@@ -94,9 +97,10 @@ public class CircleInfo implements Serializable {
     private Integer circleSign;
 
     /**
-     * 圈子所在位置（0开发者圈子 1 技能 2 考研 3生活 4阅读 5外语 6财汇 7计算机 8更多 ）
+     * 圈子所在位置（1技能 2考研 3生活 4阅读 5健身 6学校 7考试 8科研 9竞赛 10更多 ）
      */
-    @ApiModelProperty(value = "圈子所在位置（0开发者圈子 1 技能 2 考研 3生活 4阅读 5外语 6财汇 7计算机 8更多 ）")
+    @ApiModelProperty(value = "圈子所在位置（1技能 2考研 3生活 4阅读 5健身 6学校 7考试 8科研 9竞赛 10更多 ）")
+    @NotBlank(message = "圈子所在位置不能为空->circleLocation")
     private Integer circleLocation;
 
     /**
@@ -115,6 +119,7 @@ public class CircleInfo implements Serializable {
      * 圈子标签
      */
     @ApiModelProperty(value = "圈子标签")
+    @NotBlank(message = "圈子标签不能为空！-> circleLabel")
     private String circleLabel;
 
     /**

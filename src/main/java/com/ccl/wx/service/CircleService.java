@@ -51,24 +51,6 @@ public interface CircleService {
     Boolean updateCircleHeadImage(String circleid, String filePath);
 
     /**
-     * 创建圈子
-     *
-     * @param circleInfo 圈子信息
-     * @return
-     */
-    String fondCircle(CircleInfo circleInfo);
-
-    /**
-     * 检测圈子名称是否重复,
-     * 为空 true
-     * 不为空 false
-     *
-     * @param circleName 圈子名称
-     * @return
-     */
-    Boolean detectionCircleNameRepetition(String circleName);
-
-    /**
      * 正常加入圈子
      * 自己主动退出的圈子再次加入不需要圈主同意即可加入
      * TODO 圈主淘汰的人需要圈主的同意才可加入

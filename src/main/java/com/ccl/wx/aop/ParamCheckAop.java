@@ -2,10 +2,8 @@ package com.ccl.wx.aop;
 
 import com.ccl.wx.annotation.ParamCheck;
 import com.ccl.wx.entity.CircleInfo;
-import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.exception.CircleIsNullException;
 import com.ccl.wx.exception.ParamIsNullException;
-import com.ccl.wx.exception.UserIsNullException;
 import com.ccl.wx.service.CircleInfoService;
 import com.ccl.wx.service.UserInfoService;
 import lombok.extern.slf4j.Slf4j;
@@ -75,10 +73,6 @@ public class ParamCheckAop {
         ParamCheck paramCheck = signature.getMethod().getAnnotation(ParamCheck.class);
         for (int i = 0; i < parameterAnnotations.length; i++) {
             for (int j = 0; j < parameterAnnotations[i].length; j++) {
-                // token 中已经检测无需检测
-                //if ("userid".equals(paramNames[i]) || "userId".equals(paramNames[i])) {
-                //    userIsNull((String) paramValues[i], value[0]);
-                //}
                 if ("circleid".equals(paramNames[i]) || "circleId".equals(paramNames[i])) {
                     circleIsNull(Long.valueOf(String.valueOf(paramValues[i])), value[0]);
                 }
@@ -105,13 +99,6 @@ public class ParamCheckAop {
         CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
         if (circleInfo == null) {
             throw new CircleIsNullException(circleId, url);
-        }
-    }
-
-    private void userIsNull(String userId, String url) {
-        UserInfo userInfo = userInfoService.selectByPrimaryKey(userId);
-        if (userInfo == null) {
-            throw new UserIsNullException(userId, url);
         }
     }
 

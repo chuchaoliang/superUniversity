@@ -31,6 +31,20 @@ public class DefaultProperties {
     private String defaultThemeTitle;
 
     /**
+     * 默认圈子头像
+     */
+    @Value("${user.head.image}")
+    private String defaultUserHeadImage;
+
+    /**
+     * 用户头像默认上传路径
+     */
+    @Value("${user.head.image.path}")
+    private String defaultUserHeadImagePath;
+
+    private String defaultNginxPath;
+
+    /**
      * 默认主题id
      */
     @Value("${circle.theme.id}")

@@ -24,7 +24,7 @@ public class UserIsNullValidator implements ConstraintValidator<UserCheck, Strin
     public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
         UserInfo userInfo = userInfoService.selectByPrimaryKey(value);
         if (userInfo == null) {
-            throw new UserIsNullException(value, "未知url");
+            throw new UserIsNullException(value, null);
         }
         return true;
     }
