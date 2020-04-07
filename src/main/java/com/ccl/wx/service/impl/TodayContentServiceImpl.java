@@ -1,12 +1,15 @@
 package com.ccl.wx.service.impl;
 
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.ccl.wx.common.DiaryStatusList;
 import com.ccl.wx.dto.CircleTodayContentDTO;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.entity.JoinCircle;
 import com.ccl.wx.entity.TodayContent;
+import com.ccl.wx.entity.UserDiary;
 import com.ccl.wx.enums.*;
 import com.ccl.wx.mapper.TodayContentMapper;
 import com.ccl.wx.properties.DefaultProperties;
@@ -265,7 +268,7 @@ public class TodayContentServiceImpl implements TodayContentService {
     }
 
     @Override
-    public String selectAllThemeByCircleIdPage(Long circleId, String userId, Integer page, Boolean signIn) {
+    public String selectAllThemeByCircleIdPage(Long circleId, String userId, Integer page, Boolean signIn, Date date) {
         // 查询用户加入圈子的信息
         JoinCircle joinCircle = joinCircleService.selectByPrimaryKey(circleId, userId);
         // 此用户未加入此圈子 或者被淘汰了
@@ -296,13 +299,10 @@ public class TodayContentServiceImpl implements TodayContentService {
             // 设置日志总数
             circleThemeVO.setDiaryNumber(diaryNumber);
             // 设置今天是否打卡
-            circleThemeVO.setSignInSuccess(false);
-            if (!StringUtils.isEmpty(joinCircle.getThemeId())) {
-                List<String> themes = Arrays.asList(joinCircle.getThemeId().split(","));
-                if (themes.contains(String.valueOf(todayContent.getId()))) {
-                    // 用户今天此主题已经打卡
-                    circleThemeVO.setSignInSuccess(true);
-                }
+            if (date != null) {
+                // 判断用户是否打卡此主题
+                boolean themeSignIn = judgeUserThemeClockByDate(circleId, userId, date, DiaryStatusList.userCircleDiaryStatusList(), todayContent.getId().intValue());
+                circleThemeVO.setSignInSuccess(themeSignIn);
             }
             circleThemeVO.setDefaultTheme(false);
             // 判断是否为默认主题
@@ -323,6 +323,16 @@ public class TodayContentServiceImpl implements TodayContentService {
             themeList.add(joinCircleService.judgeUserIsCircleManage(circleId.intValue(), permissionList, userId));
         }
         return JSON.toJSONStringWithDateFormat(themeList, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+    }
+
+    @Override
+    public boolean judgeUserThemeClockByDate(Long circleId, String userId, Date date, List<Integer> diaryStatus, Integer themeId) {
+        String formatDate = DateUtil.format(date, DatePattern.PURE_DATE_PATTERN);
+        List<UserDiary> userDiaries = userDiaryService.selectByCircleIdAndUserIdAndDiaryCreatetimeAndDiaryStatus(circleId, userId, formatDate, diaryStatus, themeId);
+        if (userDiaries.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 
     @Override

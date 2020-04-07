@@ -598,12 +598,8 @@ public class UserDiaryServiceImpl implements UserDiaryService {
     }
 
     @Override
-    public String getCircleDiaryById(Long diaryId) {
-        UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(diaryId);
-        if ("".equals(userDiary.getDiaryImage())) {
-            userDiary.setDiaryImage(null);
-        }
-        return JSON.toJSONString(userDiary);
+    public List<UserDiary> selectByCircleIdAndUserIdAndDiaryCreatetimeAndDiaryStatus(Long circleId, String userId, String date, List<Integer> diaryStatus, Integer themeId) {
+        return userDiaryMapper.selectByCircleIdAndUserIdAndDiaryCreatetimeAndDiaryStatus(circleId, userId, date, diaryStatus, themeId);
     }
 
     @Override

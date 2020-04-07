@@ -5,6 +5,7 @@ import com.ccl.wx.entity.TodayContent;
 import com.ccl.wx.vo.CircleThemeVO;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -105,7 +106,7 @@ public interface TodayContentService {
      * @param signIn   是否为打卡 是打卡（true）否（false）
      * @return
      */
-    String selectAllThemeByCircleIdPage(Long circleId, String userId, Integer page, Boolean signIn);
+    String selectAllThemeByCircleIdPage(Long circleId, String userId, Integer page, Boolean signIn, Date date);
 
     /**
      * 保存主题音频文件
@@ -164,12 +165,26 @@ public interface TodayContentService {
 
     /**
      * 保存主题头像
+     *
      * @param image
      * @param userId
      * @param id
      * @return
      */
     String saveThemeHeadImage(MultipartFile image, String userId, Long id);
+
+    /**
+     * 判断用户某一天是否打卡某一主题
+     * true打卡 false未打卡
+     *
+     * @param circleId    圈子id
+     * @param userId      用户id
+     * @param themeId     主题id
+     * @param date        日期
+     * @param diaryStatus 日志状态列表
+     * @return
+     */
+    boolean judgeUserThemeClockByDate(Long circleId, String userId, Date date, List<Integer> diaryStatus, Integer themeId);
 }
 
 

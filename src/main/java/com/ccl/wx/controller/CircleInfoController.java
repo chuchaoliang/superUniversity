@@ -96,7 +96,7 @@ public class CircleInfoController {
     @ParamCheck
     @GetMapping("/home")
     public Result<String> getCircle(@RequestParam(value = "circleId", required = false) Long circleId,
-                                    @RequestParam(value = "userId", required = false) String userId) {
+                                    @RequestHeader(value = "token", required = false) String userId) {
         return ResponseMsgUtil.success(circleInfoService.getCircleIndexAllContent(userId, circleId.intValue()));
     }
 

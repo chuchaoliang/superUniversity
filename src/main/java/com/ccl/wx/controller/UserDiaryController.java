@@ -19,7 +19,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -55,16 +54,11 @@ public class UserDiaryController {
      * @param diaryId 日志id
      * @return （与此日志相关的全部评论、点赞、点评信息）
      */
-    @GetMapping("/getonediaryinfo")
-    public String getDiaryInfoByDiaryId(@RequestParam(value = "diaryid", required = false) String diaryId) {
-        if (StringUtils.isEmpty(diaryId)) {
-            // 前端传输的数据为空
-            return "fail";
-        } else {
-            // 获取评论内容
-            UserDiaryDTO diaryInfoById = circleService.getDiaryInfoById(Long.valueOf(diaryId));
-            return JSON.toJSONStringWithDateFormat(diaryInfoById, "yyyy-MM-dd", SerializerFeature.WriteDateUseDateFormat);
-        }
+    @GetMapping("/diary/get/one")
+    public String getDiaryInfoByDiaryId(@ParamCheck @RequestParam(value = "diaryId", required = false) String diaryId) {
+        // 获取评论内容
+        UserDiaryDTO diaryInfoById = circleService.getDiaryInfoById(Long.valueOf(diaryId));
+        return JSON.toJSONStringWithDateFormat(diaryInfoById, "yyyy-MM-dd", SerializerFeature.WriteDateUseDateFormat);
     }
 
     /**
@@ -223,7 +217,7 @@ public class UserDiaryController {
     @ParamCheck
     @GetMapping("/diary/get/all")
     public Result<String> getDiaryInfo(@RequestParam(value = "circleId", required = false) Long circleId,
-                                       @RequestParam(value = "userId", required = false) String userId,
+                                       @RequestHeader(value = "token", required = false) String userId,
                                        @RequestParam(value = "page", required = false) Integer page) {
         return ResponseMsgUtil.success(userDiaryService.getAllDiaryInfo(circleId, userId, page));
     }
@@ -257,21 +251,6 @@ public class UserDiaryController {
                                  @RequestParam(value = "circleid", required = false) String circleid,
                                  @RequestParam(value = "diaryid", required = false) Long diaryid) {
         return JSON.toJSONStringWithDateFormat(circleService.getAllLikeUserNickName(userid, circleid, diaryid), "yyyy-MM-dd mm:ss", SerializerFeature.DisableCircularReferenceDetect);
-    }
-
-
-    /**
-     * 根据日志id查询该日志信息
-     *
-     * @param diaryId
-     * @return
-     */
-    @GetMapping("/getonediarybyid")
-    public String getDiaryById(@RequestParam(value = "diaryId", required = false) Long diaryId) {
-        if (StringUtils.isEmpty(diaryId)) {
-            return "fail";
-        }
-        return userDiaryService.getCircleDiaryById(diaryId);
     }
 
     /**

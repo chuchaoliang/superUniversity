@@ -201,4 +201,15 @@ public interface UserDiaryMapper {
      * @return
      */
     List<UserDiary> selectAllByCircleIdAndDiaryStatus(@Param("circleId") Long circleId, @Param("diaryStatusList") List<Integer> diaryStatus);
+
+    /**
+     * 查询出某位用户某一天是否在某一个主题下打卡
+     *
+     * @param circleId    圈子id
+     * @param userId      用户id
+     * @param date        哪一天（20200311）
+     * @param diaryStatus 日志状态
+     * @return
+     */
+    List<UserDiary> selectByCircleIdAndUserIdAndDiaryCreatetimeAndDiaryStatus(@Param("circleId") Long circleId, @Param("userId") String userId, @Param("diaryCreatetime") String date, @Param("diaryStatus") List<Integer> diaryStatus, @Param("themeId") Integer themeId);
 }

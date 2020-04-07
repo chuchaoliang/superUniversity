@@ -83,26 +83,26 @@ public interface CircleService {
     /**
      * 获取全部的日志评论
      *
-     * @param diaryid 日志id
+     * @param diaryId 日志id
      * @return
      */
-    List<CommentDTO> getAllComment(Long diaryid);
+    List<CommentDTO> getAllComment(Long diaryId);
 
     /**
      * 获取全部的日志点评
      *
-     * @param diaryid 日志id
+     * @param diaryId 日志id
      * @return
      */
-    List<CommentDTO> getMasterComment(Long diaryid);
+    List<CommentDTO> getMasterComment(Long diaryId);
 
     /**
      * 根据日记id查询全部的信息（点赞、评论、点评）
      *
-     * @param diaryid 日志id
+     * @param diaryId 日志id
      * @return
      */
-    UserDiaryDTO getDiaryInfoById(Long diaryid);
+    UserDiaryDTO getDiaryInfoById(Long diaryId);
 
     /**
      * 获取此日记的点赞状态
@@ -154,8 +154,8 @@ public interface CircleService {
     /**
      * 根据圈子id判断是否为私密圈子
      *
-     * @param circleid 圈子id
+     * @param circleId 圈子id
      * @return
      */
-    Boolean judgeCirclePrivacyStatus(Long circleid);
+    Boolean judgeCirclePrivacyStatus(Long circleId);
 }

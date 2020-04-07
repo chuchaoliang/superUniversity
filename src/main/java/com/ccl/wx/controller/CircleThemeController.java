@@ -18,10 +18,12 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,6 +39,9 @@ public class CircleThemeController {
 
     @Resource
     private UserDiaryService circleDiaryService;
+
+    @Resource
+    private TodayContentService todayContentService;
 
     /**
      * TODO
@@ -57,9 +62,6 @@ public class CircleThemeController {
         return ResponseMsgUtil.success(result);
     }
 
-    @Resource
-    private TodayContentService todayContentService;
-
     /**
      * 用户打卡获取主题相关信息
      *
@@ -71,10 +73,11 @@ public class CircleThemeController {
     @ParamCheck
     @ApiOperation(value = "用户打卡获取主题相关信息")
     @GetMapping("/theme/user/signin")
-    public Result<String> getThemeUserSignInInfo(@RequestParam(value = "userId", required = false) String userId,
+    public Result<String> getThemeUserSignInInfo(@RequestHeader(value = "token", required = false) String userId,
                                                  @RequestParam(value = "circleId", required = false) Long circleId,
-                                                 @RequestParam(value = "page", required = false) Integer page) {
-        String result = todayContentService.selectAllThemeByCircleIdPage(circleId, userId, page, true);
+                                                 @RequestParam(value = "page", required = false) Integer page,
+                                                 @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+        String result = todayContentService.selectAllThemeByCircleIdPage(circleId, userId, page, true, date);
         if (EnumResultStatus.FAIL.getValue().equals(result)) {
             return ResponseMsgUtil.fail("此用户未加入此圈子，或者被淘汰，状态异常！");
         }
@@ -92,7 +95,7 @@ public class CircleThemeController {
     @ApiOperation(value = "获取圈子首页的主题")
     @GetMapping("/theme/get/home")
     public Result<String> getAllCircleHomeTheme(@RequestParam(value = "circleId", required = false) Long circleId,
-                                                @RequestParam(value = "userId", required = false) String userId) {
+                                                @RequestHeader(value = "token", required = false) String userId) {
         List<CircleThemeVO> circleThemeVOS = todayContentService.selectAllThemeByCircleHome(userId, circleId);
         return ResponseMsgUtil.success(JSON.toJSONStringWithDateFormat(circleThemeVOS, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat));
     }
@@ -114,9 +117,9 @@ public class CircleThemeController {
     @ParamCheck
     @GetMapping("/theme/get/all/page")
     public Result<String> getAllThemeByCircleIdPage(@RequestParam(value = "circleId", required = false) Long circleId,
-                                                    @RequestParam(value = "userId", required = false) String userId,
+                                                    @RequestHeader(value = "token", required = false) String userId,
                                                     @RequestParam(value = "page", required = false) Integer page) {
-        String result = todayContentService.selectAllThemeByCircleIdPage(circleId, userId, page, false);
+        String result = todayContentService.selectAllThemeByCircleIdPage(circleId, userId, page, false, null);
         if (EnumResultStatus.FAIL.getValue().equals(result)) {
             return ResponseMsgUtil.fail("此用户未加入此圈子，或者被淘汰，状态异常！");
         }
@@ -156,7 +159,7 @@ public class CircleThemeController {
     @ApiOperation(value = "添加圈子主题内容和标题")
     @PostMapping("/theme/add/content")
     public Result<String> saveTodayContent(TodayContent todayContent,
-                                           @RequestParam(value = "userId", required = false) String userId,
+                                           @RequestHeader(value = "token", required = false) String userId,
                                            @RequestPart(value = "image", required = false) MultipartFile image) {
         String result = todayContentService.saveCircleThemeContent(todayContent, userId, image);
         if (EnumResultStatus.FAIL.getValue().equals(result)) {
@@ -175,7 +178,7 @@ public class CircleThemeController {
     @ParamCheck
     @ApiOperation(value = "保存圈子主题的音频")
     @PostMapping("/theme/add/voice")
-    public Result<String> saveCircleThemeVoice(@RequestParam(value = "userId", required = false) String userId,
+    public Result<String> saveCircleThemeVoice(@RequestHeader(value = "token", required = false) String userId,
                                                @RequestParam(value = "id", required = false) Integer id,
                                                @RequestPart(value = "voice", required = false) MultipartFile voice) {
         String result = todayContentService.saveCircleThemeVoice(userId, id, voice);
@@ -194,7 +197,7 @@ public class CircleThemeController {
     @ParamCheck
     @ApiOperation(value = "保存圈子主题的视频")
     @PostMapping("/theme/add/video")
-    public Result<String> saveCircleThemeVideo(@RequestParam(value = "userId", required = false) String userId,
+    public Result<String> saveCircleThemeVideo(@RequestHeader(value = "token", required = false) String userId,
                                                @RequestParam(value = "id", required = false) Integer id,
                                                @RequestPart(value = "video", required = false) MultipartFile video) {
         String result = todayContentService.saveCircleThemeVideo(userId, id, video);
@@ -217,7 +220,7 @@ public class CircleThemeController {
     @ParamCheck
     @PostMapping("/theme/add/image")
     public Result<String> saveTodayImage(@RequestPart(value = "image", required = false) MultipartFile image,
-                                         @RequestParam(value = "userId", required = false) String userId,
+                                         @RequestHeader(value = "token", required = false) String userId,
                                          @RequestParam(value = "id", required = false) Long id) {
         String result = todayContentService.saveEverydayImage(image, userId, id);
         if (EnumResultStatus.FAIL.getValue().equals(result)) {
@@ -238,7 +241,7 @@ public class CircleThemeController {
     @ParamCheck
     @PostMapping("/theme/add/image/head")
     public Result<String> saveThemeHeadImage(@RequestPart(value = "image", required = false) MultipartFile image,
-                                             @RequestParam(value = "userId", required = false) String userId,
+                                             @RequestHeader(value = "token", required = false) String userId,
                                              @RequestParam(value = "id", required = false) Long id) {
         String result = todayContentService.saveThemeHeadImage(image, userId, id);
         if (EnumResultStatus.FAIL.getValue().equals(result)) {
