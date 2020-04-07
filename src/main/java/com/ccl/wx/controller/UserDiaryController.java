@@ -12,6 +12,7 @@ import com.ccl.wx.service.CircleService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.util.ResponseMsgUtil;
+import com.ccl.wx.vo.UserDiaryVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -72,16 +73,19 @@ public class UserDiaryController {
      * 1. 获取日记id，日记内容，日记状态，地址信息，图片列表
      * id, diaryContent,diaryStatus,diaryAddress,images
      *
-     * @param userDiaryDTO
+     * @param userDiaryVO
      * @return
      */
-    @PostMapping("/updatecirclediary")
-    public String updateCircleDiary(@RequestBody(required = false) UserDiaryDTO userDiaryDTO) {
-        if (userDiaryDTO == null) {
-            return "fail";
-        } else {
-            return userDiaryService.updateCircleDiaryContent(userDiaryDTO);
+    @PostMapping("/diary/update")
+    public Result<String> updateCircleDiary(@Validated @RequestBody(required = false) UserDiaryVO userDiaryVO, BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseMsgUtil.fail(Objects.requireNonNull(result.getFieldError()).getDefaultMessage());
         }
+        String responseResult = userDiaryService.updateCircleDiaryContent(userDiaryVO);
+        if (EnumResultStatus.FAIL.getValue().equals(responseResult)) {
+            return ResponseMsgUtil.fail("日志不存在，或者可能被删除，或者主题不存在，被删除！");
+        }
+        return ResponseMsgUtil.success(responseResult);
     }
 
     /**

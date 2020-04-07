@@ -1,7 +1,7 @@
 package com.ccl.wx.service;
 
-import com.ccl.wx.dto.UserDiaryDTO;
 import com.ccl.wx.entity.UserDiary;
+import com.ccl.wx.vo.UserDiaryVO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -66,10 +66,10 @@ public interface UserDiaryService {
      * 编辑更新圈子日记
      * 日记id，日记内容，日记图片，日记权限，日记地址
      *
-     * @param userDiaryDTO
+     * @param userDiaryVO
      * @return
      */
-    String updateCircleDiaryContent(UserDiaryDTO userDiaryDTO);
+    String updateCircleDiaryContent(UserDiaryVO userDiaryVO);
 
     /**
      * 根据圈子id和日记状态查询全部日志信息

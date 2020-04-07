@@ -53,6 +53,11 @@ public class UserDiaryDTO {
     private String diaryVoice;
 
     /**
+     * 日志视频地址
+     */
+    private String diaryVideo;
+
+    /**
      * 日志所在的圈子id
      */
     private Long circleId;

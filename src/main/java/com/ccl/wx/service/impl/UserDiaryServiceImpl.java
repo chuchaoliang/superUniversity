@@ -14,6 +14,7 @@ import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.enums.*;
 import com.ccl.wx.mapper.UserDiaryMapper;
 import com.ccl.wx.pojo.DiaryHideComment;
+import com.ccl.wx.properties.DefaultProperties;
 import com.ccl.wx.service.*;
 import com.ccl.wx.util.CclDateUtil;
 import com.ccl.wx.util.CclUtil;
@@ -21,6 +22,7 @@ import com.ccl.wx.util.FtpUtil;
 import com.ccl.wx.vo.CircleHomeDiaryVO;
 import com.ccl.wx.vo.CircleHomeThemeVO;
 import com.ccl.wx.vo.DiaryLikeVO;
+import com.ccl.wx.vo.UserDiaryVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -63,6 +65,9 @@ public class UserDiaryServiceImpl implements UserDiaryService {
 
     @Resource
     private UserInfoService userInfoService;
+
+    @Resource
+    private DefaultProperties defaultProperties;
 
     /**
      * 多少个小时内，用户可以再次增加浏览量
@@ -247,34 +252,47 @@ public class UserDiaryServiceImpl implements UserDiaryService {
     }
 
     @Override
-    public String updateCircleDiaryContent(UserDiaryDTO userDiaryDTO) {
+    public String updateCircleDiaryContent(UserDiaryVO userDiaryVO) {
         // 根据id查询日记内容
-        UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(userDiaryDTO.getId());
+        UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(userDiaryVO.getId());
         // 判断此日记是否为空
-        if (userDiary != null) {
+        if (userDiary == null || userDiary.getDiaryStatus().equals(EnumUserDiary.USER_DIARY_DELETE.getValue())) {
+            // 理论上不存在这种情况
+            return EnumResultStatus.FAIL.getValue();
+        } else {
+            Integer themeId = userDiaryVO.getThemeId();
+            if (!defaultProperties.getDefaultThemeId().equals(themeId)) {
+                TodayContent todayContent = todayContentService.selectByPrimaryKey(themeId.longValue());
+                if (todayContent == null || todayContent.getContentStatus().equals(EnumThemeStatus.DELETE_STATUS.getValue())) {
+                    return EnumResultStatus.FAIL.getValue();
+                }
+            }
+            // 重新设置主题id
+            userDiary.setThemeId(userDiaryVO.getThemeId());
             // 重新设置圈子内容
-            userDiary.setDiaryContent(userDiaryDTO.getDiaryContent());
+            userDiary.setDiaryContent(userDiaryVO.getDiaryContent());
             // 重新设置圈子所在地址
-            userDiary.setDiaryAddress(userDiaryDTO.getDiaryAddress());
+            userDiary.setDiaryAddress(userDiaryVO.getDiaryAddress());
             // 重新设置日记状态
-            userDiary.setDiaryStatus(userDiaryDTO.getDiaryStatus());
+            userDiary.setDiaryStatus(StringUtils.isEmpty(userDiaryVO.getDiaryStatus()) ? EnumUserDiary.USER_DIARY_NORMAL.getValue() : userDiaryVO.getDiaryStatus());
             // 设置日志更新时间
             userDiary.setDiaryUpdatetime(new Date());
             // 得到历史图片列表(先判断历史图片是否为空)
             String diaryImage = userDiary.getDiaryImage();
             List<String> historyImages = new ArrayList<>();
-            if (diaryImage != null && !"".equals(diaryImage)) {
+            if (!StringUtils.isEmpty(diaryImage)) {
                 historyImages = Arrays.asList(diaryImage.split(","));
             }
             // 设置处理后的图片列表
-            userDiary.setDiaryImage(CclUtil.fileListDispose(userDiaryDTO.getImages(), historyImages));
+            userDiary.setDiaryImage(CclUtil.fileListDispose(userDiaryVO.getImages(), historyImages));
+            // 设置处理后的视频文件
+            userDiary.setDiaryVideo(CclUtil.fileDispose(userDiaryVO.getDiaryVideo(), userDiary.getDiaryVideo()));
+            // 设置处理后的音频文件
+            userDiary.setDiaryVoice(CclUtil.fileDispose(userDiaryVO.getDiaryVoice(), userDiary.getDiaryVoice()));
             // 更新日志信息
             userDiaryMapper.updateByPrimaryKeySelective(userDiary);
-            // 返回此日志id
-            return String.valueOf(userDiaryDTO.getId());
-        } else {
-            // 理论上不存在这种情况
-            return "-1";
+            // 返回此日志更新后的信息
+            return JSON.toJSONStringWithDateFormat(userDiary, DatePattern.NORM_DATETIME_MINUTE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
         }
     }
 
