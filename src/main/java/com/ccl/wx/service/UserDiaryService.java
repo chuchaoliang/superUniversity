@@ -132,17 +132,17 @@ public interface UserDiaryService {
      * @param userDiary 前端传输来的用户打卡数据
      * @return
      */
-    String publishUserDiary(UserDiary userDiary);
+    String saveUserDiary(UserDiary userDiary);
 
     /**
      * 保存日志图片
      *
      * @param userId
-     * @param id
+     * @param diaryId
      * @param image
      * @return
      */
-    String saveDiaryImage(MultipartFile image, String userId, Long id);
+    String saveDiaryImage(MultipartFile image, String userId, Long diaryId);
 
     /**
      * 根据日志id获取圈子信息
@@ -261,4 +261,24 @@ public interface UserDiaryService {
      * @return
      */
     Long countByCircleIdAndDiaryStatus(Long circleId, List<Integer> diaryStatus);
+
+    /**
+     * 保存日志音频文件
+     *
+     * @param file    文件
+     * @param userId  用户id
+     * @param diaryId 日志id
+     * @return
+     */
+    String saveDiaryVoice(MultipartFile file, String userId, Long diaryId);
+
+    /**
+     * 保存日志视频文件
+     *
+     * @param file    文件
+     * @param userId  用户id
+     * @param diaryId 日志id
+     * @return 保存后的文件地址
+     */
+    String saveDiaryVideo(MultipartFile file, String userId, Long diaryId);
 }

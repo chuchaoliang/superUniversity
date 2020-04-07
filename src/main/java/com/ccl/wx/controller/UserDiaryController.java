@@ -3,13 +3,14 @@ package com.ccl.wx.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.annotation.ParamCheck;
+import com.ccl.wx.common.EnumResultCode;
 import com.ccl.wx.common.Result;
 import com.ccl.wx.dto.UserDiaryDTO;
 import com.ccl.wx.entity.UserDiary;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.service.CircleService;
+import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.UserDiaryService;
-import com.ccl.wx.util.CclUtil;
 import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -18,11 +19,13 @@ import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * 圈子日志相关
@@ -41,6 +44,9 @@ public class UserDiaryController {
 
     @Resource
     private CircleService circleService;
+
+    @Resource
+    private JoinCircleService joinCircleService;
 
     /**
      * 根据日志的id查询日志的信息
@@ -79,23 +85,63 @@ public class UserDiaryController {
     }
 
     /**
-     * TODO API
+     * 保存日志图片
      *
-     * @param image
-     * @param userId
-     * @param id
+     * @param image   图片文件
+     * @param userId  用户id
+     * @param diaryId 日志id
      * @return
      */
-    @PostMapping("/savediaryimage")
-    public String saveDiaryImage(@RequestPart(value = "image", required = false) MultipartFile image,
-                                 @RequestParam(value = "userid", required = false) String userId,
-                                 @RequestParam(value = "id", required = false) Long id) {
-        if (image == null || StringUtils.isEmpty(id) || StringUtils.isEmpty(userId)) {
-            // 前端传来的数据为空 失败
-            return "fail";
-        } else {
-            return userDiaryService.saveDiaryImage(image, userId, id);
+    @ParamCheck
+    @PostMapping("/diary/save/image")
+    public Result<String> saveDiaryImage(@RequestPart(value = "image", required = false) MultipartFile image,
+                                         @RequestHeader(value = "token", required = false) String userId,
+                                         @RequestParam(value = "diaryId", required = false) Long diaryId) {
+        String result = userDiaryService.saveDiaryImage(image, userId, diaryId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("文件上传失败，或者日记不存在!");
         }
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
+     * 音频文件上传
+     *
+     * @param file    文件
+     * @param userId  用户id
+     * @param diaryId 日志id
+     * @return
+     */
+    @ParamCheck
+    @PostMapping("/diary/save/voice")
+    public Result<String> saveDiaryVoice(@RequestPart(value = "file", required = false) MultipartFile file,
+                                         @RequestHeader(value = "token", required = false) String userId,
+                                         @RequestParam(value = "diaryId", required = false) Long diaryId) {
+        String result = userDiaryService.saveDiaryVoice(file, userId, diaryId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("文件上传失败，已经存在音频信息，或者日记不存在!");
+        }
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
+     * 视频文件上传
+     *
+     * @param file    文件
+     * @param userId  用户id
+     * @param diaryId 日志id
+     * @return
+     */
+    @ParamCheck
+    @PostMapping("/diary/save/video")
+    public Result<String> saveDiaryVideo(@RequestPart(value = "file", required = false) MultipartFile file,
+                                         @RequestHeader(value = "token", required = false) String userId,
+                                         @RequestParam(value = "diaryId", required = false) Long diaryId) {
+        String result = userDiaryService.saveDiaryVideo(file, userId, diaryId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("文件上传失败，已经存在视频信息，或者日记不存在!");
+        }
+        return ResponseMsgUtil.success(result);
     }
 
     /**
@@ -118,20 +164,42 @@ public class UserDiaryController {
      * circleId 圈子id
      * 如果前端传来的数据不为空则返回此日记的主键id ，否则返回fail
      *
-     * @param userDiary
+     * @param userDiary 用户日志
      * @return
      */
     @ApiOperation(value = "用户发表日志", notes = "需要参数userId、diaryContent、diaryStatus、diaryAddress、circleId、themeId", httpMethod = "POST")
     @SneakyThrows
-    @PostMapping("/savediarycontent")
-    public String saveContent(@RequestBody(required = false) UserDiary userDiary) {
-        ArrayList<String> strs = new ArrayList<>();
-        strs.add("userId");
-        strs.add("circleId");
-        if (CclUtil.classPropertyIsNull(userDiary, strs)) {
-            return userDiaryService.publishUserDiary(userDiary);
+    @PostMapping("/diary/save/content")
+    public Result<String> saveContent(@Validated @RequestBody(required = false) UserDiary userDiary, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseMsgUtil.fail(Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
+        } else {
+            String result = userDiaryService.saveUserDiary(userDiary);
+            if (EnumResultStatus.FAIL.getValue().equals(result)) {
+                return ResponseMsgUtil.fail("打卡失败！用户已经打卡此主题，或者该主题被删除了！");
+            } else {
+                return ResponseMsgUtil.success(result);
+            }
         }
-        return EnumResultStatus.FAIL.getValue();
+    }
+
+    /**
+     * 检测用户打卡状态
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/diary/check/signin")
+    public Result<String> checkUserSignInStatus(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                @RequestHeader(value = "token", required = false) String userId) {
+        boolean userSignInStatus = joinCircleService.checkUserSignInStatus(circleId, userId);
+        if (!userSignInStatus) {
+            // 不可以打卡
+            return ResponseMsgUtil.fail("用户被淘汰，或者已经完成今日全部主题打卡！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS.getStatus(), "用户可以打卡！", null);
     }
 
     /**

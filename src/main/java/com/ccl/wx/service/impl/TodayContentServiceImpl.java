@@ -88,7 +88,7 @@ public class TodayContentServiceImpl implements TodayContentService {
     @Override
     public String saveEverydayImage(MultipartFile image, String userId, Long id) {
         TodayContent todayContent = todayContentMapper.selectByPrimaryKey(id);
-        if (todayContent == null) {
+        if (todayContent == null || !todayContent.getContentStatus().equals(EnumThemeStatus.USE_STATUS.getValue())) {
             return EnumResultStatus.FAIL.getValue();
         }
         boolean flag;

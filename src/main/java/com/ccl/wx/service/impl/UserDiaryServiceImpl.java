@@ -410,16 +410,21 @@ public class UserDiaryServiceImpl implements UserDiaryService {
     }
 
     @Override
-    public String publishUserDiary(UserDiary userDiary) {
-        // TODO 日志主题重复待检测（理论上不会出现这种情况）
+    public String saveUserDiary(UserDiary userDiary) {
         // 设置日志创建时间
         userDiary.setDiaryCreatetime(new Date());
         // 查询用户加入圈子的信息
         Long circleId = userDiary.getCircleId();
         String userId = userDiary.getUserId();
         Integer themeId = 0;
-        if (userDiary.getThemeId() != null) {
+        // 判断是否连续打卡一定天数获得额外能量球
+        boolean continuous = false;
+        if (!userDiary.getThemeId().equals(0)) {
             themeId = userDiary.getThemeId();
+            TodayContent todayContent = todayContentService.selectByPrimaryKey(themeId.longValue());
+            if (todayContent == null || !todayContent.getContentStatus().equals(EnumThemeStatus.USE_STATUS.getValue())) {
+                return EnumResultStatus.FAIL.getValue();
+            }
         }
         JoinCircle circleInfo = joinCircleService.selectByPrimaryKey(circleId, userId);
         // 若此用户完成全部打卡则提示您已经完成全部打卡主题
@@ -435,7 +440,7 @@ public class UserDiaryServiceImpl implements UserDiaryService {
                 themeList.add(String.valueOf(themeId));
             } else {
                 // 未知错误，对一个主题重复打卡，或者日记出现问题
-                return EnumResultStatus.UNKNOWN.getValue();
+                return EnumResultStatus.FAIL.getValue();
             }
             // 设置主题id
             circleInfo.setThemeId(CclUtil.listToString(themeList, ','));
@@ -447,11 +452,6 @@ public class UserDiaryServiceImpl implements UserDiaryService {
             }
             // 获取圈子中全部的主题总数 + 1 因为每个圈子中都存在一个无主题的情况
             int themes = todayContentService.countByCircleIdAndContentStatus(circleId, EnumThemeStatus.DELETE_STATUS.getValue()) + 1;
-            // 用户发表的日志主题被删除了
-            if (themeList.size() > themes) {
-                // 未知错误
-                return EnumResultStatus.UNKNOWN.getValue();
-            }
             // 设置打卡主题为1
             circleInfo.setUserSignStatus(EnumUserClockIn.USER_CLOCK_IN_SUCCESS.getValue());
             // 判断用户是否完成全部主题的打卡
@@ -489,13 +489,14 @@ public class UserDiaryServiceImpl implements UserDiaryService {
                 if (countDiary == 0) {
                     // 得到用户今天打卡的日记数目
                     int diaryCount = userDiaryMapper.countByUserIdAndCircleIdAndDiaryCreatetimeLike(userId, circleId, signInTime);
-                    if (diaryCount == 1) {
+                    if (diaryCount == 0) {
                         // 判断是否为连续打卡
                         if (judgeClockIn) {
                             // 获取用户的活跃度
                             Long userVitality = circleInfo.getUserVitality();
                             // 是连续第7天打卡，活跃度额外增加
                             circleInfo.setUserVitality(userVitality + EnumUserVitality.USER_CONTINUOUS_CLOCK_IN.getValue());
+                            continuous = true;
                         }
                     }
                 }
@@ -506,24 +507,22 @@ public class UserDiaryServiceImpl implements UserDiaryService {
             joinCircleService.updateByPrimaryKeySelective(circleInfo);
             // 将日志数据保存到数据库中
             userDiaryMapper.insertSelective(userDiary);
-            return String.valueOf(userDiary.getId());
+            List<Object> diaryList = new ArrayList<>();
+            diaryList.add(userDiary);
+            diaryList.add(continuous);
+            return JSON.toJSONStringWithDateFormat(diaryList, DatePattern.NORM_DATETIME_MINUTE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
         } else {
-            // 今天已经打卡
-            return EnumResultStatus.SUCCESS.getValue();
+            // 今天已经完成全部打卡
+            return EnumResultStatus.FAIL.getValue();
         }
     }
 
-    /**
-     * TODO 保存日志图片信息
-     *
-     * @param image
-     * @param userId
-     * @param id
-     * @return
-     */
     @Override
-    public String saveDiaryImage(MultipartFile image, String userId, Long id) {
-        UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(id);
+    public String saveDiaryImage(MultipartFile image, String userId, Long diaryId) {
+        UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(diaryId);
+        if (userDiary == null) {
+            return EnumResultStatus.FAIL.getValue();
+        }
         boolean flag;
         if ("".equals(userDiary.getDiaryImage())) {
             flag = true;
@@ -531,8 +530,53 @@ public class UserDiaryServiceImpl implements UserDiaryService {
             flag = false;
         }
         String imagePath = FtpUtil.uploadFile(userId, image);
-        userDiaryMapper.concatImage(id, imagePath, flag);
-        return EnumResultStatus.SUCCESS.getValue();
+        if (EnumResultStatus.FAIL.getValue().equals(imagePath)) {
+            return EnumResultStatus.FAIL.getValue();
+        }
+        userDiaryMapper.concatImage(diaryId, imagePath, flag);
+        return JSON.toJSONString(imagePath);
+    }
+
+    @Override
+    public String saveDiaryVoice(MultipartFile file, String userId, Long diaryId) {
+        UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(diaryId);
+        if (userDiary == null) {
+            return EnumResultStatus.FAIL.getValue();
+        } else {
+            if (!StringUtils.isEmpty(userDiary.getDiaryVoice())) {
+                return EnumResultStatus.FAIL.getValue();
+            } else {
+                String filePath = FtpUtil.uploadFile(userId, file);
+                if (EnumResultStatus.FAIL.getValue().equals(filePath)) {
+                    return EnumResultStatus.FAIL.getValue();
+                } else {
+                    userDiary.setDiaryVoice(filePath);
+                    userDiaryMapper.updateByPrimaryKeySelective(userDiary);
+                    return JSON.toJSONString(filePath);
+                }
+            }
+        }
+    }
+
+    @Override
+    public String saveDiaryVideo(MultipartFile file, String userId, Long diaryId) {
+        UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(diaryId);
+        if (userDiary == null) {
+            return EnumResultStatus.FAIL.getValue();
+        } else {
+            if (!StringUtils.isEmpty(userDiary.getDiaryVideo())) {
+                return EnumResultStatus.FAIL.getValue();
+            } else {
+                String filePath = FtpUtil.uploadFile(userId, file);
+                if (EnumResultStatus.FAIL.getValue().equals(filePath)) {
+                    return EnumResultStatus.FAIL.getValue();
+                } else {
+                    userDiary.setDiaryVideo(filePath);
+                    userDiaryMapper.updateByPrimaryKeySelective(userDiary);
+                    return JSON.toJSONString(filePath);
+                }
+            }
+        }
     }
 
     @Override

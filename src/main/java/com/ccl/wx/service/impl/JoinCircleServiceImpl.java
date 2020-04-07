@@ -9,6 +9,7 @@ import com.ccl.wx.dto.UserSignSuccessDTO;
 import com.ccl.wx.entity.JoinCircle;
 import com.ccl.wx.enums.EnumPage;
 import com.ccl.wx.enums.EnumUserCircle;
+import com.ccl.wx.enums.EnumUserClockIn;
 import com.ccl.wx.exception.UserJoinCircleException;
 import com.ccl.wx.mapper.JoinCircleMapper;
 import com.ccl.wx.service.JoinCircleService;
@@ -285,5 +286,16 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         returnList.add(userFailSignInByDate);
         returnList.add(judgeNextPage);
         return JSON.toJSONString(returnList);
+    }
+
+    @Override
+    public Boolean checkUserSignInStatus(Long circleId, String userId) {
+        JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+        // 检测用户是否完成全部主题的打卡
+        if (joinCircle == null || !joinCircle.getUserStatus().equals(EnumUserCircle.USER_NORMAL_STATUS.getValue())
+                || joinCircle.getUserSignStatus().equals(EnumUserClockIn.USER_ALL_CLOCK_IN_SUCCESS.getValue())) {
+            return false;
+        }
+        return true;
     }
 }
