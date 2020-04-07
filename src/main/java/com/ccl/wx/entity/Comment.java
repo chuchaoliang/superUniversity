@@ -2,9 +2,12 @@ package com.ccl.wx.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * @author 褚超亮
@@ -24,9 +27,14 @@ public class Comment implements Serializable {
      * 日志id
      */
     @ApiModelProperty(value = "日志id")
+    @NotNull(message = "日志id不能为空")
     private Long diaryId;
 
-    @ApiModelProperty(value = "")
+    /**
+     * 评论内容
+     */
+    @ApiModelProperty(value = "评论内容")
+    @NotBlank(message = "评论内容不能为空")
     private String commentContent;
 
     /**
@@ -75,6 +83,7 @@ public class Comment implements Serializable {
      * 圈子id
      */
     @ApiModelProperty(value = "圈子id")
+    @NotNull(message = "圈子id不能为空")
     private Long circleId;
 
     /**

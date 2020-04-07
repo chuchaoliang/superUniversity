@@ -62,7 +62,6 @@ public class UserDiaryController {
     }
 
     /**
-     * TODO
      * 更新圈子日志信息
      * 1. 获取日记id，日记内容，日记状态，地址信息，图片列表
      * id, diaryContent,diaryStatus,diaryAddress,images

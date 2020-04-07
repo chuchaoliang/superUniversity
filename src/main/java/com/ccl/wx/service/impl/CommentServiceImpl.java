@@ -1,22 +1,24 @@
 package com.ccl.wx.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.ccl.wx.dto.CommentDTO;
 import com.ccl.wx.dto.ReplyDTO;
 import com.ccl.wx.entity.Comment;
 import com.ccl.wx.entity.Reply;
 import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.enums.EnumComment;
+import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.mapper.CommentMapper;
-import com.ccl.wx.mapper.ReplyMapper;
 import com.ccl.wx.pojo.DiaryHideComment;
 import com.ccl.wx.service.CommentService;
+import com.ccl.wx.service.ReplyService;
 import com.ccl.wx.service.UserInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,14 +31,14 @@ import java.util.List;
 @Service
 public class CommentServiceImpl implements CommentService {
 
-    @Autowired
+    @Resource
     private CommentMapper commentMapper;
 
-    @Autowired
-    private ReplyMapper replyMapper;
-
-    @Autowired
+    @Resource
     private UserInfoService userInfoService;
+
+    @Resource
+    private ReplyService replyService;
 
     /**
      * 评论数量
@@ -90,8 +92,8 @@ public class CommentServiceImpl implements CommentService {
         ArrayList<CommentDTO> commentDTOS = new ArrayList<>();
         for (Comment comment : comments) {
             CommentDTO commentDTO = new CommentDTO();
-            // 查询此评论下的全部子评论 TODO 可以设置分页 只查询10个
-            List<Reply> replies = replyMapper.selectAllByCommentId(comment.getId(), 0, COMMENT_REPLY_NUMBER);
+            // 查询此评论下的子评论
+            List<Reply> replies = replyService.selectAllByCommentId(comment.getId(), 0, COMMENT_REPLY_NUMBER);
             ArrayList<ReplyDTO> replyDTOS = new ArrayList<>();
             for (Reply reply : replies) {
                 ReplyDTO replyDTO = new ReplyDTO();
@@ -142,7 +144,7 @@ public class CommentServiceImpl implements CommentService {
     public DiaryHideComment judgeHideCommentById(Long diaryId) {
         // 日志数
         Long commentSum = commentMapper.countByDiaryId(diaryId);
-        Long replySum = replyMapper.countByDiaryId(diaryId);
+        Long replySum = replyService.countByDiaryId(diaryId);
         DiaryHideComment diaryHideComment = new DiaryHideComment();
         long sum = commentSum + replySum;
         diaryHideComment.setCommentSum(sum);
@@ -156,7 +158,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentDTO> getMasterComment(Long diaryId) {
-        // 获取日记的点评 TODO ----------------------------
+        // 获取日记的点评
         List<Comment> comments = commentMapper.selectAllByDiaryIdAndCommentTypeOrderByCommentCreatetimeDesc(diaryId, 1, 0, 5);
         ArrayList<CommentDTO> commentDTOS = new ArrayList<>();
         for (Comment comment : comments) {
@@ -176,6 +178,31 @@ public class CommentServiceImpl implements CommentService {
             commentDTOS.add(commentDTO);
         }
         return commentDTOS;
+    }
+
+    @Override
+    public String saveDiaryComment(Comment comment) {
+        // 插入数据
+        int i = commentMapper.insertSelective(comment);
+        if (i == 1) {
+            return JSON.toJSONString(comment);
+        }
+        return EnumResultStatus.FAIL.getValue();
+    }
+
+    @Override
+    public String deleteCircleComment(Integer commentId) {
+        Comment comment = commentMapper.selectByPrimaryKey(commentId.longValue());
+        if (comment != null) {
+            // 删除评论
+            commentMapper.deleteByPrimaryKey(commentId.longValue());
+            List<Reply> replies = replyService.selectAllByCommentId(commentId.longValue(), 0, Integer.MAX_VALUE);
+            for (Reply reply : replies) {
+                replyService.deleteByPrimaryKey(reply.getId());
+            }
+            return EnumResultStatus.SUCCESS.getValue();
+        }
+        return EnumResultStatus.FAIL.getValue();
     }
 }
 

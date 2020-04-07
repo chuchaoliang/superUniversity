@@ -25,4 +25,38 @@ public interface ReplyService {
     int updateByPrimaryKey(Reply record);
 
     List<Long> selectIdByDiaryId(Long diaryId);
+
+    /**
+     * 回复评论
+     *
+     * @param reply
+     * @return
+     */
+    String replyDiaryComment(Reply reply);
+
+    /**
+     * 删除回复
+     *
+     * @param replyId 回复id
+     * @return
+     */
+    String deleteDiaryReply(Integer replyId);
+
+    /**
+     * 根据评论id查询回复数据
+     *
+     * @param commentId  评论id
+     * @param start      起始
+     * @param pageNumber 多少个数据
+     * @return
+     */
+    List<Reply> selectAllByCommentId(Long commentId, int start, Integer pageNumber);
+
+    /**
+     * 根据日记id查询回复的条数
+     *
+     * @param diaryId 日记id
+     * @return
+     */
+    Long countByDiaryId(Long diaryId);
 }
