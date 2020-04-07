@@ -451,9 +451,9 @@ public class CircleServiceImpl implements CircleService {
 
     @SneakyThrows
     @Override
-    public List<CommentDTO> getAllComment(Long diaryid) {
+    public List<CommentDTO> getAllComment(Long diaryId) {
         // 获取子评论
-        List<Comment> comments = commentMapper.selectAllByDiaryIdAndCommentTypeOrderByCommentCreatetimeDesc(diaryid, 0, 0, 10);
+        List<Comment> comments = commentMapper.selectAllByDiaryIdAndCommentTypeOrderByCommentCreatetimeDesc(diaryId, 0, 0, 10);
         ArrayList<CommentDTO> commentDTOS = new ArrayList<>();
         for (Comment comment : comments) {
             if (COMMENT_DELETE_STATUS.equals(comment.getCommentStatus())) {
@@ -506,9 +506,9 @@ public class CircleServiceImpl implements CircleService {
 
     @SneakyThrows
     @Override
-    public List<CommentDTO> getMasterComment(Long diaryid) {
+    public List<CommentDTO> getMasterComment(Long diaryId) {
         // 获取日记的点评
-        List<Comment> comments = commentMapper.selectAllByDiaryIdAndCommentTypeOrderByCommentCreatetimeDesc(diaryid, 1, 0, 5);
+        List<Comment> comments = commentMapper.selectAllByDiaryIdAndCommentTypeOrderByCommentCreatetimeDesc(diaryId, 1, 0, 5);
         ArrayList<CommentDTO> commentDTOS = new ArrayList<>();
         for (Comment comment : comments) {
             if (COMMENT_DELETE_STATUS.equals(comment.getCommentStatus())) {
@@ -530,11 +530,11 @@ public class CircleServiceImpl implements CircleService {
     }
 
     @Override
-    public UserDiaryDTO getDiaryInfoById(Long diaryid) {
+    public UserDiaryDTO getDiaryInfoById(Long diaryId) {
         // 全部点评
-        List<CommentDTO> masterComment = circleService.getMasterComment(diaryid);
+        List<CommentDTO> masterComment = circleService.getMasterComment(diaryId);
         // 全部评论
-        List<CommentDTO> allComment = circleService.getAllComment(diaryid);
+        List<CommentDTO> allComment = circleService.getAllComment(diaryId);
         UserDiaryDTO userDiaryDTO = new UserDiaryDTO();
         userDiaryDTO.setMasterComments(masterComment);
         userDiaryDTO.setComments(allComment);
@@ -560,8 +560,8 @@ public class CircleServiceImpl implements CircleService {
     }
 
     @Override
-    public Boolean judgeCirclePrivacyStatus(Long circleid) {
-        CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleid);
+    public Boolean judgeCirclePrivacyStatus(Long circleId) {
+        CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleId);
         // 判断是否为私密圈子
         if (circleInfo.getCircleSet().equals(CIRCLE_PASSWORD_STATUS) && !StringUtils.isEmpty(circleInfo.getCirclePassword())) {
             return true;

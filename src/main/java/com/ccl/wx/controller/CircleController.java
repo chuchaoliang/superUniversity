@@ -174,28 +174,6 @@ public class CircleController {
     }
 
     /**
-     * 获取用户的打卡状态
-     *
-     * @param circleid 圈子id
-     * @param userid   用户id
-     * @return
-     */
-    @GetMapping("/getsignstatus")
-    public String getSignStatus(@RequestParam(value = "circleid", required = false) String circleid,
-                                @RequestParam(value = "userid", required = false) String userid) {
-        if (StringUtils.isEmpty(circleid) || StringUtils.isEmpty(userid)) {
-            return "fail";
-        } else {
-            JoinCircle circle = joinCircleMapper.selectByPrimaryKey(Long.valueOf(circleid), userid);
-            if (circle.getUserSignStatus().equals(0)) {
-                return "success";
-            } else {
-                return "-1";
-            }
-        }
-    }
-
-    /**
      * 判断用户是否为圈主
      *
      * @param circleid 圈子id

@@ -1,7 +1,7 @@
 package com.ccl.wx.service;
 
-import com.ccl.wx.dto.UserDiaryDTO;
 import com.ccl.wx.entity.UserDiary;
+import com.ccl.wx.vo.UserDiaryVO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -66,10 +66,10 @@ public interface UserDiaryService {
      * 编辑更新圈子日记
      * 日记id，日记内容，日记图片，日记权限，日记地址
      *
-     * @param userDiaryDTO
+     * @param userDiaryVO
      * @return
      */
-    String updateCircleDiaryContent(UserDiaryDTO userDiaryDTO);
+    String updateCircleDiaryContent(UserDiaryVO userDiaryVO);
 
     /**
      * 根据圈子id和日记状态查询全部日志信息
@@ -132,25 +132,17 @@ public interface UserDiaryService {
      * @param userDiary 前端传输来的用户打卡数据
      * @return
      */
-    String publishUserDiary(UserDiary userDiary);
+    String saveUserDiary(UserDiary userDiary);
 
     /**
      * 保存日志图片
      *
      * @param userId
-     * @param id
+     * @param diaryId
      * @param image
      * @return
      */
-    String saveDiaryImage(MultipartFile image, String userId, Long id);
-
-    /**
-     * 根据日志id获取圈子信息
-     *
-     * @param diaryId 日志id
-     * @return
-     */
-    String getCircleDiaryById(Long diaryId);
+    String saveDiaryImage(MultipartFile image, String userId, Long diaryId);
 
     /**
      * 增加浏览量
@@ -261,4 +253,35 @@ public interface UserDiaryService {
      * @return
      */
     Long countByCircleIdAndDiaryStatus(Long circleId, List<Integer> diaryStatus);
+
+    /**
+     * 保存日志音频文件
+     *
+     * @param file    文件
+     * @param userId  用户id
+     * @param diaryId 日志id
+     * @return
+     */
+    String saveDiaryVoice(MultipartFile file, String userId, Long diaryId);
+
+    /**
+     * 保存日志视频文件
+     *
+     * @param file    文件
+     * @param userId  用户id
+     * @param diaryId 日志id
+     * @return 保存后的文件地址
+     */
+    String saveDiaryVideo(MultipartFile file, String userId, Long diaryId);
+
+    /**
+     * 查询出某位用户某一天是否在某一个主题下打卡
+     *
+     * @param circleId    圈子id
+     * @param userId      用户id
+     * @param date        哪一天（20200311）
+     * @param diaryStatus 日志状态
+     * @return
+     */
+    List<UserDiary> selectByCircleIdAndUserIdAndDiaryCreatetimeAndDiaryStatus(Long circleId, String userId, String date, List<Integer> diaryStatus, Integer themeId);
 }

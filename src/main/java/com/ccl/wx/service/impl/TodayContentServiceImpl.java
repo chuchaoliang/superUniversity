@@ -1,12 +1,15 @@
 package com.ccl.wx.service.impl;
 
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.ccl.wx.common.DiaryStatusList;
 import com.ccl.wx.dto.CircleTodayContentDTO;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.entity.JoinCircle;
 import com.ccl.wx.entity.TodayContent;
+import com.ccl.wx.entity.UserDiary;
 import com.ccl.wx.enums.*;
 import com.ccl.wx.mapper.TodayContentMapper;
 import com.ccl.wx.properties.DefaultProperties;
@@ -88,7 +91,7 @@ public class TodayContentServiceImpl implements TodayContentService {
     @Override
     public String saveEverydayImage(MultipartFile image, String userId, Long id) {
         TodayContent todayContent = todayContentMapper.selectByPrimaryKey(id);
-        if (todayContent == null) {
+        if (todayContent == null || !todayContent.getContentStatus().equals(EnumThemeStatus.USE_STATUS.getValue())) {
             return EnumResultStatus.FAIL.getValue();
         }
         boolean flag;
@@ -108,9 +111,9 @@ public class TodayContentServiceImpl implements TodayContentService {
         TodayContent todayContent = todayContentMapper.selectByPrimaryKey(themeId);
         CircleTodayContentDTO circleTodayContentDTO = new CircleTodayContentDTO();
         // 判断是否有此今日内容 一般肯定不为空
-        if (StringUtils.isEmpty(todayContent)) {
-            // 出错今日内容为空，出现未知错误
-            return EnumResultStatus.UNKNOWN.getValue();
+        if (todayContent == null || todayContent.getContentStatus().equals(EnumThemeStatus.DELETE_STATUS.getValue())) {
+            // 此主题被删除
+            return EnumResultStatus.FAIL.getValue();
         } else {
             // 今日内容不为空
             BeanUtils.copyProperties(todayContent, circleTodayContentDTO);
@@ -166,7 +169,7 @@ public class TodayContentServiceImpl implements TodayContentService {
         TodayContent todayContent = todayContentMapper.selectByPrimaryKey(themeId);
         // 要删除的主题不存在？？
         if (todayContent == null || EnumThemeStatus.DELETE_STATUS.getValue() == todayContent.getContentStatus()) {
-            return EnumResultStatus.UNKNOWN.getValue();
+            return EnumResultStatus.FAIL.getValue();
         }
         CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
         if (circleInfo.getThemeSum() > 1) {
@@ -177,6 +180,7 @@ public class TodayContentServiceImpl implements TodayContentService {
         userDiaryService.updateDiaryStatusByThemeId(themeId.intValue(), EnumUserDiary.USER_DIARY_THEME_DELETE.getValue());
         // 主题设置为删除状态
         todayContent.setContentStatus(EnumThemeStatus.DELETE_STATUS.getValue());
+        todayContent.setDeleteTime(new Date());
         todayContentMapper.updateByPrimaryKeySelective(todayContent);
         return EnumResultStatus.SUCCESS.getValue();
     }
@@ -264,9 +268,13 @@ public class TodayContentServiceImpl implements TodayContentService {
     }
 
     @Override
-    public String selectAllThemeByCircleIdPage(Long circleId, String userId, Integer page, Boolean signIn) {
+    public String selectAllThemeByCircleIdPage(Long circleId, String userId, Integer page, Boolean signIn, Date date) {
         // 查询用户加入圈子的信息
         JoinCircle joinCircle = joinCircleService.selectByPrimaryKey(circleId, userId);
+        // 此用户未加入此圈子 或者被淘汰了
+        if (joinCircle == null || !joinCircle.getUserStatus().equals(EnumUserCircle.USER_NORMAL_STATUS.getValue())) {
+            return EnumResultStatus.FAIL.getValue();
+        }
         // 判断此用户今日打卡主题是否为空
         int pageNumber = EnumPage.PAGE_NUMBER.getValue();
         List<TodayContent> todayContents = todayContentMapper.selectAllByCircleIdOrderByCreateTimeDesc(circleId, EnumThemeStatus.USE_STATUS.getValue(), page * pageNumber, pageNumber);
@@ -291,13 +299,10 @@ public class TodayContentServiceImpl implements TodayContentService {
             // 设置日志总数
             circleThemeVO.setDiaryNumber(diaryNumber);
             // 设置今天是否打卡
-            circleThemeVO.setSignInSuccess(false);
-            if (!StringUtils.isEmpty(joinCircle.getThemeId())) {
-                List<String> themes = Arrays.asList(joinCircle.getThemeId().split(","));
-                if (themes.contains(String.valueOf(todayContent.getId()))) {
-                    // 用户今天此主题已经打卡
-                    circleThemeVO.setSignInSuccess(true);
-                }
+            if (date != null) {
+                // 判断用户是否打卡此主题
+                boolean themeSignIn = judgeUserThemeClockByDate(circleId, userId, date, DiaryStatusList.userCircleDiaryStatusList(), todayContent.getId().intValue());
+                circleThemeVO.setSignInSuccess(themeSignIn);
             }
             circleThemeVO.setDefaultTheme(false);
             // 判断是否为默认主题
@@ -318,6 +323,16 @@ public class TodayContentServiceImpl implements TodayContentService {
             themeList.add(joinCircleService.judgeUserIsCircleManage(circleId.intValue(), permissionList, userId));
         }
         return JSON.toJSONStringWithDateFormat(themeList, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+    }
+
+    @Override
+    public boolean judgeUserThemeClockByDate(Long circleId, String userId, Date date, List<Integer> diaryStatus, Integer themeId) {
+        String formatDate = DateUtil.format(date, DatePattern.PURE_DATE_PATTERN);
+        List<UserDiary> userDiaries = userDiaryService.selectByCircleIdAndUserIdAndDiaryCreatetimeAndDiaryStatus(circleId, userId, formatDate, diaryStatus, themeId);
+        if (userDiaries.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 
     @Override

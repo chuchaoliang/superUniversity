@@ -8,7 +8,6 @@ import com.ccl.wx.service.CircleScheduleService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.TodayContentService;
 import com.ccl.wx.service.UserDiaryService;
-import com.ccl.wx.util.CclUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -79,7 +78,10 @@ public class CclWxApplicationTests {
     @SneakyThrows
     @Test
     public void test1() {
-        System.out.println(CclUtil.getFileUploadAddress("o1x2q5czO_xCH9eemeEfL41_gvMk"));
+        String str = null;
+        if (str.equals("test")) {
+            System.out.println("hshsh");
+        }
     }
 
     @SneakyThrows

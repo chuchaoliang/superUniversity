@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -25,12 +27,14 @@ public class UserDiary implements Serializable {
      * 用户id
      */
     @ApiModelProperty(value = "用户id")
+    @NotBlank(message = "用户id不能为空")
     private String userId;
 
     /**
      * 日志所在的圈子id
      */
     @ApiModelProperty(value = "日志所在的圈子id")
+    @NotNull(message = "圈子id不能为空")
     private Long circleId;
 
     /**

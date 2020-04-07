@@ -219,4 +219,15 @@ public interface JoinCircleService {
      * @return
      */
     Long sumUserVitalityByCircleIdAndUserStatus(Long circleId, Integer userStatus);
+
+    /**
+     * 检测用户是否完成全部主题打卡（用户是否可以打卡）
+     * false 完成全部主题 不可以在打卡
+     * true 未完成 可以打卡
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    Boolean checkUserSignInStatus(Long circleId, String userId);
 }
