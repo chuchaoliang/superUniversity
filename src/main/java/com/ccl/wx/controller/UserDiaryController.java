@@ -219,6 +219,7 @@ public class UserDiaryController {
 
     /**
      * 获取某个用户的全部日志信息
+     * 打卡记录
      *
      * @param circleId 圈子id
      * @param userId   用户id
@@ -226,11 +227,12 @@ public class UserDiaryController {
      * @return
      */
     @ParamCheck
-    @GetMapping("/diary/get/user")
-    public String getAssignDiaryInfo(@RequestParam(value = "circleId", required = false) Long circleId,
-                                     @RequestParam(value = "userId", required = false) String userId,
-                                     @RequestParam(value = "page", required = false) Integer page) {
-        return userDiaryService.getAssignDiaryInfo(circleId, userId, page);
+    @GetMapping("/menu/diary/get/user")
+    public Result<String> getAssignDiaryInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                                             @RequestHeader(value = "token", required = false) String userId,
+                                             @RequestParam(value = "page", required = false) Integer page) {
+        String result = userDiaryService.getAssignDiaryInfo(circleId, userId, page);
+        return ResponseMsgUtil.success(result);
     }
 
     /**
@@ -238,10 +240,11 @@ public class UserDiaryController {
      *
      * @return
      */
+    @ParamCheck
     @GetMapping("/diary/add/browse")
-    public String addDiaryBrowse(@ParamCheck @RequestParam(value = "userId", required = false) String userId,
-                                 @ParamCheck @RequestParam(value = "diaryId", required = false) Long diaryId) {
+    public Result<String> addDiaryBrowse(@RequestHeader(value = "token", required = false) String userId,
+                                         @RequestParam(value = "diaryId", required = false) Long diaryId) {
         userDiaryService.addDiaryBrowseNumber(userId, diaryId);
-        return "success";
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
     }
 }
