@@ -7,9 +7,7 @@ import com.ccl.wx.entity.*;
 import com.ccl.wx.enums.EnumUserCircle;
 import com.ccl.wx.enums.EnumUserDiary;
 import com.ccl.wx.mapper.*;
-import com.ccl.wx.service.CircleRedisService;
 import com.ccl.wx.service.CircleService;
-import com.ccl.wx.service.CommentService;
 import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.util.FtpUtil;
 import lombok.SneakyThrows;
@@ -17,14 +15,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -52,25 +51,7 @@ public class CircleServiceImpl implements CircleService {
     private CircleInfoMapper circleInfoMapper;
 
     @Autowired
-    private UserDiaryMapper userDiaryMapper;
-
-    @Autowired
     private UserInfoMapper userInfoMapper;
-
-    @Autowired
-    private TodayContentMapper todayContentMapper;
-
-    @Autowired
-    private UserLikeMapper userLikeMapper;
-
-    @Autowired
-    private RedisTemplate redisTemplate;
-
-    @Autowired
-    private CircleRedisService circleRedisService;
-
-    @Autowired
-    private CommentService commentService;
 
     @Resource
     private UserDiaryService userDiaryService;
@@ -361,92 +342,6 @@ public class CircleServiceImpl implements CircleService {
         circleAllMember.add(str2);
         circleAllMember.add(str3);
         return circleAllMember;
-    }
-
-    @Override
-    public List<UserInfo> getAllLikeUserNickName(String userid, String circleid, Long diaryid) {
-        // 先判断缓存中是否存在
-        ArrayList<UserInfo> userInfos = new ArrayList<>();
-        UserLike userLike = userLikeMapper.selectByTypeId(diaryid);
-        Integer userLikeStatus = circleRedisService.getUserLikeStatus(userid, circleid, diaryid);
-        if (userLike != null && !StringUtils.isEmpty(userLike.getLikeUserid())) {
-            // 数据库中存在此数据
-            List<String> userids = new ArrayList<>(Arrays.asList(userLike.getLikeUserid().split(",")));
-            // 用户id列表去重
-            List<String> fuserids = userids.stream().distinct().collect(Collectors.toList());
-            boolean loginUserLikeCondition = (userLikeStatus != null && userLikeStatus.equals(LIKE_STATUS)) || (userLikeStatus == null && fuserids.contains(userid));
-            // 删除本用户
-            fuserids.removeIf(s -> s.equals(userid));
-            // 判断删除本用户之后是否为空
-            if (fuserids.size() > 0) {
-                for (String likeUserId : fuserids) {
-                    UserInfo userInfo = userInfoMapper.selectByPrimaryKey(likeUserId);
-                    userInfos.add(userInfo);
-                }
-            }
-            // 查找本用户（访问程序的用户）
-            UserInfo loginUserInfo = userInfoMapper.selectByPrimaryKey(userid);
-            // 添加本用户点赞条件
-            if (loginUserLikeCondition) {
-                userInfos.add(0, loginUserInfo);
-            }
-        } else {
-            // 数据库中不存在 查看缓存中是否存在
-            if (userLikeStatus != null && userLikeStatus.equals(LIKE_STATUS)) {
-                userInfos.add(0, userInfoMapper.selectByPrimaryKey(userid));
-            }
-        }
-        return userInfos;
-    }
-
-    @Override
-    public String getAllLikeUserNickName(List<UserInfo> userInfos) {
-        StringBuffer stringBuffer = new StringBuffer();
-        if (userInfos.size() != 0) {
-            for (UserInfo userInfo : userInfos) {
-                stringBuffer.append(userInfo.getNickname()).append(",");
-            }
-            return String.valueOf(stringBuffer.deleteCharAt(stringBuffer.length() - 1));
-        } else {
-            return "";
-        }
-    }
-
-    @Override
-    public Boolean judgeDiaryLikeStatus(String userid, String circleid, Long diaryid) {
-        String hash = LIKE_PREFIX + userid;
-        String key = circleid + CONNECT_VALUE + diaryid;
-        // 先判断缓存中是否存在
-        if (redisTemplate.opsForHash().hasKey(hash, key)) {
-            // 缓存中存在
-            if (redisTemplate.opsForHash().get(hash, key).equals(LIKE_STATUS)) {
-                // 状态为点赞状态1
-                return true;
-            } else {
-                // 状态为取消点赞状态0
-                return false;
-            }
-        } else {
-            // 缓存为空
-            UserLike userLike = userLikeMapper.selectByTypeId(diaryid);
-            if (userLike != null) {
-                // 数据库不为空
-                if (userLike.getLikeStatus().equals(LIKE_STATUS)) {
-                    // 为生效状态
-                    List<String> userids = Arrays.asList(userLike.getLikeUserid().split(","));
-                    if (userids.contains(userid)) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            } else {
-                // 数据库为空
-                return false;
-            }
-        }
     }
 
     @SneakyThrows

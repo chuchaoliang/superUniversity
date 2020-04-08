@@ -59,4 +59,68 @@ public interface UserLikeService {
      * @return
      */
     Boolean judgeDiaryLikeStatus(String userId, String circleId, Long diaryId);
+
+    /**
+     * 保存点赞 点赞状态 1 取消点赞 0
+     *
+     * @param userId   用户id
+     * @param circleId 圈子id
+     * @param diaryId  日志id
+     * @return
+     */
+    String saveLikeRedis(String userId, String circleId, String diaryId);
+
+    /**
+     * 取消点赞
+     *
+     * @param userId   用户id
+     * @param circleId 圈子id
+     * @param diaryId  日志id
+     * @return
+     */
+    String unLikeFromRedis(String userId, String circleId, String diaryId);
+
+    /**
+     * 删除点赞数据
+     *
+     * @param userId   用户id
+     * @param circleId 圈子id
+     * @param diaryId  日志id
+     * @return
+     */
+    String deleteLikeFromRedis(String userId, String circleId, String diaryId);
+
+    /**
+     * 日志点赞数+1
+     *
+     * @param diaryId 日志id
+     * @return
+     */
+    String incrementLikedCount(String diaryId);
+
+    /**
+     * 日志点赞数-1
+     *
+     * @param diaryId 日志id
+     * @return
+     */
+    String decrementLikeCount(String diaryId);
+
+    /**
+     * 判断用户的点赞状态60s内只能进行15次点赞
+     *
+     * @param userId 用户id
+     * @return
+     */
+    Boolean judgeLikeStatus(String userId);
+
+    /**
+     * 判断该点赞状态是否存在，存在返回其点赞状态
+     *
+     * @param userId   用户id
+     * @param circleId 圈子id
+     * @param diaryId  日志id
+     * @return
+     */
+    Integer getUserLikeStatus(String userId, String circleId, Long diaryId);
 }

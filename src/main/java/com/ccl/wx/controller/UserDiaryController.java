@@ -238,21 +238,6 @@ public class UserDiaryController {
     }
 
     /**
-     * 获取日志全部点赞信息
-     *
-     * @param userid
-     * @param circleid
-     * @param diaryid
-     * @return
-     */
-    @GetMapping("/getalllike")
-    public String getAllUserLike(@RequestParam(value = "userid", required = false) String userid,
-                                 @RequestParam(value = "circleid", required = false) String circleid,
-                                 @RequestParam(value = "diaryid", required = false) Long diaryid) {
-        return JSON.toJSONStringWithDateFormat(circleService.getAllLikeUserNickName(userid, circleid, diaryid), "yyyy-MM-dd mm:ss", SerializerFeature.DisableCircularReferenceDetect);
-    }
-
-    /**
      * 增加日志浏览量，并不仅仅日志信息的
      *
      * @return

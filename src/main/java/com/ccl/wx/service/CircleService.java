@@ -4,7 +4,6 @@ import com.ccl.wx.dto.CommentDTO;
 import com.ccl.wx.dto.UserDiaryDTO;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.entity.JoinCircle;
-import com.ccl.wx.entity.UserInfo;
 
 import java.util.List;
 
@@ -103,35 +102,6 @@ public interface CircleService {
      * @return
      */
     UserDiaryDTO getDiaryInfoById(Long diaryId);
-
-    /**
-     * 获取此日记的点赞状态
-     *
-     * @param userid   用户id
-     * @param circleid 圈子id
-     * @param diaryid  日志id
-     * @return
-     */
-    Boolean judgeDiaryLikeStatus(String userid, String circleid, Long diaryid);
-
-    /**
-     * 获取全部点赞用户昵称或者信息
-     * userid::userNickname
-     *
-     * @param diaryId
-     * @param circleId
-     * @param userId
-     * @return
-     */
-    List<UserInfo> getAllLikeUserNickName(String userId, String circleId, Long diaryId);
-
-    /**
-     * 根据点赞用户昵称拼接其昵称
-     *
-     * @param userInfos
-     * @return
-     */
-    String getAllLikeUserNickName(List<UserInfo> userInfos);
 
     /**
      * 获取用户加入在某个圈子的信息

@@ -4,9 +4,8 @@ import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.entity.UserLike;
 import com.ccl.wx.enums.EnumLike;
 import com.ccl.wx.enums.EnumRedis;
+import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.mapper.UserLikeMapper;
-import com.ccl.wx.service.CircleRedisService;
-import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.service.UserInfoService;
 import com.ccl.wx.service.UserLikeService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +18,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -35,16 +35,10 @@ public class UserLikeServiceImpl implements UserLikeService {
     private RedisTemplate redisTemplate;
 
     @Resource
-    private UserDiaryService userDiaryService;
-
-    @Resource
     private UserLikeMapper userLikeMapper;
 
     @Resource
     private UserInfoService userInfoService;
-
-    @Resource
-    private CircleRedisService circleRedisService;
 
     @Override
     public int deleteByPrimaryKey(Long id) {
@@ -96,12 +90,12 @@ public class UserLikeServiceImpl implements UserLikeService {
         // 先判断缓存中是否存在
         ArrayList<UserInfo> userInfos = new ArrayList<>();
         UserLike userLike = userLikeMapper.selectByTypeId(diaryId);
-        Integer userLikeStatus = circleRedisService.getUserLikeStatus(userId, circleId, diaryId);
+        Integer userLikeStatus = getUserLikeStatus(userId, circleId, diaryId);
         if (userLike != null && !StringUtils.isEmpty(userLike.getLikeUserid())) {
             // 数据库中存在此数据
             List<String> userids = new ArrayList<>(Arrays.asList(userLike.getLikeUserid().split(",")));
             // 用户id列表去重
-            List<String> fuserids = userids.stream().distinct().collect(Collectors.toList());
+            List<String> fuserids = userids.stream().distinct().limit(EnumLike.USER_LIKE_NUMBER.getValue()).collect(Collectors.toList());
             boolean loginUserLikeCondition = (userLikeStatus != null && userLikeStatus.equals(EnumLike.LIKE_SUCCESS.getValue()))
                     || (userLikeStatus == null && fuserids.contains(userId));
             // 删除本用户
@@ -175,6 +169,88 @@ public class UserLikeServiceImpl implements UserLikeService {
                 // 数据库为空
                 return false;
             }
+        }
+    }
+
+    @Override
+    public String saveLikeRedis(String userId, String circleId, String diaryId) {
+        boolean likeStatus = judgeLikeStatus(userId);
+        if (likeStatus) {
+            // 用户点赞状态存储到redis中 like::用户id 键 圈子id::日志id 值 1 点赞 0 取消点赞
+            String key = circleId + EnumRedis.REDIS_JOINT.getValue() + diaryId;
+            redisTemplate.opsForHash().put(EnumRedis.LIKE_PREFIX.getValue() + userId, key, EnumLike.LIKE_DIARY.getValue());
+            // 点赞数目 +1 若状态已经是1 则点赞数目不增加
+            incrementLikedCount(diaryId);
+            return EnumResultStatus.SUCCESS.getValue();
+        }
+        return EnumResultStatus.FAIL.getValue();
+    }
+
+    @Override
+    public String unLikeFromRedis(String userId, String circleId, String diaryId) {
+        String key = circleId + EnumRedis.REDIS_JOINT.getValue() + diaryId;
+        redisTemplate.opsForHash().put(EnumRedis.LIKE_PREFIX.getValue() + userId, key, EnumLike.LIKE_FAIL.getValue());
+        // 点赞数目 -1
+        decrementLikeCount(diaryId);
+        return EnumResultStatus.SUCCESS.getValue();
+    }
+
+    @Override
+    public String deleteLikeFromRedis(String userId, String circleId, String diaryId) {
+        String key = circleId + EnumRedis.REDIS_JOINT.getValue() + diaryId;
+        // 删除redis缓存
+        redisTemplate.opsForHash().delete(EnumRedis.LIKE_PREFIX.getValue() + userId, key);
+        // 点赞数目 -1
+        decrementLikeCount(diaryId);
+        return EnumResultStatus.SUCCESS.getValue();
+    }
+
+    @Override
+    public String incrementLikedCount(String diaryId) {
+        if (!redisTemplate.hasKey(EnumRedis.LIKE_SUM_PREFIX.getValue() + diaryId)) {
+            redisTemplate.opsForValue().set(EnumRedis.LIKE_SUM_PREFIX.getValue() + diaryId, 1);
+        } else {
+            redisTemplate.opsForValue().increment(EnumRedis.LIKE_SUM_PREFIX.getValue() + diaryId, 1);
+        }
+        return EnumResultStatus.SUCCESS.getValue();
+    }
+
+    @Override
+    public String decrementLikeCount(String diaryId) {
+        if (!redisTemplate.hasKey(EnumRedis.LIKE_SUM_PREFIX.getValue() + diaryId)) {
+            redisTemplate.opsForValue().set(EnumRedis.LIKE_SUM_PREFIX.getValue() + diaryId, -1);
+        } else {
+            redisTemplate.opsForValue().increment(EnumRedis.LIKE_SUM_PREFIX.getValue() + diaryId, -1);
+        }
+        return EnumResultStatus.SUCCESS.getValue();
+    }
+
+    @Override
+    public Boolean judgeLikeStatus(String userId) {
+        // 值+1
+        String userKey = EnumRedis.LIKE_STATUS_PREFIX.getValue() + userId;
+        redisTemplate.opsForValue().increment(userKey);
+        int likeStatus = Integer.parseInt(String.valueOf(redisTemplate.opsForValue().get(userKey)));
+        if (likeStatus <= EnumLike.SUM_LIKE.getValue()) {
+            // 可以进行点赞,并且设置过期时间为60s
+            redisTemplate.expire(userKey, EnumLike.OUT_TIME.getValue(), TimeUnit.SECONDS);
+            return true;
+        } else {
+            // 不能设置
+            return false;
+        }
+    }
+
+    @Override
+    public Integer getUserLikeStatus(String userId, String circleId, Long diaryId) {
+        String hash = EnumRedis.LIKE_PREFIX.getValue() + userId;
+        String key = circleId + EnumRedis.REDIS_JOINT.getValue() + diaryId;
+        Boolean keyStatus = redisTemplate.opsForHash().hasKey(hash, key);
+        if (keyStatus) {
+            // 此键存在
+            return Integer.parseInt(String.valueOf(redisTemplate.opsForHash().get(hash, key)));
+        } else {
+            return null;
         }
     }
 }
