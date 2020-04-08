@@ -83,10 +83,10 @@ public interface UserDiaryService {
     /**
      * 删除用户日志信息
      *
-     * @param diaryid 日记id
+     * @param diaryId 日记id
      * @return
      */
-    String deleteUserDiaryInfo(Long diaryid);
+    String deleteUserDiaryInfo(Long diaryId);
 
     /**
      * 判断用户活跃度减去几 -1 还是 -7

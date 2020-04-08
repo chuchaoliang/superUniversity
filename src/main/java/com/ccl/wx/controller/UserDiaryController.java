@@ -17,7 +17,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -142,15 +141,19 @@ public class UserDiaryController {
     }
 
     /**
-     * 删除用户的日志信息
-     * TODO 删除日志信息
+     * 删除日志
      *
-     * @param diaryid 日志id
+     * @param diaryId 日志id
      * @return
      */
-    @GetMapping("/deldiary")
-    public String deleteCircleDiaryInfo(@ParamCheck @RequestParam(value = "diaryid", required = false) Long diaryid) {
-        return userDiaryService.deleteUserDiaryInfo(diaryid);
+    @ApiOperation(value = "删除日志", httpMethod = "GET")
+    @GetMapping("/diary/del")
+    public Result<String> deleteCircleDiaryInfo(@ParamCheck @RequestParam(value = "diaryId", required = false) Long diaryId) {
+        String result = userDiaryService.deleteUserDiaryInfo(diaryId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("日记不能存在，或者已经被删除了！未知错误！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
     }
 
     /**
@@ -165,7 +168,6 @@ public class UserDiaryController {
      * @return
      */
     @ApiOperation(value = "用户发表日志", notes = "需要参数userId、diaryContent、diaryStatus、diaryAddress、circleId、themeId", httpMethod = "POST")
-    @SneakyThrows
     @PostMapping("/diary/save/content")
     public Result<String> saveContent(@Validated @RequestBody(required = false) UserDiary userDiary, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
