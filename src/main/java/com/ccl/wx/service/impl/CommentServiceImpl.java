@@ -13,6 +13,8 @@ import com.ccl.wx.pojo.DiaryHideComment;
 import com.ccl.wx.service.CommentService;
 import com.ccl.wx.service.ReplyService;
 import com.ccl.wx.service.UserInfoService;
+import com.ccl.wx.vo.CircleHomeCommentVO;
+import com.ccl.wx.vo.CircleHomeReplyVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -203,6 +205,66 @@ public class CommentServiceImpl implements CommentService {
             return EnumResultStatus.SUCCESS.getValue();
         }
         return EnumResultStatus.FAIL.getValue();
+    }
+
+    @Override
+    public Boolean checkComment(Integer diaryId) {
+        int masterCommentNumber = getMasterComment(diaryId.longValue()).size();
+        if (masterCommentNumber >= EnumComment.COMMENT_MAX_NUMBER.getValue()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public List<CircleHomeCommentVO> getAllComment(Long diaryId, Integer page) {
+        // 获取子评论
+        List<Comment> comments = commentMapper.selectAllByDiaryIdAndCommentTypeOrderByCommentCreatetimeDesc(diaryId, 0, 0, 10);
+        List<CircleHomeCommentVO> circleHomeCommentVOS = new ArrayList<>();
+        for (Comment comment : comments) {
+            if (EnumComment.COMMENT_DELETE_STATUS.getValue().equals(comment.getCommentStatus())) {
+                // 点评为删除状态
+                continue;
+            }
+            CircleHomeCommentVO circleHomeCommentVO = new CircleHomeCommentVO();
+            // 查询此评论下的全部子评论
+            List<Reply> replies = replyService.selectAllByCommentId(comment.getId(), 0, 3);
+            List<CircleHomeReplyVO> circleHomeReplyVOS = new ArrayList<>();
+            for (Reply reply : replies) {
+                CircleHomeReplyVO circleHomeReplyVO = new CircleHomeReplyVO();
+                // 回复人信息
+                UserInfo userInfo = userInfoService.selectByPrimaryKey(reply.getReplyUserid());
+                // 目标用户信息
+                UserInfo targetUserInfo = userInfoService.selectByPrimaryKey(reply.getTargetUserid());
+                BeanUtils.copyProperties(reply, circleHomeReplyVO);
+                // 设置回复人昵称
+                circleHomeReplyVO.setNickName(userInfo.getNickname());
+                // 设置回复人性别
+                circleHomeReplyVO.setGender(userInfo.getGender());
+                // 设置回复人头像
+                circleHomeReplyVO.setHeadImage(userInfo.getAvatarurl());
+                // 设置目标人昵称
+                circleHomeReplyVO.setTargetNickName(targetUserInfo.getNickname());
+                circleHomeReplyVOS.add(circleHomeReplyVO);
+                if (circleHomeCommentVOS.size() == 15) {
+                    break;
+                }
+            }
+            // 获取用户信息
+            UserInfo userInfo = userInfoService.selectByPrimaryKey(comment.getUserId());
+            BeanUtils.copyProperties(comment, circleHomeCommentVOS);
+            // 设置用户昵称
+            circleHomeCommentVO.setNickName(userInfo.getNickname());
+            // 设置用户头像
+            circleHomeCommentVO.setHeadImage(userInfo.getAvatarurl());
+            // 设置用户性别
+            circleHomeCommentVO.setGender(userInfo.getGender());
+            // 设置此评论的回复
+            circleHomeCommentVO.setReplies(circleHomeReplyVOS);
+            circleHomeCommentVOS.add(circleHomeCommentVO);
+        }
+        return circleHomeCommentVOS;
     }
 }
 

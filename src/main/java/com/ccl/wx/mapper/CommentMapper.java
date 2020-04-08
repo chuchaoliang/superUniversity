@@ -1,7 +1,10 @@
 package com.ccl.wx.mapper;
 
 import com.ccl.wx.entity.Comment;
-import org.apache.ibatis.annotations.Mapper;import org.apache.ibatis.annotations.Param;import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @author 褚超亮
@@ -44,7 +47,7 @@ public interface CommentMapper {
     /**
      * 根据圈子id查询全部评论信息
      *
-     * @param circleId
+     * @param circleId 圈子id
      * @return
      */
     List<Comment> selectAllByCircleId(@Param("circleId") Long circleId);
@@ -52,7 +55,7 @@ public interface CommentMapper {
     /**
      * 根据日志id查询全部评论id列表
      *
-     * @param diaryId
+     * @param diaryId 日志id
      * @return
      */
     List<Long> selectIdByDiaryId(@Param("diaryId") Long diaryId);
@@ -60,7 +63,7 @@ public interface CommentMapper {
     /**
      * 根据日记id查询存在多少评论
      *
-     * @param diaryId
+     * @param diaryId 日志id
      * @return
      */
     Long countByDiaryId(@Param("diaryId") Long diaryId);

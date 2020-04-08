@@ -281,7 +281,16 @@ public interface UserDiaryService {
      * @param userId      用户id
      * @param date        哪一天（20200311）
      * @param diaryStatus 日志状态
+     * @param themeId     主题id
      * @return
      */
     List<UserDiary> selectByCircleIdAndUserIdAndDiaryCreatetimeAndDiaryStatus(Long circleId, String userId, String date, List<Integer> diaryStatus, Integer themeId);
+
+    /**
+     * 根据日记id查询全部的信息（点赞、评论、点评）
+     *
+     * @param diaryId 日志id
+     * @return
+     */
+    String getDiaryInfoById(Long diaryId);
 }

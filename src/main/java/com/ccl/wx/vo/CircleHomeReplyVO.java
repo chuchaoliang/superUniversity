@@ -31,11 +31,6 @@ public class CircleHomeReplyVO implements Serializable {
     private String replyUserid;
 
     /**
-     * 目标用户id
-     */
-    private String targetUserid;
-
-    /**
      * 回复点赞数
      */
     private Long replyLike;
@@ -49,6 +44,21 @@ public class CircleHomeReplyVO implements Serializable {
      * 回复人昵称
      */
     private String nickName;
+
+    /**
+     * 回复人头像
+     */
+    private String headImage;
+
+    /**
+     * 回复人性别
+     */
+    private String gender;
+
+    /**
+     * 目标用户id
+     */
+    private String targetUserid;
 
     /**
      * 目标人昵称

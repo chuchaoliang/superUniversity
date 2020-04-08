@@ -630,4 +630,9 @@ public class UserDiaryServiceImpl implements UserDiaryService {
             redisTemplate.delete(set);
         }
     }
+
+    @Override
+    public String getDiaryInfoById(Long diaryId) {
+        return "";
+    }
 }

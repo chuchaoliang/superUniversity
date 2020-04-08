@@ -42,7 +42,17 @@ public class CircleHomeCommentVO implements Serializable {
     private String nickName;
 
     /**
+     * 评论人头像
+     */
+    private String headImage;
+
+    /**
+     * 评论人性别
+     */
+    private String gender;
+
+    /**
      * 评论表列表
      */
-    private List<CircleHomeReplyVO> replyDTOS;
+    private List<CircleHomeReplyVO> replies;
 }

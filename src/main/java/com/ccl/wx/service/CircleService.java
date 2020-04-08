@@ -1,7 +1,5 @@
 package com.ccl.wx.service;
 
-import com.ccl.wx.dto.CommentDTO;
-import com.ccl.wx.dto.UserDiaryDTO;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.entity.JoinCircle;
 
@@ -78,30 +76,6 @@ public interface CircleService {
      * @return
      */
     List<String> getCircleAllMember(String circleid);
-
-    /**
-     * 获取全部的日志评论
-     *
-     * @param diaryId 日志id
-     * @return
-     */
-    List<CommentDTO> getAllComment(Long diaryId);
-
-    /**
-     * 获取全部的日志点评
-     *
-     * @param diaryId 日志id
-     * @return
-     */
-    List<CommentDTO> getMasterComment(Long diaryId);
-
-    /**
-     * 根据日记id查询全部的信息（点赞、评论、点评）
-     *
-     * @param diaryId 日志id
-     * @return
-     */
-    UserDiaryDTO getDiaryInfoById(Long diaryId);
 
     /**
      * 获取用户加入在某个圈子的信息

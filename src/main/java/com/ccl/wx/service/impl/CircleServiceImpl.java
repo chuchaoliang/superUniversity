@@ -2,15 +2,18 @@ package com.ccl.wx.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.ccl.wx.dto.*;
-import com.ccl.wx.entity.*;
+import com.ccl.wx.dto.CircleMemberDTO;
+import com.ccl.wx.dto.CirclesDTO;
+import com.ccl.wx.dto.JoinCircleDTO;
+import com.ccl.wx.entity.CircleInfo;
+import com.ccl.wx.entity.JoinCircle;
+import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.enums.EnumUserCircle;
 import com.ccl.wx.enums.EnumUserDiary;
 import com.ccl.wx.mapper.*;
 import com.ccl.wx.service.CircleService;
 import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.util.FtpUtil;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -342,98 +345,6 @@ public class CircleServiceImpl implements CircleService {
         circleAllMember.add(str2);
         circleAllMember.add(str3);
         return circleAllMember;
-    }
-
-    @SneakyThrows
-    @Override
-    public List<CommentDTO> getAllComment(Long diaryId) {
-        // 获取子评论
-        List<Comment> comments = commentMapper.selectAllByDiaryIdAndCommentTypeOrderByCommentCreatetimeDesc(diaryId, 0, 0, 10);
-        ArrayList<CommentDTO> commentDTOS = new ArrayList<>();
-        for (Comment comment : comments) {
-            if (COMMENT_DELETE_STATUS.equals(comment.getCommentStatus())) {
-                // 点评为删除状态
-                continue;
-            }
-            CommentDTO commentDTO = new CommentDTO();
-            // 查询此评论下的全部子评论 TODO 可以设置分页 只查询10个
-            List<Reply> replies = replyMapper.selectAllByCommentId(comment.getId(), 0, 3);
-            ArrayList<ReplyDTO> replyDTOS = new ArrayList<>();
-            for (Reply reply : replies) {
-                ReplyDTO replyDTO = new ReplyDTO();
-                // 回复人信息
-                UserInfo userInfo = userInfoMapper.selectByPrimaryKey(reply.getReplyUserid());
-                // 目标用户信息
-                UserInfo targetUserInfo = userInfoMapper.selectByPrimaryKey(reply.getTargetUserid());
-                BeanUtils.copyProperties(reply, replyDTO);
-                // 设置回复人昵称
-                replyDTO.setNickName(userInfo.getNickname());
-                // 设置回复人性别
-                replyDTO.setGender(userInfo.getGender());
-                // 设置回复人头像
-                replyDTO.setHeadImage(userInfo.getAvatarurl());
-                // 设置目标人昵称
-                replyDTO.setTargetNickName(targetUserInfo.getNickname());
-                // 设置目标人性别
-                replyDTO.setTargetGender(targetUserInfo.getGender());
-                // 设置目标人头像
-                replyDTO.setTargetHeadImage(targetUserInfo.getAvatarurl());
-                replyDTOS.add(replyDTO);
-                if (commentDTOS.size() == 15) {
-                    break;
-                }
-            }
-            // 获取用户信息
-            UserInfo userInfo = userInfoMapper.selectByPrimaryKey(comment.getUserId());
-            BeanUtils.copyProperties(comment, commentDTO);
-            // 设置用户昵称
-            commentDTO.setNickName(userInfo.getNickname());
-            // 设置用户头像
-            commentDTO.setHeadImage(userInfo.getAvatarurl());
-            // 设置用户性别
-            commentDTO.setGender(userInfo.getGender());
-            // 设置此评论的回复
-            commentDTO.setReplyDTOS(replyDTOS);
-            commentDTOS.add(commentDTO);
-        }
-        return commentDTOS;
-    }
-
-    @SneakyThrows
-    @Override
-    public List<CommentDTO> getMasterComment(Long diaryId) {
-        // 获取日记的点评
-        List<Comment> comments = commentMapper.selectAllByDiaryIdAndCommentTypeOrderByCommentCreatetimeDesc(diaryId, 1, 0, 5);
-        ArrayList<CommentDTO> commentDTOS = new ArrayList<>();
-        for (Comment comment : comments) {
-            if (COMMENT_DELETE_STATUS.equals(comment.getCommentStatus())) {
-                // 点评为删除状态
-                continue;
-            }
-            CommentDTO commentDTO = new CommentDTO();
-            UserInfo userInfo = userInfoMapper.selectByPrimaryKey(comment.getUserId());
-            BeanUtils.copyProperties(comment, commentDTO);
-            // 设置用户昵称
-            commentDTO.setNickName(userInfo.getNickname());
-            // 设置用户头像
-            commentDTO.setHeadImage(userInfo.getAvatarurl());
-            // 设置用户性别
-            commentDTO.setGender(userInfo.getGender());
-            commentDTOS.add(commentDTO);
-        }
-        return commentDTOS;
-    }
-
-    @Override
-    public UserDiaryDTO getDiaryInfoById(Long diaryId) {
-        // 全部点评
-        List<CommentDTO> masterComment = circleService.getMasterComment(diaryId);
-        // 全部评论
-        List<CommentDTO> allComment = circleService.getAllComment(diaryId);
-        UserDiaryDTO userDiaryDTO = new UserDiaryDTO();
-        userDiaryDTO.setMasterComments(masterComment);
-        userDiaryDTO.setComments(allComment);
-        return userDiaryDTO;
     }
 
     @Override

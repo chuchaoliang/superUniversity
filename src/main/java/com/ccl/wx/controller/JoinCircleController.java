@@ -2,14 +2,13 @@ package com.ccl.wx.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.ccl.wx.annotation.ParamCheck;
+import com.ccl.wx.common.Result;
 import com.ccl.wx.enums.EnumPage;
 import com.ccl.wx.service.JoinCircleService;
+import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -37,9 +36,10 @@ public class JoinCircleController {
      */
     @ParamCheck
     @GetMapping("/menu/rank/all/vitality")
-    public String getUserVitalityRanking(@RequestParam(value = "circleId", required = false) Long circleId,
-                                         @RequestParam(value = "page", required = false) Integer page) {
-        return joinCircleService.getUserVitalityRankingData(circleId, page);
+    public Result<String> getUserVitalityRanking(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                 @RequestParam(value = "page", required = false) Integer page) {
+        String result = joinCircleService.getUserVitalityRankingData(circleId, page);
+        return ResponseMsgUtil.success(result);
     }
 
     /**
@@ -51,39 +51,40 @@ public class JoinCircleController {
      */
     @ParamCheck
     @GetMapping("/menu/rank/all/signin")
-    public String getUserSignInRanking(@RequestParam(value = "circleId", required = false) Long circleId,
-                                       @RequestParam(value = "page", required = false) Integer page) {
-        return joinCircleService.getUserSignInRankingData(circleId, page);
+    public Result<String> getUserSignInRanking(@RequestParam(value = "circleId", required = false) Long circleId,
+                                               @RequestParam(value = "page", required = false) Integer page) {
+        String result = joinCircleService.getUserSignInRankingData(circleId, page);
+        return ResponseMsgUtil.success(result);
     }
 
     /**
      * 获取某位用在圈子中的活跃度排名信息
      *
-     * @param circleId
-     * @param userId
+     * @param circleId 圈子id
+     * @param userId   用户id
      * @return
      */
     @ParamCheck
     @GetMapping("/menu/rank/person/vitality")
-    public String getPersonUserVitalityRanking(@RequestParam(value = "circleId", required = false) Long circleId,
-                                               @RequestParam(value = "userId", required = false) String userId) {
+    public Result<String> getPersonUserVitalityRanking(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                       @RequestHeader(value = "token", required = false) String userId) {
         List<Map> userVitalityRankingInfo = joinCircleService.getUserVitalityRankingInfo(circleId, userId, 0, EnumPage.LAST_NUMBER.getValue());
-        return JSON.toJSONString(userVitalityRankingInfo);
+        return ResponseMsgUtil.success(JSON.toJSONString(userVitalityRankingInfo));
     }
 
     /**
      * 获取某位用在圈子中的连续打卡排名信息
      *
-     * @param circleId
-     * @param userId
+     * @param circleId 圈子id
+     * @param userId   用户id
      * @return
      */
     @ParamCheck
     @GetMapping("/menu/rank/person/signin")
-    public String getUserSignInRanking(@RequestParam(value = "circleId", required = false) Long circleId,
-                                       @RequestParam(value = "userId", required = false) String userId) {
+    public Result<String> getUserSignInRanking(@RequestParam(value = "circleId", required = false) Long circleId,
+                                               @RequestHeader(value = "token", required = false) String userId) {
         List<Map> userSignInRankingInfo = joinCircleService.getUserSignInRankingInfo(circleId, userId, 0, EnumPage.LAST_NUMBER.getValue());
-        return JSON.toJSONString(userSignInRankingInfo);
+        return ResponseMsgUtil.success(JSON.toJSONString(userSignInRankingInfo));
     }
 
     /**
