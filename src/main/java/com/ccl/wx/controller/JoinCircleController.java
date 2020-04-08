@@ -98,11 +98,12 @@ public class JoinCircleController {
      */
     @ParamCheck
     @GetMapping("/menu/statistics/all/success")
-    public String getUserSignStatisticsSuccessInfo(@RequestParam(value = "circleId", required = false) Long circleId,
-                                                   @RequestParam(value = "userId", required = false) String userId,
-                                                   @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyyMMdd") Date date,
-                                                   @RequestParam(value = "page", required = false) Integer page) {
-        return joinCircleService.getUserSignStatisticsSuccessInfo(circleId, userId, date, page);
+    public Result<String> getUserSignStatisticsSuccessInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                           @RequestHeader(value = "token", required = false) String userId,
+                                                           @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
+                                                           @RequestParam(value = "page", required = false) Integer page) {
+        String result = joinCircleService.getUserSignStatisticsSuccessInfo(circleId, userId, date, page);
+        return ResponseMsgUtil.success(result);
     }
 
     /**
@@ -117,11 +118,12 @@ public class JoinCircleController {
      */
     @ParamCheck
     @GetMapping("/menu/statistics/all/fail")
-    public String getUserSignStatisticsFailInfo(@RequestParam(value = "circleId", required = false) Long circleId,
-                                                @RequestParam(value = "userId", required = false) String userId,
-                                                @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyyMMdd") Date date,
-                                                @RequestParam(value = "page", required = false) Integer page) {
-        return joinCircleService.getUserSignStatisticsFailInfo(circleId, userId, date, page);
+    public Result<String> getUserSignStatisticsFailInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                        @RequestHeader(value = "token", required = false) String userId,
+                                                        @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
+                                                        @RequestParam(value = "page", required = false) Integer page) {
+        String result = joinCircleService.getUserSignStatisticsFailInfo(circleId, userId, date, page);
+        return ResponseMsgUtil.success(result);
     }
 
     /**
@@ -133,9 +135,10 @@ public class JoinCircleController {
      */
     @ParamCheck
     @GetMapping("/menu/statistics/number")
-    public String getSignStatisticsNumberInfo(@RequestParam(value = "circleId", required = false) Long circleId,
-                                              @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyyMMdd") Date date) {
-        return joinCircleService.getCircleSignInInfo(circleId, date);
+    public Result<String> getSignStatisticsNumberInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                      @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+        String result = joinCircleService.getCircleSignInInfo(circleId, date);
+        return ResponseMsgUtil.success(result);
     }
 }
 
