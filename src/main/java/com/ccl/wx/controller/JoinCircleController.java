@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.ccl.wx.annotation.ParamCheck;
 import com.ccl.wx.common.Result;
 import com.ccl.wx.enums.EnumPage;
+import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -139,6 +141,46 @@ public class JoinCircleController {
                                                       @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         String result = joinCircleService.getCircleSignInInfo(circleId, date);
         return ResponseMsgUtil.success(result);
+    }
+
+    /**
+     * 加入圈子
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/join")
+    public Result<String> joinCircle(@RequestParam(value = "circleId", required = false) Long circleId,
+                                     @RequestHeader(value = "token", required = false) String userId) {
+        String result = joinCircleService.joinCircle(circleId, userId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            ResponseMsgUtil.fail("加入圈子失败！");
+        }
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
+     * TODO API
+     * 根据密码加入圈子
+     *
+     * @param circleid  圈子id
+     * @param userid    用户id
+     * @param cpassword 圈子密码
+     * @return
+     */
+    @GetMapping("/joinqzbyp")
+    public String joinCircleByPassword(@RequestParam(value = "circleid", required = false) String circleid,
+                                       @RequestParam(value = "userid", required = false) String userid,
+                                       @RequestParam(value = "cpassword", required = false) String cpassword) {
+        System.out.println("输入密码：" + cpassword);
+        if (StringUtils.isEmpty(circleid) || StringUtils.isEmpty(userid) || StringUtils.isEmpty(cpassword)) {
+            return "fail";
+        } else {
+            return "";
+            //return circleService.joinPrivacyCircleByPassword(circleid, userid, cpassword);
+        }
     }
 }
 

@@ -6,6 +6,7 @@ import com.ccl.wx.common.EnumResultCode;
 import com.ccl.wx.common.Result;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.entity.JoinCircle;
+import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.service.CircleInfoService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.impl.CircleServiceImpl;
@@ -54,17 +55,21 @@ public class CircleInfoController {
      * @return
      */
     @PostMapping("/found")
-    public Result<String> foundCircle(@Validated @RequestBody(required = false) CircleInfo circleInfo,
+    public Result<String> foundCircle(@Validated CircleInfo circleInfo,
+                                      @RequestHeader(value = "token", required = false) String userId,
                                       @RequestParam(value = "image", required = false) MultipartFile image,
                                       BindingResult result) {
         if (result.hasErrors()) {
             // 参数校检存在错误
             return ResponseMsgUtil.fail(Objects.requireNonNull(result.getFieldError()).getDefaultMessage());
-        } else {
-            // 检测圈子名字是否重复
-            circleInfoService.fondCircle(circleInfo, image);
-            return ResponseMsgUtil.success("");
         }
+        circleInfo.setCircleUserid(userId);
+        // 检测圈子名字是否重复
+        String resultResponse = circleInfoService.fondCircle(circleInfo, image);
+        if (EnumResultStatus.FAIL.getValue().equals(resultResponse)) {
+            return ResponseMsgUtil.fail("创建失败！");
+        }
+        return ResponseMsgUtil.success(resultResponse);
     }
 
     /**
@@ -76,7 +81,7 @@ public class CircleInfoController {
     @GetMapping("/check/name")
     public Result<String> checkCircleNameRepetition(@RequestParam(value = "circleName", required = false) String circleName) {
         if (circleInfoService.checkCircleName(circleName)) {
-            return ResponseMsgUtil.success(EnumResultCode.SUCCESS.getStatus(),"昵称可以使用！",JSON.toJSONString(circleName));
+            return ResponseMsgUtil.success(EnumResultCode.SUCCESS.getStatus(), "昵称可以使用！", JSON.toJSONString(circleName));
         } else {
             return ResponseMsgUtil.fail(EnumResultCode.CIRCLE_NAME_REPETITION.getStatus(), "圈子昵称重复！-->" + circleName);
         }

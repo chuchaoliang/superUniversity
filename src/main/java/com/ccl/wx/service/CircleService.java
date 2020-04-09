@@ -48,17 +48,6 @@ public interface CircleService {
     Boolean updateCircleHeadImage(String circleid, String filePath);
 
     /**
-     * 正常加入圈子
-     * 自己主动退出的圈子再次加入不需要圈主同意即可加入
-     * TODO 圈主淘汰的人需要圈主的同意才可加入
-     *
-     * @param circleid 圈子id
-     * @param userid   用户id
-     * @return
-     */
-    String joinCircle(String circleid, String userid);
-
-    /**
      * 私密圈子
      * 根据圈子密码加入圈子
      *

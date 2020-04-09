@@ -182,51 +182,6 @@ public class CircleServiceImpl implements CircleService {
     }
 
     @Override
-    public String joinCircle(String circleid, String userid) {
-        String status = "success";
-        JoinCircle joinCircle = new JoinCircle();
-        // 设置圈子id
-        joinCircle.setCircleId(Long.valueOf(circleid));
-        // 设置用户id
-        joinCircle.setUserId(userid);
-        JoinCircle circleUser = joinCircleMapper.selectByPrimaryKey(Long.valueOf(circleid), userid);
-        // 圈子中人数 +1
-        circleInfoMapper.updateCircleMemberByCircleId(Long.valueOf(circleid), 1);
-        if (circleUser != null) {
-            if (circleUser.getUserStatus().equals(EnumUserCircle.USER_OUT_STATUS.getValue())) {
-                joinCircle.setUserStatus(EnumUserCircle.USER_NORMAL_STATUS.getValue());
-                joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
-                return status;
-            } else {
-                return "1";
-            }
-        } else {
-            // 设置加入时间
-            joinCircle.setJoinTime(new Date());
-            // 根据圈子id查询圈子数据
-            CircleInfo circle = circleInfoMapper.selectByPrimaryKey(Long.valueOf(circleid));
-            // 查看是否为圈主或者圈子成员
-            if (circle.getCircleUserid().equals(userid)) {
-                // 圈主
-                joinCircle.setUserPermission(2);
-                joinCircle.setUserStatus(0);
-            } else {
-                // 普通成员
-                joinCircle.setUserPermission(0);
-                // 查看圈子状态
-                if (circle.getCircleSet().equals(0)) {
-                    joinCircle.setUserStatus(0);
-                } else if (circle.getCircleSet().equals(1)) {
-                    joinCircle.setUserStatus(1);
-                    status = "fail";
-                }
-            }
-            joinCircleMapper.insertSelective(joinCircle);
-            return status;
-        }
-    }
-
-    @Override
     public String joinPrivacyCircleByPassword(String circleid, String userid, String cpassword) {
         CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(Long.valueOf(circleid));
         // 圈子密码不存在

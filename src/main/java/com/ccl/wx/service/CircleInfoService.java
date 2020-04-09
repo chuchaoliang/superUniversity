@@ -87,9 +87,19 @@ public interface CircleInfoService {
     /**
      * 检测圈子名称是否重复
      * true 不重复 false 重复
+     *
      * @param circleName 圈子名称
      * @return
      */
     boolean checkCircleName(String circleName);
+
+    /**
+     * 更新圈子人数
+     *
+     * @param circleId 圈子id
+     * @param value    要增加的值人
+     * @return
+     */
+    Integer updateCircleMemberByCircleId(Long circleId, int value);
 }
 

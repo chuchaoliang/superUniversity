@@ -113,46 +113,6 @@ public class CircleController {
     }
 
     /**
-     * 加入圈子
-     * TODO API 未检测圈子是否为空，重复加入圈子待检测
-     *
-     * @param circleid 圈子id
-     * @param userid   用户id
-     * @return
-     */
-    @GetMapping("/joinqz")
-    public String joinCircle(@RequestParam(value = "circleid", required = false) String circleid,
-                             @RequestParam(value = "userid", required = false) String userid) {
-        // 如果为圈主不需要检查密码即可加入圈子
-        if (StringUtils.isEmpty(circleid) || StringUtils.isEmpty(userid)) {
-            return "fail";
-        } else {
-            return circleService.joinCircle(circleid, userid);
-        }
-    }
-
-    /**
-     * TODO API
-     * 根据密码加入圈子
-     *
-     * @param circleid  圈子id
-     * @param userid    用户id
-     * @param cpassword 圈子密码
-     * @return
-     */
-    @GetMapping("/joinqzbyp")
-    public String joinCircleByPassword(@RequestParam(value = "circleid", required = false) String circleid,
-                                       @RequestParam(value = "userid", required = false) String userid,
-                                       @RequestParam(value = "cpassword", required = false) String cpassword) {
-        System.out.println("输入密码：" + cpassword);
-        if (StringUtils.isEmpty(circleid) || StringUtils.isEmpty(userid) || StringUtils.isEmpty(cpassword)) {
-            return "fail";
-        } else {
-            return circleService.joinPrivacyCircleByPassword(circleid, userid, cpassword);
-        }
-    }
-
-    /**
      * TODO API
      * 检测圈子密码是否为空
      *
