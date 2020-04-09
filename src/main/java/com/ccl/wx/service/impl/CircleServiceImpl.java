@@ -25,7 +25,6 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -177,50 +176,6 @@ public class CircleServiceImpl implements CircleService {
                 return true;
             } else {
                 return false;
-            }
-        }
-    }
-
-    @Override
-    public String joinPrivacyCircleByPassword(String circleid, String userid, String cpassword) {
-        CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(Long.valueOf(circleid));
-        // 圈子密码不存在
-        if (StringUtils.isEmpty(circleInfo.getCirclePassword())) {
-            return "-1";
-        } else {
-            // 判断密码是否正确
-            if (cpassword.equals(circleInfo.getCirclePassword())) {
-                // 圈子总人数 +1
-                circleInfoMapper.updateCircleMemberByCircleId(Long.valueOf(circleid), 1);
-                // 密码正确，加入圈子
-                JoinCircle joinCircle = new JoinCircle();
-                // 设置圈子id
-                joinCircle.setCircleId(Long.valueOf(circleid));
-                // 设置用户id
-                joinCircle.setUserId(userid);
-                // 查询数据库该用户是否加入过该圈子
-                JoinCircle circleUser = joinCircleMapper.selectByPrimaryKey(Long.valueOf(circleid), userid);
-                if (circleUser != null) {
-                    // 说明圈子中存在此用户，将该圈子用户设置为正常状态
-                    joinCircle.setUserStatus((EnumUserCircle.USER_NORMAL_STATUS.getValue()));
-                    // 更新数据
-                    joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
-                    return "success";
-                } else {
-                    // 用户未曾加入过该圈子
-                    // 设置加入时间
-                    joinCircle.setJoinTime(new Date());
-                    // 设置用户状态
-                    joinCircle.setUserStatus(EnumUserCircle.USER_NORMAL_STATUS.getValue());
-                    // 设置用户权限
-                    joinCircle.setUserPermission(0);
-                    // 插入数据
-                    joinCircleMapper.insertSelective(joinCircle);
-                    return "success";
-                }
-            } else {
-                // 密码错误
-                return "-1";
             }
         }
     }

@@ -9,7 +9,6 @@ import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -162,25 +161,23 @@ public class JoinCircleController {
     }
 
     /**
-     * TODO API
      * 根据密码加入圈子
      *
-     * @param circleid  圈子id
-     * @param userid    用户id
-     * @param cpassword 圈子密码
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param password 圈子密码
      * @return
      */
-    @GetMapping("/joinqzbyp")
-    public String joinCircleByPassword(@RequestParam(value = "circleid", required = false) String circleid,
-                                       @RequestParam(value = "userid", required = false) String userid,
-                                       @RequestParam(value = "cpassword", required = false) String cpassword) {
-        System.out.println("输入密码：" + cpassword);
-        if (StringUtils.isEmpty(circleid) || StringUtils.isEmpty(userid) || StringUtils.isEmpty(cpassword)) {
-            return "fail";
-        } else {
-            return "";
-            //return circleService.joinPrivacyCircleByPassword(circleid, userid, cpassword);
+    @ParamCheck
+    @GetMapping("/join/password")
+    public Result<String> joinCircleByPassword(@RequestParam(value = "circleId", required = false) Long circleId,
+                                               @RequestHeader(value = "token", required = false) String userId,
+                                               @RequestParam(value = "password", required = false) String password) {
+        String result = joinCircleService.joinCircleByPassword(circleId, userId, password);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("加入失败！密码错误！");
         }
+        return ResponseMsgUtil.success(result);
     }
 }
 

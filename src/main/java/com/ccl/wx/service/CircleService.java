@@ -48,17 +48,6 @@ public interface CircleService {
     Boolean updateCircleHeadImage(String circleid, String filePath);
 
     /**
-     * 私密圈子
-     * 根据圈子密码加入圈子
-     *
-     * @param circleid  圈子id
-     * @param userid    用户id
-     * @param cpassword 圈子密码
-     * @return
-     */
-    String joinPrivacyCircleByPassword(String circleid, String userid, String cpassword);
-
-    /**
      * 获取圈子内全部状态的成员
      *
      * @param circleid 圈子id

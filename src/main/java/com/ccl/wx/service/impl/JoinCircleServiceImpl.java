@@ -19,6 +19,7 @@ import com.ccl.wx.util.CclUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -347,6 +348,29 @@ public class JoinCircleServiceImpl implements JoinCircleService {
             int i = joinCircleMapper.insertSelective(joinCircle);
             if (i == 1) {
                 return JSON.toJSONString(joinCircle);
+            } else {
+                return EnumResultStatus.FAIL.getValue();
+            }
+        }
+    }
+
+    @Override
+    public String joinCircleByPassword(Long circleId, String userId, String password) {
+        CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
+        // 圈子密码不存在
+        String circlePassword = circleInfo.getCirclePassword();
+        if (StringUtils.isEmpty(circlePassword)) {
+            return EnumResultStatus.FAIL.getValue();
+        } else {
+            if (password.equals(circlePassword)) {
+                // 密码正确，嫁娶圈子
+                String result = joinCircle(circleId, userId);
+                if (!EnumResultStatus.FAIL.getValue().equals(result)) {
+                    // 加入成功
+                    return result;
+                } else {
+                    return EnumResultStatus.FAIL.getValue();
+                }
             } else {
                 return EnumResultStatus.FAIL.getValue();
             }
