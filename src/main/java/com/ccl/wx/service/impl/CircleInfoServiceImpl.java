@@ -1,14 +1,13 @@
 package com.ccl.wx.service.impl;
 
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.lang.PatternPool;
+import cn.hutool.core.lang.Validator;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.dto.CircleInfoDTO;
 import com.ccl.wx.entity.CircleInfo;
-import com.ccl.wx.enums.EnumResultStatus;
-import com.ccl.wx.enums.EnumUserCircle;
-import com.ccl.wx.enums.EnumUserDiary;
-import com.ccl.wx.enums.EnumUserPermission;
+import com.ccl.wx.enums.*;
 import com.ccl.wx.mapper.CircleInfoMapper;
 import com.ccl.wx.properties.DefaultProperties;
 import com.ccl.wx.service.CircleInfoService;
@@ -24,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -154,26 +152,38 @@ public class CircleInfoServiceImpl implements CircleInfoService {
     public String fondCircle(CircleInfo circleInfo, MultipartFile image) {
         // 检测圈子名称是否重复
         if (checkCircleName(circleInfo.getCircleName())) {
-            CircleInfo finCircleInfo = new CircleInfo();
-            BeanUtils.copyProperties(circleInfo, finCircleInfo);
-            finCircleInfo.setCircleCreatetime(new Date());
-            finCircleInfo.setCircleHimage(defaultProperties.getDefaultImage());
-            finCircleInfo.setCircleLocation(circleInfo.getCircleLocation() + 1);
-
+            if (!StringUtils.isEmpty(circleInfo.getCircleSet()) && circleInfo.getCircleSet().equals(EnumCircle.PASSWORD_JOIN.getValue())) {
+                String circlePassword = StringUtils.trimAllWhitespace(circleInfo.getCirclePassword());
+                //[0-9]{6} 6位数字
+                boolean password = !StringUtils.isEmpty(circlePassword) &&
+                        circlePassword.length() == EnumCircle.PASSWORD_LENGTH.getValue() &&
+                        Validator.isMactchRegex(PatternPool.NUMBERS, circlePassword);
+                if (!password) {
+                    return EnumResultStatus.FAIL.getValue();
+                }
+            } else {
+                circleInfo.setCirclePassword(null);
+            }
             // 如果前端
-            if (StringUtils.isEmpty(circleInfo.getCircleHimage())) {
+            if (image == null) {
                 circleInfo.setCircleHimage(defaultProperties.getDefaultImage());
             } else {
                 String imagePath = FtpUtil.uploadFile(circleInfo.getCircleUserid(), image);
+                circleInfo.setCircleHimage(imagePath);
             }
-
-            int insert = circleInfoMapper.insertSelective(finCircleInfo);
+            int insert = circleInfoMapper.insertSelective(circleInfo);
             if (insert == 1) {
-                // 插入成功返回圈子信息
-                return JSON.toJSONString(circleInfo);
+                // 加入圈子
+                String result = joinCircleService.joinCircle(circleInfo.getCircleId(), circleInfo.getCircleUserid());
+                if (EnumResultStatus.FAIL.getValue().equals(result)) {
+                    return EnumResultStatus.FAIL.getValue();
+                } else {
+                    // 插入成功返回圈子信息
+                    return JSON.toJSONString(circleInfo);
+                }
             } else {
                 // 返回值 1 失败
-                return EnumResultStatus.UNKNOWN.getValue();
+                return EnumResultStatus.FAIL.getValue();
             }
         } else {
             // 圈子名字重复
@@ -190,5 +200,10 @@ public class CircleInfoServiceImpl implements CircleInfoService {
         }
         return false;
     }
-}
 
+    @Override
+    public Integer updateCircleMemberByCircleId(Long circleId, int value) {
+        int i = circleInfoMapper.updateCircleMemberByCircleId(circleId, value);
+        return i;
+    }
+}

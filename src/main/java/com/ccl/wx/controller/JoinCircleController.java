@@ -2,14 +2,14 @@ package com.ccl.wx.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.ccl.wx.annotation.ParamCheck;
+import com.ccl.wx.common.Result;
 import com.ccl.wx.enums.EnumPage;
+import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.service.JoinCircleService;
+import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -37,9 +37,10 @@ public class JoinCircleController {
      */
     @ParamCheck
     @GetMapping("/menu/rank/all/vitality")
-    public String getUserVitalityRanking(@RequestParam(value = "circleId", required = false) Long circleId,
-                                         @RequestParam(value = "page", required = false) Integer page) {
-        return joinCircleService.getUserVitalityRankingData(circleId, page);
+    public Result<String> getUserVitalityRanking(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                 @RequestParam(value = "page", required = false) Integer page) {
+        String result = joinCircleService.getUserVitalityRankingData(circleId, page);
+        return ResponseMsgUtil.success(result);
     }
 
     /**
@@ -51,39 +52,40 @@ public class JoinCircleController {
      */
     @ParamCheck
     @GetMapping("/menu/rank/all/signin")
-    public String getUserSignInRanking(@RequestParam(value = "circleId", required = false) Long circleId,
-                                       @RequestParam(value = "page", required = false) Integer page) {
-        return joinCircleService.getUserSignInRankingData(circleId, page);
+    public Result<String> getUserSignInRanking(@RequestParam(value = "circleId", required = false) Long circleId,
+                                               @RequestParam(value = "page", required = false) Integer page) {
+        String result = joinCircleService.getUserSignInRankingData(circleId, page);
+        return ResponseMsgUtil.success(result);
     }
 
     /**
      * 获取某位用在圈子中的活跃度排名信息
      *
-     * @param circleId
-     * @param userId
+     * @param circleId 圈子id
+     * @param userId   用户id
      * @return
      */
     @ParamCheck
     @GetMapping("/menu/rank/person/vitality")
-    public String getPersonUserVitalityRanking(@RequestParam(value = "circleId", required = false) Long circleId,
-                                               @RequestParam(value = "userId", required = false) String userId) {
+    public Result<String> getPersonUserVitalityRanking(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                       @RequestHeader(value = "token", required = false) String userId) {
         List<Map> userVitalityRankingInfo = joinCircleService.getUserVitalityRankingInfo(circleId, userId, 0, EnumPage.LAST_NUMBER.getValue());
-        return JSON.toJSONString(userVitalityRankingInfo);
+        return ResponseMsgUtil.success(JSON.toJSONString(userVitalityRankingInfo));
     }
 
     /**
      * 获取某位用在圈子中的连续打卡排名信息
      *
-     * @param circleId
-     * @param userId
+     * @param circleId 圈子id
+     * @param userId   用户id
      * @return
      */
     @ParamCheck
     @GetMapping("/menu/rank/person/signin")
-    public String getUserSignInRanking(@RequestParam(value = "circleId", required = false) Long circleId,
-                                       @RequestParam(value = "userId", required = false) String userId) {
+    public Result<String> getUserSignInRanking(@RequestParam(value = "circleId", required = false) Long circleId,
+                                               @RequestHeader(value = "token", required = false) String userId) {
         List<Map> userSignInRankingInfo = joinCircleService.getUserSignInRankingInfo(circleId, userId, 0, EnumPage.LAST_NUMBER.getValue());
-        return JSON.toJSONString(userSignInRankingInfo);
+        return ResponseMsgUtil.success(JSON.toJSONString(userSignInRankingInfo));
     }
 
     /**
@@ -97,11 +99,12 @@ public class JoinCircleController {
      */
     @ParamCheck
     @GetMapping("/menu/statistics/all/success")
-    public String getUserSignStatisticsSuccessInfo(@RequestParam(value = "circleId", required = false) Long circleId,
-                                                   @RequestParam(value = "userId", required = false) String userId,
-                                                   @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyyMMdd") Date date,
-                                                   @RequestParam(value = "page", required = false) Integer page) {
-        return joinCircleService.getUserSignStatisticsSuccessInfo(circleId, userId, date, page);
+    public Result<String> getUserSignStatisticsSuccessInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                           @RequestHeader(value = "token", required = false) String userId,
+                                                           @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
+                                                           @RequestParam(value = "page", required = false) Integer page) {
+        String result = joinCircleService.getUserSignStatisticsSuccessInfo(circleId, userId, date, page);
+        return ResponseMsgUtil.success(result);
     }
 
     /**
@@ -116,11 +119,12 @@ public class JoinCircleController {
      */
     @ParamCheck
     @GetMapping("/menu/statistics/all/fail")
-    public String getUserSignStatisticsFailInfo(@RequestParam(value = "circleId", required = false) Long circleId,
-                                                @RequestParam(value = "userId", required = false) String userId,
-                                                @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyyMMdd") Date date,
-                                                @RequestParam(value = "page", required = false) Integer page) {
-        return joinCircleService.getUserSignStatisticsFailInfo(circleId, userId, date, page);
+    public Result<String> getUserSignStatisticsFailInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                        @RequestHeader(value = "token", required = false) String userId,
+                                                        @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
+                                                        @RequestParam(value = "page", required = false) Integer page) {
+        String result = joinCircleService.getUserSignStatisticsFailInfo(circleId, userId, date, page);
+        return ResponseMsgUtil.success(result);
     }
 
     /**
@@ -132,9 +136,48 @@ public class JoinCircleController {
      */
     @ParamCheck
     @GetMapping("/menu/statistics/number")
-    public String getSignStatisticsNumberInfo(@RequestParam(value = "circleId", required = false) Long circleId,
-                                              @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyyMMdd") Date date) {
-        return joinCircleService.getCircleSignInInfo(circleId, date);
+    public Result<String> getSignStatisticsNumberInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                      @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
+        String result = joinCircleService.getCircleSignInInfo(circleId, date);
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
+     * 加入圈子
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/join")
+    public Result<String> joinCircle(@RequestParam(value = "circleId", required = false) Long circleId,
+                                     @RequestHeader(value = "token", required = false) String userId) {
+        String result = joinCircleService.joinCircle(circleId, userId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            ResponseMsgUtil.fail("加入圈子失败！");
+        }
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
+     * 根据密码加入圈子
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param password 圈子密码
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/join/password")
+    public Result<String> joinCircleByPassword(@RequestParam(value = "circleId", required = false) Long circleId,
+                                               @RequestHeader(value = "token", required = false) String userId,
+                                               @RequestParam(value = "password", required = false) String password) {
+        String result = joinCircleService.joinCircleByPassword(circleId, userId, password);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("加入失败！密码错误！");
+        }
+        return ResponseMsgUtil.success(result);
     }
 }
 

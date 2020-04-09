@@ -29,7 +29,22 @@ public enum EnumLike {
     /**
      * 回复点赞
      */
-    LIKE_REPLY(3);
+    LIKE_REPLY(3),
+
+    /**
+     * 一段时间内总点赞数
+     */
+    SUM_LIKE(15),
+
+    /**
+     * 过期时间（s）
+     */
+    OUT_TIME(60),
+
+    /**
+     * 日记展示的全部点赞
+     */
+    USER_LIKE_NUMBER(10);
 
     private Integer value;
 

@@ -1,14 +1,10 @@
 package com.ccl.wx.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.annotation.ParamCheck;
 import com.ccl.wx.common.EnumResultCode;
 import com.ccl.wx.common.Result;
-import com.ccl.wx.dto.UserDiaryDTO;
 import com.ccl.wx.entity.UserDiary;
 import com.ccl.wx.enums.EnumResultStatus;
-import com.ccl.wx.service.CircleService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.util.ResponseMsgUtil;
@@ -17,7 +13,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -43,26 +38,9 @@ public class UserDiaryController {
     private UserDiaryService userDiaryService;
 
     @Resource
-    private CircleService circleService;
-
-    @Resource
     private JoinCircleService joinCircleService;
 
     /**
-     * 根据日志的id查询日志的信息
-     *
-     * @param diaryId 日志id
-     * @return （与此日志相关的全部评论、点赞、点评信息）
-     */
-    @GetMapping("/diary/get/one")
-    public String getDiaryInfoByDiaryId(@ParamCheck @RequestParam(value = "diaryId", required = false) String diaryId) {
-        // 获取评论内容
-        UserDiaryDTO diaryInfoById = circleService.getDiaryInfoById(Long.valueOf(diaryId));
-        return JSON.toJSONStringWithDateFormat(diaryInfoById, "yyyy-MM-dd", SerializerFeature.WriteDateUseDateFormat);
-    }
-
-    /**
-     * TODO
      * 更新圈子日志信息
      * 1. 获取日记id，日记内容，日记状态，地址信息，图片列表
      * id, diaryContent,diaryStatus,diaryAddress,images
@@ -80,6 +58,20 @@ public class UserDiaryController {
             return ResponseMsgUtil.fail("日志不存在，或者可能被删除，或者主题不存在，被删除！");
         }
         return ResponseMsgUtil.success(responseResult);
+    }
+
+    /**
+     * 根据日志的id查询日志的信息
+     * TODO 暂时不使用
+     *
+     * @param diaryId 日志id
+     * @return （与此日志相关的全部评论、点赞、点评信息）
+     */
+    @GetMapping("/diary/get/one")
+    public Result<String> getDiaryInfoByDiaryId(@ParamCheck @RequestParam(value = "diaryId", required = false) String diaryId) {
+        // 获取评论内容
+        String result = userDiaryService.getDiaryInfoById(Long.valueOf(diaryId));
+        return ResponseMsgUtil.success(result);
     }
 
     /**
@@ -143,15 +135,19 @@ public class UserDiaryController {
     }
 
     /**
-     * 删除用户的日志信息
-     * TODO 删除日志信息
+     * 删除日志
      *
-     * @param diaryid 日志id
+     * @param diaryId 日志id
      * @return
      */
-    @GetMapping("/deldiary")
-    public String deleteCircleDiaryInfo(@ParamCheck @RequestParam(value = "diaryid", required = false) Long diaryid) {
-        return userDiaryService.deleteUserDiaryInfo(diaryid);
+    @ApiOperation(value = "删除日志", httpMethod = "GET")
+    @GetMapping("/diary/del")
+    public Result<String> deleteCircleDiaryInfo(@ParamCheck @RequestParam(value = "diaryId", required = false) Long diaryId) {
+        String result = userDiaryService.deleteUserDiaryInfo(diaryId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("日记不能存在，或者已经被删除了！未知错误！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
     }
 
     /**
@@ -166,7 +162,6 @@ public class UserDiaryController {
      * @return
      */
     @ApiOperation(value = "用户发表日志", notes = "需要参数userId、diaryContent、diaryStatus、diaryAddress、circleId、themeId", httpMethod = "POST")
-    @SneakyThrows
     @PostMapping("/diary/save/content")
     public Result<String> saveContent(@Validated @RequestBody(required = false) UserDiary userDiary, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -224,6 +219,7 @@ public class UserDiaryController {
 
     /**
      * 获取某个用户的全部日志信息
+     * 打卡记录
      *
      * @param circleId 圈子id
      * @param userId   用户id
@@ -231,26 +227,12 @@ public class UserDiaryController {
      * @return
      */
     @ParamCheck
-    @GetMapping("/diary/get/user")
-    public String getAssignDiaryInfo(@RequestParam(value = "circleId", required = false) Long circleId,
-                                     @RequestParam(value = "userId", required = false) String userId,
-                                     @RequestParam(value = "page", required = false) Integer page) {
-        return userDiaryService.getAssignDiaryInfo(circleId, userId, page);
-    }
-
-    /**
-     * 获取日志全部点赞信息
-     *
-     * @param userid
-     * @param circleid
-     * @param diaryid
-     * @return
-     */
-    @GetMapping("/getalllike")
-    public String getAllUserLike(@RequestParam(value = "userid", required = false) String userid,
-                                 @RequestParam(value = "circleid", required = false) String circleid,
-                                 @RequestParam(value = "diaryid", required = false) Long diaryid) {
-        return JSON.toJSONStringWithDateFormat(circleService.getAllLikeUserNickName(userid, circleid, diaryid), "yyyy-MM-dd mm:ss", SerializerFeature.DisableCircularReferenceDetect);
+    @GetMapping("/menu/diary/get/user")
+    public Result<String> getAssignDiaryInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                                             @RequestHeader(value = "token", required = false) String userId,
+                                             @RequestParam(value = "page", required = false) Integer page) {
+        String result = userDiaryService.getAssignDiaryInfo(circleId, userId, page);
+        return ResponseMsgUtil.success(result);
     }
 
     /**
@@ -258,10 +240,11 @@ public class UserDiaryController {
      *
      * @return
      */
+    @ParamCheck
     @GetMapping("/diary/add/browse")
-    public String addDiaryBrowse(@ParamCheck @RequestParam(value = "userId", required = false) String userId,
-                                 @ParamCheck @RequestParam(value = "diaryId", required = false) Long diaryId) {
+    public Result<String> addDiaryBrowse(@RequestHeader(value = "token", required = false) String userId,
+                                         @RequestParam(value = "diaryId", required = false) Long diaryId) {
         userDiaryService.addDiaryBrowseNumber(userId, diaryId);
-        return "success";
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
     }
 }

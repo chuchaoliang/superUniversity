@@ -297,9 +297,12 @@ public class UserDiaryServiceImpl implements UserDiaryService {
     }
 
     @Override
-    public String deleteUserDiaryInfo(Long diaryid) {
+    public String deleteUserDiaryInfo(Long diaryId) {
         // 根据id查询日志信息
-        UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(diaryid);
+        UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(diaryId);
+        if (userDiary == null || userDiary.getDiaryStatus().equals(EnumUserDiary.USER_DIARY_DELETE.getValue())) {
+            return EnumResultStatus.FAIL.getValue();
+        }
         // 将日志状态设置为删除状态
         userDiary.setDiaryStatus(EnumUserDiary.USER_DIARY_DELETE.getValue());
         // 更新日志
@@ -316,20 +319,19 @@ public class UserDiaryServiceImpl implements UserDiaryService {
         String diaryCreateStr = String.valueOf(DateUtil.format(userDiary.getDiaryCreatetime(), DatePattern.NORM_DATE_PATTERN));
         // 获取日志的主题id，判断主题列表id是否为空
         String themeIds = joinCircle.getThemeId();
-        // 判断主题列表是否为空
-        if (StringUtils.isEmpty(themeIds)) {
-            return EnumResultStatus.UNKNOWN.getValue();
-        }
-        // 获取主题列表
-        ArrayList<String> themeIdsList = new ArrayList<>(Arrays.asList(themeIds.split(",")));
         // 判断日志是否为今日
         if (DateUtil.betweenDay(userDiary.getDiaryCreatetime(), new Date(), true) == 0) {
-            // 判断主题id是否在今日的主题列表中
-            if (!themeIdsList.contains(themeId)) {
-                return EnumResultStatus.UNKNOWN.getValue();
+            // 判断主题列表是否为空
+            if (StringUtils.isEmpty(themeIds)) {
+                return EnumResultStatus.FAIL.getValue();
             }
-            // 删除此日志主题
-            themeIdsList.removeIf(s -> s.equals(themeId));
+            // 获取主题列表
+            ArrayList<String> themeIdsList = new ArrayList<>(Arrays.asList(themeIds.split(",")));
+            // 判断主题id是否在今日的主题列表中
+            if (themeIdsList.contains(themeId)) {
+                // 删除此日志主题
+                themeIdsList.removeIf(s -> s.equals(themeId));
+            }
             // 判断列表id对应的日志是否为空
             if (themeIdsList.isEmpty()) {
                 // 日志已经全部删除
@@ -627,5 +629,10 @@ public class UserDiaryServiceImpl implements UserDiaryService {
             userDiaryMapper.updateDiaryBrowseById(browseNumber, Long.valueOf(diaryId));
             redisTemplate.delete(set);
         }
+    }
+
+    @Override
+    public String getDiaryInfoById(Long diaryId) {
+        return "";
     }
 }

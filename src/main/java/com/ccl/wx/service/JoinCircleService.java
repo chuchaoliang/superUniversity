@@ -230,4 +230,23 @@ public interface JoinCircleService {
      * @return
      */
     Boolean checkUserSignInStatus(Long circleId, String userId);
+
+    /**
+     * 加入圈子
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    String joinCircle(Long circleId, String userId);
+
+    /**
+     * 根据密码加入圈子
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param password 密码
+     * @return
+     */
+    String joinCircleByPassword(Long circleId, String userId, String password);
 }

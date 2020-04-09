@@ -1,7 +1,9 @@
 package com.ccl.wx.service;
 
 import com.ccl.wx.dto.CommentDTO;
-import com.ccl.wx.entity.Comment;import com.ccl.wx.pojo.DiaryHideComment;
+import com.ccl.wx.entity.Comment;
+import com.ccl.wx.pojo.DiaryHideComment;
+import com.ccl.wx.vo.CircleHomeCommentVO;
 
 import java.util.List;
 
@@ -57,5 +59,38 @@ public interface CommentService {
      * @return
      */
     List<CommentDTO> getMasterComment(Long diaryId);
+
+    /**
+     * 保存日志评论
+     *
+     * @param comment 评论内容
+     * @return
+     */
+    String saveDiaryComment(Comment comment);
+
+    /**
+     * 删除圈子评论
+     *
+     * @param commentId 评论id
+     * @return
+     */
+    String deleteCircleComment(Integer commentId);
+
+    /**
+     * 检测圈子管理员是否可以点评日志
+     *
+     * @param diaryId 日志id
+     * @return
+     */
+    Boolean checkComment(Integer diaryId);
+
+    /**
+     * 获取全部的日志评论
+     *
+     * @param diaryId 日志id
+     * @param page    页数
+     * @return
+     */
+    List<CircleHomeCommentVO> getAllComment(Long diaryId, Integer page);
 }
 

@@ -26,7 +26,12 @@ public enum EnumComment {
     /**
      * 评论删除状态
      */
-    COMMENT_DELETE_STATUS(1);
+    COMMENT_DELETE_STATUS(1),
+
+    /**
+     * 日记点评最多数量
+     */
+    COMMENT_MAX_NUMBER(3);
 
     public Integer value;
 

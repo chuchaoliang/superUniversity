@@ -6,12 +6,12 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.dto.UserSignSuccessDTO;
+import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.entity.JoinCircle;
-import com.ccl.wx.enums.EnumPage;
-import com.ccl.wx.enums.EnumUserCircle;
-import com.ccl.wx.enums.EnumUserClockIn;
+import com.ccl.wx.enums.*;
 import com.ccl.wx.exception.UserJoinCircleException;
 import com.ccl.wx.mapper.JoinCircleMapper;
+import com.ccl.wx.service.CircleInfoService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.util.CclDateUtil;
@@ -19,6 +19,7 @@ import com.ccl.wx.util.CclUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -38,6 +39,9 @@ public class JoinCircleServiceImpl implements JoinCircleService {
 
     @Resource
     private UserDiaryService userDiaryService;
+
+    @Resource
+    private CircleInfoService circleInfoService;
 
     @Override
     public int deleteByPrimaryKey(Long circleId, String userId) {
@@ -297,5 +301,79 @@ public class JoinCircleServiceImpl implements JoinCircleService {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String joinCircle(Long circleId, String userId) {
+        // 根据圈子id查询圈子数据
+        CircleInfo circle = circleInfoService.selectByPrimaryKey(circleId);
+        JoinCircle joinCircle = new JoinCircle();
+        // 设置圈子id
+        joinCircle.setCircleId(circleId);
+        // 设置用户id
+        joinCircle.setUserId(userId);
+        JoinCircle circleUser = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+        // 加入圈子为空（用户曾经未加入过此圈子） || 用户状态不等于正常状态 && 圈子设置不等于需要管理员同意才能加入！
+        boolean judgeJoin = circleUser == null || (!circleUser.getUserStatus().equals(EnumUserCircle.USER_NORMAL_STATUS.getValue()) &&
+                !circle.getCircleSet().equals(EnumCircle.AGREE_JOIN.getValue()));
+        if (judgeJoin) {
+            // 圈子中人数 +1
+            circleInfoService.updateCircleMemberByCircleId(circleId, 1);
+        }
+        if (circleUser != null) {
+            // 用户曾经加入过圈子，TODO 这里可以设置用户是否可以加入被淘汰的圈子，或者其他的限制
+            if (circle.getCircleSet().equals(EnumCircle.AGREE_JOIN.getValue()) &&
+                    !circleUser.getUserStatus().equals(EnumUserCircle.USER_NORMAL_STATUS.getValue())) {
+                joinCircle.setUserStatus(EnumUserCircle.USER_AWAIT_STATUS.getValue());
+            } else {
+                joinCircle.setUserStatus(EnumUserCircle.USER_NORMAL_STATUS.getValue());
+            }
+            joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
+            return JSON.toJSONString(joinCircle);
+        } else {
+            // 查看是否为圈主或者圈子成员
+            if (circle.getCircleUserid().equals(userId)) {
+                // 圈主
+                joinCircle.setUserPermission(EnumUserPermission.MASTER_USER.getValue());
+            } else {
+                // 查看圈子状态
+                if (circle.getCircleSet().equals(EnumCircle.AGREE_JOIN.getValue())) {
+                    // 设置用户为等待加入状态
+                    joinCircle.setUserStatus(EnumUserCircle.USER_AWAIT_STATUS.getValue());
+                } else {
+                    // 设置用户为正常状态
+                    joinCircle.setUserStatus(EnumUserCircle.USER_NORMAL_STATUS.getValue());
+                }
+            }
+            int i = joinCircleMapper.insertSelective(joinCircle);
+            if (i == 1) {
+                return JSON.toJSONString(joinCircle);
+            } else {
+                return EnumResultStatus.FAIL.getValue();
+            }
+        }
+    }
+
+    @Override
+    public String joinCircleByPassword(Long circleId, String userId, String password) {
+        CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
+        // 圈子密码不存在
+        String circlePassword = circleInfo.getCirclePassword();
+        if (StringUtils.isEmpty(circlePassword)) {
+            return EnumResultStatus.FAIL.getValue();
+        } else {
+            if (password.equals(circlePassword)) {
+                // 密码正确，嫁娶圈子
+                String result = joinCircle(circleId, userId);
+                if (!EnumResultStatus.FAIL.getValue().equals(result)) {
+                    // 加入成功
+                    return result;
+                } else {
+                    return EnumResultStatus.FAIL.getValue();
+                }
+            } else {
+                return EnumResultStatus.FAIL.getValue();
+            }
+        }
     }
 }

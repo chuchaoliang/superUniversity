@@ -29,7 +29,12 @@ public enum EnumRedis {
     /**
      * redis连接符号
      */
-    REDIS_JOINT("::");
+    REDIS_JOINT("::"),
+
+    /**
+     * 点赞状态
+     */
+    LIKE_STATUS_PREFIX("likeStatus::");
 
     private String value;
 

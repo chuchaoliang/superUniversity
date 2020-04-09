@@ -83,10 +83,10 @@ public interface UserDiaryService {
     /**
      * 删除用户日志信息
      *
-     * @param diaryid 日记id
+     * @param diaryId 日记id
      * @return
      */
-    String deleteUserDiaryInfo(Long diaryid);
+    String deleteUserDiaryInfo(Long diaryId);
 
     /**
      * 判断用户活跃度减去几 -1 还是 -7
@@ -281,7 +281,16 @@ public interface UserDiaryService {
      * @param userId      用户id
      * @param date        哪一天（20200311）
      * @param diaryStatus 日志状态
+     * @param themeId     主题id
      * @return
      */
     List<UserDiary> selectByCircleIdAndUserIdAndDiaryCreatetimeAndDiaryStatus(Long circleId, String userId, String date, List<Integer> diaryStatus, Integer themeId);
+
+    /**
+     * 根据日记id查询全部的信息（点赞、评论、点评）
+     *
+     * @param diaryId 日志id
+     * @return
+     */
+    String getDiaryInfoById(Long diaryId);
 }

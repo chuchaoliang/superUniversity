@@ -1,5 +1,7 @@
 package com.ccl.wx;
 
+import cn.hutool.core.lang.PatternPool;
+import cn.hutool.core.lang.Validator;
 import com.ccl.wx.mapper.*;
 import com.ccl.wx.properties.DefaultProperties;
 import com.ccl.wx.properties.FileUploadProperties;
@@ -11,21 +13,20 @@ import com.ccl.wx.service.UserDiaryService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
 @Slf4j
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest
 public class CclWxApplicationTests {
 
@@ -78,10 +79,13 @@ public class CclWxApplicationTests {
     @SneakyThrows
     @Test
     public void test1() {
-        String str = null;
-        if (str.equals("test")) {
-            System.out.println("hshsh");
-        }
+        String str = "1   sss sss";
+        System.out.println(StringUtils.trimAllWhitespace(str));
+        System.out.println(StringUtils.trimAllWhitespace(str).length());
+        System.out.println(str);
+        System.out.println(str.length());
+        boolean mactchRegex = Validator.isMactchRegex(PatternPool.NUMBERS, "1");
+        System.out.println(mactchRegex);
     }
 
     @SneakyThrows
