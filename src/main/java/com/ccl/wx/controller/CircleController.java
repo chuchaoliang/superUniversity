@@ -1,19 +1,18 @@
 package com.ccl.wx.controller;
 
-import com.ccl.wx.entity.JoinCircle;
 import com.ccl.wx.entity.UserDiary;
 import com.ccl.wx.mapper.CircleInfoMapper;
 import com.ccl.wx.mapper.JoinCircleMapper;
 import com.ccl.wx.mapper.UserDiaryMapper;
 import com.ccl.wx.service.impl.CircleServiceImpl;
-import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.util.FtpUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Date;
 
 /**
  * 圈子相关
@@ -84,122 +83,6 @@ public class CircleController {
             userDiary.setDiaryVoice(voicePath);
             userDiaryMapper.updateByPrimaryKeySelective(userDiary);
             return "success";
-        }
-    }
-
-    /**
-     * 退出圈子
-     * TODO 退出圈子可以添加一个状态码，给圈主发送退出消息 待重构
-     *
-     * @param circleid 圈子id
-     * @param userid   用户id
-     * @return
-     */
-    @GetMapping("/exitqz")
-    public String exitCircle(@RequestParam(value = "circleid", required = false) String circleid,
-                             @RequestParam(value = "userid", required = false) String userid) {
-        if (StringUtils.isEmpty(circleid) || StringUtils.isEmpty(userid)) {
-            return "fail";
-        } else {
-            // 退出圈子，圈子人数-1
-            circleInfoMapper.updateCircleMemberByCircleId(Long.valueOf(circleid), -1);
-            JoinCircle circleInfo = joinCircleMapper.selectByPrimaryKey(Long.valueOf(circleid), userid);
-            circleInfo.setExitTime(new Date());
-            circleInfo.setUserStatus(2);
-            System.out.println(circleInfo);
-            joinCircleMapper.updateByPrimaryKeySelective(circleInfo);
-            return "success";
-        }
-    }
-
-    /**
-     * TODO API
-     * 检测圈子密码是否为空
-     *
-     * @param circleid 圈子id
-     * @return
-     */
-    @GetMapping("/judgecp")
-    public String judgeCirclePasswordExists(@RequestParam(value = "circleid") String circleid) {
-        if (StringUtils.isEmpty(circleid)) {
-            return "fail";
-        } else {
-            CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(Long.valueOf(circleid));
-            if (StringUtils.isEmpty(circleInfo.getCirclePassword())) {
-                return "-1";
-            } else {
-                return "success";
-            }
-        }
-    }
-
-    /**
-     * 判断用户是否为圈主
-     *
-     * @param circleid 圈子id
-     * @param userid   用户id
-     * @return
-     */
-    @GetMapping("/judgecircle")
-    public String judgeCircle(@RequestParam(value = "circleid", required = false) String circleid,
-                              @RequestParam(value = "userid", required = false) String userid) {
-        if (StringUtils.isEmpty(circleid) || StringUtils.isEmpty(userid)) {
-            return "-1";
-        } else {
-            CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(Long.valueOf(circleid));
-            if (circleInfo.getCircleUserid().equals(userid)) {
-                // 是圈主
-                return "success";
-            } else {
-                // 不是圈主
-                return "fail";
-            }
-        }
-    }
-
-    /**
-     * 判断是否为私密圈子
-     *
-     * @param circleid
-     * @return
-     */
-    @GetMapping("/jprivacycircle")
-    public String judgeCirclePrivacy(@RequestParam(value = "circleid", required = false) Long circleid) {
-        if (StringUtils.isEmpty(circleid)) {
-            return "fail";
-        } else {
-            Boolean cPrivacy = circleService.judgeCirclePrivacyStatus(circleid);
-            if (cPrivacy) {
-                // 是私密圈子
-                return "success";
-            } else {
-                // 不是私密圈子
-                return "-1";
-            }
-        }
-    }
-
-    /**
-     * 判断用户是否可以直接进入私密圈子
-     *
-     * @param userid
-     * @param circleid
-     * @return
-     */
-    @GetMapping("/juserintoprivacy")
-    public String judgeUserIntoPrivacyCircle(@RequestParam(value = "userid", required = false) String userid,
-                                             @RequestParam(value = "circleid", required = false) Long circleid) {
-        if (StringUtils.isEmpty(userid) || StringUtils.isEmpty(circleid)) {
-            return "fail";
-        } else {
-            Boolean userPrivacy = circleService.judgeUserIntoPrivacyCircle(userid, circleid);
-            if (userPrivacy) {
-                // 可以直接进入
-                return "success";
-            } else {
-                // 不能直接进入
-                return "-1";
-            }
         }
     }
 }

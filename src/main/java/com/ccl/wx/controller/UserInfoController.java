@@ -6,7 +6,6 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.annotation.ParamCheck;
 import com.ccl.wx.common.EnumResultCode;
 import com.ccl.wx.common.Result;
-import com.ccl.wx.dto.UserBasicInfoDTO;
 import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.mapper.JoinCircleMapper;
@@ -46,25 +45,25 @@ public class UserInfoController {
     @Resource
     private UserInfoService userInfoService;
 
-    /**
-     * 获取用户的基本信息
-     *
-     * @param userid 用户id
-     * @return
-     */
-    @ApiOperation(value = "获取用户的基本信息", notes = "通过用户id获取用户基本信息")
-    @ApiImplicitParam(name = "userid", value = "用户ID", dataType = "String", example = "o1x2q5czO_xCH9eemeEfL41_gvMk")
-    @GetMapping("/getuserbasicinfo")
-    public String getUserBasicInfo(@ParamCheck @RequestParam(value = "userid", required = false) String userid) {
-        UserBasicInfoDTO userBasicInfoDTO = new UserBasicInfoDTO();
-        UserInfo userInfo = userInfoService.selectByPrimaryKey(userid);
-        userBasicInfoDTO.setUserRank(userInfo.getUserId());
-        userBasicInfoDTO.setSumClockNum(joinCircleMapper.sumUserSigninDayByUserid(userid));
-        userBasicInfoDTO.setSumFoundCircle(joinCircleMapper.countByUserIdAndUserPermission(userid, 2));
-        userBasicInfoDTO.setSumIntegral(joinCircleMapper.sumUserVitalityByUserid(userid));
-        userBasicInfoDTO.setSumJoinCircle(joinCircleMapper.countByUserIdAndUserPermission(userid, 0));
-        return JSON.toJSONString(userBasicInfoDTO);
-    }
+    ///**
+    // * 获取用户的基本信息
+    // *
+    // * @param userid 用户id
+    // * @return
+    // */
+    //@ApiOperation(value = "获取用户的基本信息", notes = "通过用户id获取用户基本信息")
+    //@ApiImplicitParam(name = "userid", value = "用户ID", dataType = "String", example = "o1x2q5czO_xCH9eemeEfL41_gvMk")
+    //@GetMapping("/getuserbasicinfo")
+    //public String getUserBasicInfo(@ParamCheck @RequestParam(value = "userid", required = false) String userid) {
+    //    UserBasicInfoDTO userBasicInfoDTO = new UserBasicInfoDTO();
+    //    UserInfo userInfo = userInfoService.selectByPrimaryKey(userid);
+    //    userBasicInfoDTO.setUserRank(userInfo.getUserId());
+    //    userBasicInfoDTO.setSumClockNum(joinCircleMapper.sumUserSigninDayByUserid(userid));
+    //    userBasicInfoDTO.setSumFoundCircle(joinCircleMapper.countByUserIdAndUserPermission(userid, 2));
+    //    userBasicInfoDTO.setSumIntegral(joinCircleMapper.sumUserVitalityByUserid(userid));
+    //    userBasicInfoDTO.setSumJoinCircle(joinCircleMapper.countByUserIdAndUserPermission(userid, 0));
+    //    return JSON.toJSONString(userBasicInfoDTO);
+    //}
 
     /**
      * 获取用户的积分
@@ -100,23 +99,6 @@ public class UserInfoController {
         } else {
             return circleService.getUserInCircleInfo(userid, circleid);
         }
-    }
-
-    /**
-     * 根据用户id 判断用户是否不存在,用户存在success 不存在fail
-     *
-     * @param id 用户id
-     * @return
-     */
-    @ApiOperation(value = "判断此用户是否为空")
-    @ApiImplicitParam(name = "userId", value = "用户id", dataType = "String")
-    @GetMapping("/judgeuserinfo")
-    public String judgeUserInfoIsNull(@ParamCheck @RequestParam(value = "userId", required = false) String id) {
-        UserInfo userInfo = userInfoService.selectByPrimaryKey(id);
-        if (userInfo == null) {
-            return EnumResultStatus.FAIL.getValue();
-        }
-        return EnumResultStatus.SUCCESS.getValue();
     }
 
     /**

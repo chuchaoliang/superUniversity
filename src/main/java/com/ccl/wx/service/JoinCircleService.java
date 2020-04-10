@@ -48,15 +48,6 @@ public interface JoinCircleService {
     int updateByCircleIdAndUserSignStatus(Long circleId, Integer userSignStatus);
 
     /**
-     * 更新圈子全部成员打卡状态
-     *
-     * @param circleId     圈子id
-     * @param signInStatus 打卡状态
-     * @return
-     */
-    int updateCircleSignInStatus(Long circleId, Integer signInStatus);
-
-    /**
      * 根据圈子用户状态获取总人数
      *
      * @param circleId
@@ -198,7 +189,7 @@ public interface JoinCircleService {
      *
      * @param circleId 圈子id
      * @param userId   用户id
-     * @return
+     * @return true(是) false(不是)
      */
     Boolean judgeUserInCircle(Integer circleId, String userId);
 
@@ -209,7 +200,7 @@ public interface JoinCircleService {
      * @param userPermission 圈子状态
      * @return
      */
-    List<JoinCircle> selectAllByUserIdAndUserPermission(String userId, int userPermission);
+    List<JoinCircle> selectAllByUserIdAndUserPermission(String userId, List<Integer> userPermission);
 
     /**
      * 根据圈子id和用户状态得到用户圈子总活跃度
@@ -249,4 +240,31 @@ public interface JoinCircleService {
      * @return
      */
     String joinCircleByPassword(Long circleId, String userId, String password);
+
+    /**
+     * 退出圈子
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    String exitCircle(Long circleId, String userId);
+
+    /**
+     * 我加入的圈子
+     *
+     * @param userId 用户id
+     * @param page   页数
+     * @return
+     */
+    String selectUserJoinCircle(String userId, Integer page);
+
+    /**
+     * 我创建的圈子
+     *
+     * @param userId 用户id
+     * @param page   页数
+     * @return
+     */
+    String selectUserFoundCircle(String userId, Integer page);
 }

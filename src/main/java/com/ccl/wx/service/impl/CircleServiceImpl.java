@@ -3,13 +3,10 @@ package com.ccl.wx.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.dto.CircleMemberDTO;
-import com.ccl.wx.dto.CirclesDTO;
 import com.ccl.wx.dto.JoinCircleDTO;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.entity.JoinCircle;
 import com.ccl.wx.entity.UserInfo;
-import com.ccl.wx.enums.EnumUserCircle;
-import com.ccl.wx.enums.EnumUserDiary;
 import com.ccl.wx.mapper.*;
 import com.ccl.wx.service.CircleService;
 import com.ccl.wx.service.UserDiaryService;
@@ -20,13 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**
@@ -181,49 +175,6 @@ public class CircleServiceImpl implements CircleService {
     }
 
     @Override
-    public String selectCircleDTO(List<CircleInfo> circles) {
-        // 正常查询 热门查询 最新查询
-        ArrayList<List<CirclesDTO>> str = new ArrayList<>();
-        ArrayList<CirclesDTO> circlesDTOS = new ArrayList<>();
-        for (CircleInfo circle : circles) {
-            CirclesDTO circlesDTO = new CirclesDTO();
-            // 查询圈子中正常状态的用户
-            Integer sumperson = joinCircleMapper.countByCircleIdAndUserStatus(circle.getCircleId(), EnumUserCircle.USER_NORMAL_STATUS.getValue());
-            // 根据日志状态查询日志信息
-            ArrayList<Integer> diaryStatus = new ArrayList<>();
-            diaryStatus.add(EnumUserDiary.USER_DIARY_NORMAL.getValue());
-            diaryStatus.add(EnumUserDiary.USER_DIARY_PERMISSION.getValue());
-            Long sumdiary = userDiaryService.countByCircleIdAndDiaryStatus(circle.getCircleId(), diaryStatus);
-            BeanUtils.copyProperties(circle, circlesDTO);
-            circlesDTO.setJoinPerson(sumperson);
-            circlesDTO.setSumDiary(sumdiary);
-            circlesDTOS.add(circlesDTO);
-        }
-        // 根据热度降序排列
-        List<CirclesDTO> circlesDTOSByVitality = circlesDTOS.stream().
-                sorted(Comparator.comparingLong(CirclesDTO::getCircleVitality).reversed().
-                        thenComparing(CirclesDTO::getJoinPerson)).collect(Collectors.toList());
-        // 根据创建时间降序排列
-        List<CirclesDTO> circlesDTOSByCreateTime = circlesDTOS.stream().
-                sorted(Comparator.comparing(CirclesDTO::getCircleCreatetime).reversed().
-                        thenComparing(CirclesDTO::getJoinPerson)).collect(Collectors.toList());
-        str.add(circlesDTOS);
-        str.add(circlesDTOSByVitality);
-        str.add(circlesDTOSByCreateTime);
-        return JSON.toJSON(str).toString();
-    }
-
-    @Override
-    public Boolean judgeUserCircleMaster(String circleId, String userId) {
-        CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(Long.valueOf(circleId));
-        if (circleInfo.getCircleUserid().equals(userId)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
     public String selectCircleAllMemberDTO(List<JoinCircle> circles) {
         ArrayList<CircleMemberDTO> circleMemberDTOS = new ArrayList<>();
         for (JoinCircle circle : circles) {
@@ -272,36 +223,6 @@ public class CircleServiceImpl implements CircleService {
             return JSON.toJSONStringWithDateFormat(joinCircleDTO, "yyyy-MM-dd", SerializerFeature.WriteDateUseDateFormat);
         } else {
             return "fail";
-        }
-    }
-
-    @Override
-    public Boolean judgeCirclePrivacyStatus(Long circleId) {
-        CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleId);
-        // 判断是否为私密圈子
-        if (circleInfo.getCircleSet().equals(CIRCLE_PASSWORD_STATUS) && !StringUtils.isEmpty(circleInfo.getCirclePassword())) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public Boolean judgeUserIntoPrivacyCircle(String userid, Long circleid) {
-        // 判断用户是否为圈主
-        Boolean circleMaster = circleService.judgeUserCircleMaster(String.valueOf(circleid), userid);
-        if (circleMaster) {
-            // 是圈主
-            return true;
-        } else {
-            // 不是圈主
-            List<String> userIds = joinCircleMapper.selectUserIdByCircleIdAndUserStatus(circleid, EnumUserCircle.USER_NORMAL_STATUS.getValue());
-            if (userIds.contains(userid)) {
-                // 是圈子成员
-                return true;
-            } else {
-                // 不是圈子成员
-                return false;
-            }
         }
     }
 }

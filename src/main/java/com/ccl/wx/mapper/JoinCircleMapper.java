@@ -27,6 +27,14 @@ public interface JoinCircleMapper {
     int updateByPrimaryKey(JoinCircle record);
 
     /**
+     * 根据条件查询信息
+     *
+     * @param joinCircle
+     * @return
+     */
+    List<JoinCircle> selectByAll(JoinCircle joinCircle);
+
+    /**
      * 根据圈子id 和用户状态来查询圈子中人数
      *
      * @param circleId
@@ -34,15 +42,6 @@ public interface JoinCircleMapper {
      * @return
      */
     Integer countByCircleIdAndUserStatus(@Param("circleId") Long circleId, @Param("userStatus") Integer userStatus);
-
-    /**
-     * 查看圈子中今日打卡人数
-     *
-     * @param circleId
-     * @param userSignStatus
-     * @return
-     */
-    Integer countByCircleIdAndUserSignStatus(@Param("circleId") Long circleId, @Param("userSignStatus") Integer userSignStatus);
 
     /**
      * 根据圈子id获取全部的圈子用户id
@@ -53,44 +52,6 @@ public interface JoinCircleMapper {
     List<String> selectUserIdByCircleId(@Param("circleId") Long circleId);
 
     /**
-     * 更新打卡日记天数 + 1
-     *
-     * @param circleId 圈子id
-     * @param userId   用户id
-     * @param number   每次加的天数
-     * @return
-     */
-    int addUserSigninDay(@Param("circleId") Long circleId, @Param("userid") String userId, @Param("number") Integer number);
-
-    /**
-     * 连续签到数 + 1
-     *
-     * @param circleId 圈子id
-     * @param userId   用户id
-     * @param number   每次增加的数目
-     * @return
-     */
-    int addUserSignIn(@Param("circleId") Long circleId, @Param("userId") String userId, @Param("number") Integer number);
-
-    /**
-     * 更新用户的圈子活跃度
-     *
-     * @param circleId 圈子id
-     * @param userId   用户id
-     * @param number   每次添加的数据
-     * @return
-     */
-    int addUserVitality(@Param("circleId") Long circleId, @Param("userid") String userId, @Param("number") Integer number);
-
-    /**
-     * 根据圈子id获取所有数据
-     *
-     * @param circleId 圈子id
-     * @return
-     */
-    List<JoinCircle> selectAllByCircleId(@Param("circleId") Long circleId);
-
-    /**
      * 根据圈子和用户状态查询圈子数据
      *
      * @param circleId   圈子id
@@ -98,15 +59,6 @@ public interface JoinCircleMapper {
      * @return
      */
     List<JoinCircle> selectAllByCircleIdAndUserStatus(@Param("circleId") Long circleId, @Param("userStatus") Integer userStatus);
-
-    /**
-     * 更新圈子全部用户的打卡状态
-     *
-     * @param signInStatus 用户打卡状态
-     * @param circleId     圈子id
-     * @return
-     */
-    int updateByCircleId(@Param("circleId") Long circleId, @Param("signInStatus") Integer signInStatus);
 
     /**
      * 更新圈子状态
@@ -156,49 +108,13 @@ public interface JoinCircleMapper {
     int sumUserVitalityByUserid(@Param("userid") String userid);
 
     /**
-     * 根据用户id和用户状态获取圈子加入的个数
-     *
-     * @param userId         用户id
-     * @param userPermission 用户状态 0 正常用户 1管理员用户 2圈主
-     * @return
-     */
-    Integer countByUserIdAndUserPermission(@Param("userId") String userId, @Param("userPermission") Integer userPermission);
-
-    /**
      * 查找用户加入的圈子或者创建的圈子
      *
      * @param userId         用户id
      * @param userPermission 用户加入的圈子权限
      * @return
      */
-    List<JoinCircle> selectAllByUserIdAndUserPermission(@Param("userId") String userId, @Param("userPermission") Integer userPermission);
-
-    /**
-     * 根据圈子id和用户加入状态查询用户id
-     *
-     * @param circleId
-     * @param userStatus
-     * @return
-     */
-    List<String> selectUserIdByCircleIdAndUserStatus(@Param("circleId") Long circleId, @Param("userStatus") Integer userStatus);
-
-    /**
-     * 查询全部数据
-     *
-     * @return
-     */
-    List<JoinCircle> selectAllData();
-
-    /**
-     * 根据圈子中用户活跃度顺序获取用户id
-     *
-     * @param circleId   圈子id
-     * @param userStatus 用户状态
-     * @param start      起始页
-     * @param pageNumber 每页的数量
-     * @return
-     */
-    List<String> selectUseridGetVitalitySort(@Param("circleId") Long circleId, @Param("userStatus") Integer userStatus, @Param("start") Integer start, @Param("pageNumber") Integer pageNumber);
+    List<JoinCircle> selectAllByUserIdAndUserPermission(@Param("userId") String userId, @Param("userPermission") List<Integer> userPermission);
 
     /**
      * TODO 以下6个查询方法待重构(重复)!!!!!!

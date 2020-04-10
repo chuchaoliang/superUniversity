@@ -179,5 +179,19 @@ public class JoinCircleController {
         }
         return ResponseMsgUtil.success(result);
     }
+
+    /**
+     * 退出圈子
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    @GetMapping("/exit")
+    public String exitCircle(@RequestParam(value = "token", required = false) Long circleId,
+                             @RequestParam(value = "userId", required = false) String userId) {
+        String result = joinCircleService.exitCircle(circleId, userId);
+        return result;
+    }
 }
 

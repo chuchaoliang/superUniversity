@@ -5,6 +5,7 @@ import cn.hutool.core.lang.PatternPool;
 import cn.hutool.core.lang.Validator;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.ccl.wx.common.CircleInfoComparator;
 import com.ccl.wx.dto.CircleInfoDTO;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.enums.*;
@@ -14,8 +15,10 @@ import com.ccl.wx.service.CircleInfoService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.TodayContentService;
 import com.ccl.wx.service.UserDiaryService;
+import com.ccl.wx.util.CclUtil;
 import com.ccl.wx.util.FtpUtil;
 import com.ccl.wx.vo.CircleIndexVO;
+import com.ccl.wx.vo.CircleInfoVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -24,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author 褚超亮
@@ -206,4 +210,60 @@ public class CircleInfoServiceImpl implements CircleInfoService {
         int i = circleInfoMapper.updateCircleMemberByCircleId(circleId, value);
         return i;
     }
+
+    @Override
+    public String selectAdornCircle(List<CircleInfo> circles, String userId, Integer number, Integer page) {
+        Integer pageNumber = EnumPage.PAGE_NUMBER.getValue();
+        List<CircleInfo> disposeCircles = circles.stream().sorted(new CircleInfoComparator())
+                .skip(page * pageNumber.longValue()).limit(pageNumber).collect(Collectors.toList());
+        List<CircleInfoVO> circleInfoVOS = new ArrayList<>();
+        for (CircleInfo circle : disposeCircles) {
+            CircleInfoVO circleInfoVO = new CircleInfoVO();
+            BeanUtils.copyProperties(circle, circleInfoVO);
+            // 设置圈子成员
+            circleInfoVO.setCircleMember(joinCircleService.countByCircleIdAndUserStatus(circle.getCircleId(), EnumUserCircle.USER_NORMAL_STATUS.getValue()));
+            // 设置是否为私密圈子
+            circleInfoVO.setPrivacy(circle.getCircleSet().equals(EnumCircle.PASSWORD_JOIN.getValue()));
+            // 设置用户是否加入圈子
+            circleInfoVO.setJoin(joinCircleService.judgeUserInCircle(circle.getCircleId().intValue(), userId));
+            // 设置用户的圈子权限
+            ArrayList<Integer> userPermission = new ArrayList<>();
+            userPermission.add(EnumUserPermission.ADMIN_USER.getValue());
+            userPermission.add(EnumUserPermission.MASTER_USER.getValue());
+            // 设置用户是否为圈子管理人员
+            circleInfoVO.setManage(joinCircleService.judgeUserIsCircleManage(circle.getCircleId().intValue(), userPermission, userId));
+            circleInfoVOS.add(circleInfoVO);
+        }
+        // 判断是否存在下一页
+        List<Object> result = new ArrayList<>();
+        result.add(circleInfoVOS);
+        result.add(CclUtil.judgeNextPage(number, EnumPage.PAGE_NUMBER.getValue(), page));
+        return JSON.toJSONString(result);
+    }
+
+    @Override
+    public String selectCircleByType(Integer type, String userId, Integer page) {
+        List<CircleInfo> circles = circleInfoMapper.findAllByCircleLocation(type);
+        return selectAdornCircle(circles, userId, circles.size(), page);
+    }
+
+    @Override
+    public String judgeUserIntoPrivacyCircle(String userId, Long circleId) {
+        boolean userInCircle = joinCircleService.judgeUserInCircle(circleId.intValue(), userId);
+        CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleId);
+        if (!circleInfo.getCircleSet().equals(EnumCircle.PASSWORD_JOIN.getValue())) {
+            return EnumResultStatus.SUCCESS.getValue();
+        }
+        if (userInCircle) {
+            return EnumResultStatus.SUCCESS.getValue();
+        }
+        return EnumResultStatus.FAIL.getValue();
+    }
+
+    @Override
+    public List<CircleInfo> selectByAll(CircleInfo circleInfo) {
+        return circleInfoMapper.selectByAll(circleInfo);
+    }
 }
+
+

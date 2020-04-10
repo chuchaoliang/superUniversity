@@ -84,11 +84,6 @@ public class JoinCircleServiceImpl implements JoinCircleService {
     }
 
     @Override
-    public int updateCircleSignInStatus(Long circleId, Integer signInStatus) {
-        return joinCircleMapper.updateByCircleId(circleId, signInStatus);
-    }
-
-    @Override
     public int countByCircleIdAndUserStatus(Long circleId, Integer userStatus) {
         return joinCircleMapper.countByCircleIdAndUserStatus(circleId, userStatus);
     }
@@ -139,7 +134,7 @@ public class JoinCircleServiceImpl implements JoinCircleService {
     }
 
     @Override
-    public List<JoinCircle> selectAllByUserIdAndUserPermission(String userId, int userPermission) {
+    public List<JoinCircle> selectAllByUserIdAndUserPermission(String userId, List<Integer> userPermission) {
         return joinCircleMapper.selectAllByUserIdAndUserPermission(userId, userPermission);
     }
 
@@ -363,7 +358,7 @@ public class JoinCircleServiceImpl implements JoinCircleService {
             return EnumResultStatus.FAIL.getValue();
         } else {
             if (password.equals(circlePassword)) {
-                // 密码正确，嫁娶圈子
+                // 密码正确，加入圈子
                 String result = joinCircle(circleId, userId);
                 if (!EnumResultStatus.FAIL.getValue().equals(result)) {
                     // 加入成功
@@ -375,5 +370,40 @@ public class JoinCircleServiceImpl implements JoinCircleService {
                 return EnumResultStatus.FAIL.getValue();
             }
         }
+    }
+
+    @Override
+    public String exitCircle(Long circleId, String userId) {
+        // 退出圈子，圈子人数-1
+        circleInfoService.updateCircleMemberByCircleId(circleId, -1);
+        JoinCircle circleInfo = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+        circleInfo.setExitTime(new Date());
+        circleInfo.setUserStatus(EnumUserCircle.USER_EXIT_STATUS.getValue());
+        System.out.println(circleInfo);
+        joinCircleMapper.updateByPrimaryKeySelective(circleInfo);
+        return "success";
+    }
+
+    @Override
+    public String selectUserJoinCircle(String userId, Integer page) {
+        JoinCircle joinCircle = new JoinCircle();
+        joinCircle.setUserId(userId);
+        joinCircle.setUserStatus(EnumUserCircle.USER_NORMAL_STATUS.getValue());
+        // 查询条件为用户id和用户状态
+        List<Long> circleIds = joinCircleMapper.selectByAll(joinCircle).stream().map(JoinCircle::getCircleId).collect(Collectors.toList());
+        List<CircleInfo> circleInfos = new ArrayList<>();
+        for (Long circleId : circleIds) {
+            CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
+            circleInfos.add(circleInfo);
+        }
+        return circleInfoService.selectAdornCircle(circleInfos, userId, circleInfos.size(), page);
+    }
+
+    @Override
+    public String selectUserFoundCircle(String userId, Integer page) {
+        CircleInfo circleInfo = new CircleInfo();
+        circleInfo.setCircleUserid(userId);
+        List<CircleInfo> circleInfos = circleInfoService.selectByAll(circleInfo);
+        return circleInfoService.selectAdornCircle(circleInfos, userId, circleInfos.size(), page);
     }
 }

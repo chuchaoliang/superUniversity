@@ -101,5 +101,45 @@ public interface CircleInfoService {
      * @return
      */
     Integer updateCircleMemberByCircleId(Long circleId, int value);
+
+    /**
+     * 圈子装饰方法
+     *
+     * @param circles 需要装饰的圈子信息
+     * @param userId  用户id
+     * @param number  数据总数
+     * @param page    当前是第几页
+     * @return
+     */
+    String selectAdornCircle(List<CircleInfo> circles, String userId, Integer number, Integer page);
+
+    /**
+     * 根据圈子类型查找圈子
+     *
+     * @param type   圈子类型
+     * @param userId 用户id
+     * @param page   当前页
+     * @return
+     */
+    String selectCircleByType(Integer type, String userId, Integer page);
+
+    /**
+     * 判断用户是否可以进入私密圈子
+     *
+     * @param userId   用户id
+     * @param circleId 圈子id
+     * @return
+     */
+    String judgeUserIntoPrivacyCircle(String userId, Long circleId);
+
+    /**
+     * 根据条件查询圈子
+     *
+     * @param circleInfo 条件
+     * @return
+     */
+    List<CircleInfo> selectByAll(CircleInfo circleInfo);
 }
+
+
 

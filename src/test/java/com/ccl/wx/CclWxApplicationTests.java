@@ -1,7 +1,8 @@
 package com.ccl.wx;
 
-import cn.hutool.core.lang.PatternPool;
-import cn.hutool.core.lang.Validator;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
+import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.mapper.*;
 import com.ccl.wx.properties.DefaultProperties;
 import com.ccl.wx.properties.FileUploadProperties;
@@ -13,20 +14,24 @@ import com.ccl.wx.service.UserDiaryService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
-//@RunWith(SpringRunner.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest
 public class CclWxApplicationTests {
 
@@ -79,33 +84,24 @@ public class CclWxApplicationTests {
     @SneakyThrows
     @Test
     public void test1() {
-        String str = "1   sss sss";
-        System.out.println(StringUtils.trimAllWhitespace(str));
-        System.out.println(StringUtils.trimAllWhitespace(str).length());
-        System.out.println(str);
-        System.out.println(str.length());
-        boolean mactchRegex = Validator.isMactchRegex(PatternPool.NUMBERS, "1");
-        System.out.println(mactchRegex);
+        //List<CircleInfo> circleinfos = circleInfoMapper.selectByAll(null).stream().filter(circleInfo -> circleInfo.getCircleUserid().equals("o1x2q5Yu0nXAkeHGC0JuLHYHfe0A")
+        //        && circleInfo.getCircleMember() > 10).skip(2).limit(1).collect(Collectors.toList());
+        List<CircleInfo> collect = circleInfoMapper.selectByAll(null).stream().sorted((item1, item2) -> {
+            int num1 = item2.getDiarySum() / item2.getCircleMember() - item1.getDiarySum() / item1.getCircleMember();
+            return num1 == 0 ? item2.getCircleCreatetime().compareTo(item1.getCircleCreatetime()) : num1;
+        }).collect(Collectors.toList());
+        System.out.println(collect.size());
+        //collect.sort(Comparator.comparing(CircleInfo::getCircleMember).thenComparing(CircleInfo::getDiarySum).reversed());
+        collect.forEach(circleInfo -> System.out.println(circleInfo.getCircleId() + "-->" + circleInfo.getCircleMember() +
+                "-->" + circleInfo.getDiarySum() + "-->" + DateUtil.format(circleInfo.getCircleCreatetime(), DatePattern.NORM_DATETIME_PATTERN)));
     }
 
     @SneakyThrows
     @Test
     public void test3() {
-        //URL url = new URL("https://ccllove.club/user/o1x2q5czO_xCH9eemeEfL41_gvMk/20200326/image/20200326102101_191a5ed8b05f497b8d36b69567559544.png");
-        URL url = new URL("https://www.baidu.com");
-        System.out.println("协议:" + url.getProtocol());
-        System.out.println("主机:" + url.getHost());
-        System.out.println("端口:" + url.getPort());
-        URLConnection urlConnection = url.openConnection();
-        InputStream inputStream = urlConnection.getInputStream();
-        byte[] image = new byte[10240];
-        int len;
-        while ((len = inputStream.read(image)) != -1) {
-            System.out.println(new String(image, 0, len));
-        }
-        //InputStream stream = URLUtil.getStream(url);
-        //MultipartFile file = new MockMultipartFile("test.png", stream);
-        //System.out.println(file.getName());
+        List<CircleInfo> circleInfos = circleInfoMapper.selectByAll(null);
+        circleInfos.sort(Comparator.comparing(CircleInfo::getCircleMember).thenComparing(CircleInfo::getDiarySum).reversed());
+        circleInfos.forEach(circleInfo -> System.out.println(circleInfo.getCircleId() + "-->" + circleInfo.getCircleMember() + "-->" + circleInfo.getDiarySum()));
     }
 
     @SneakyThrows

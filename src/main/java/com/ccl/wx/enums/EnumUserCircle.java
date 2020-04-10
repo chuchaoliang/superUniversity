@@ -24,7 +24,12 @@ public enum EnumUserCircle {
     /**
      * 用户被拒绝状态
      */
-    USER_REFUSE_STATUS(3);
+    USER_REFUSE_STATUS(3),
+
+    /**
+     * 用户退出圈子
+     */
+    USER_EXIT_STATUS(4);
 
     private int value;
 
