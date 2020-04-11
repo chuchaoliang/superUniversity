@@ -8,7 +8,6 @@ import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.service.CircleInfoService;
 import com.ccl.wx.service.JoinCircleService;
-import com.ccl.wx.service.impl.CircleServiceImpl;
 import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -37,9 +36,6 @@ public class CircleInfoController {
 
     @Resource
     private JoinCircleService joinCircleService;
-
-    @Resource
-    private CircleServiceImpl circleService;
 
     @Resource
     private CircleInfoService circleInfoService;
@@ -117,41 +113,42 @@ public class CircleInfoController {
         return ResponseMsgUtil.success(circleInfoService.selectCircleByType(type, userId, page));
     }
 
-    ///**
-    // * 根据关键词搜索圈子数据
-    // *
-    // * @param keyword 圈子关键词
-    // * @return
-    // */
-    //@GetMapping("/sqzkeyword")
-    //public String searchCircleByKeyWord(@RequestParam(value = "keyword", required = false) String keyword) {
-    //    if (StringUtils.isEmpty(keyword)) {
-    //        return "fail";
-    //    } else {
-    //        List<CircleInfo> circles = circleInfoService.selectAllLikeAndCircleName(keyword);
-    //        String circlesDTO = circleInfoService.selectAdornCircle(circles);
-    //        return circlesDTO;
-    //    }
-    //}
-    //
-    ///**
-    // * 根据圈子类型和关键词查询数据
-    // *
-    // * @param keyword 关键词
-    // * @param ctype   圈子类型
-    // * @return
-    // */
-    //@GetMapping("/sqzlkeyword")
-    //public String searchCircleByLocationKeyWord(@RequestParam(value = "keyword", required = false) String keyword,
-    //                                            @RequestParam(value = "ctype", required = false) String ctype) {
-    //    if (StringUtils.isEmpty(keyword) || StringUtils.isEmpty(ctype)) {
-    //        return "fail";
-    //    }
-    //    List<CircleInfo> circles = circleInfoService.selectAllByCircleNameLikeAndCircleLocation(keyword, Integer.parseInt(ctype));
-    //    String circlesDTO = circleInfoService.selectAdornCircle(circles);
-    //    return circlesDTO;
-    //}
-    //
+    /**
+     * 根据关键词搜索圈子数据
+     *
+     * @param keyword 圈子关键词
+     * @param userId  用户id
+     * @param page    页数
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/search/keyword")
+    public Result<String> searchCircleByKeyWord(@RequestParam(value = "keyword", required = false) String keyword,
+                                                @RequestHeader(value = "token", required = false) String userId,
+                                                @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
+        String result = circleInfoService.searchCircleByKeyWord(keyword, userId, page);
+        return ResponseMsgUtil.success(result);
+    }
+
+
+    /**
+     * 根据圈子类型和关键词查询数据
+     *
+     * @param keyword 关键词
+     * @param type    圈子类型
+     * @param page    页数
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/search/keyword/type")
+    public Result<String> searchCircleByTypeKeyWord(@RequestParam(value = "keyword", required = false) String keyword,
+                                                    @RequestParam(value = "type", required = false) Integer type,
+                                                    @RequestHeader(value = "token", required = false) String userId,
+                                                    @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
+        String result = circleInfoService.searchCircleByTypeKeyWord(keyword, type, userId, page);
+        return ResponseMsgUtil.success(result);
+    }
+
 
     /**
      * 我加入的圈子

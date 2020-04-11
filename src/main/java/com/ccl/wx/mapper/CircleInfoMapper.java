@@ -26,14 +26,6 @@ public interface CircleInfoMapper {
     int updateByPrimaryKey(CircleInfo record);
 
     /**
-     * 根据圈子类型查找圈子
-     *
-     * @param circleLocation 圈子所在位置
-     * @return
-     */
-    List<CircleInfo> findAllByCircleLocation(@Param("circleLocation") Integer circleLocation);
-
-    /**
      * 根据条件查询圈子
      *
      * @param circleInfo 条件
@@ -50,28 +42,13 @@ public interface CircleInfoMapper {
     List<CircleInfo> selectByCircleName(@Param("circleName") String circleName);
 
     /**
-     * 根据关键词模糊查询数据
+     * 查询圈子
      *
-     * @param likeCircleName 圈子查询关键词
+     * @param keyword 关键词
+     * @param type    类型（位置）
      * @return
      */
-    List<CircleInfo> selectAllLikeAndCircleName(@Param("likeCircleName") String likeCircleName);
-
-    /**
-     * 根据关键词和圈子位置查询圈子数据
-     *
-     * @param likeCircleName 圈子查询关键词
-     * @param circleLocation 圈子位置信息
-     * @return
-     */
-    List<CircleInfo> selectAllByCircleNameLikeAndCircleLocation(@Param("likeCircleName") String likeCircleName, @Param("circleLocation") Integer circleLocation);
-
-    /**
-     * 挑选圈子的所有名称
-     *
-     * @return
-     */
-    List<String> selectAllCircleName();
+    List<CircleInfo> selectSearchCircleInfo(@Param("keyword") String keyword, @Param("type") Integer type);
 
     /**
      * 更新圈子中数据
@@ -82,21 +59,4 @@ public interface CircleInfoMapper {
      * @return
      */
     int updateCircleData(@Param("circleInfo") CircleInfo circleInfo, @Param("circleId") Long circleId, @Param("value") Integer value);
-
-    /**
-     * 悲观锁
-     *
-     * @param circleId
-     * @return
-     */
-    List<CircleInfo> selectByCircleId(@Param("circleId") Long circleId);
-
-    /**
-     * 根据圈子id更新圈子主题总数
-     *
-     * @param circleId 圈子id
-     * @param value    需要加或者减的值 + value - value
-     * @return
-     */
-    Integer updateThemeNumberByCircleId(@Param("circleId") Long circleId, @Param("value") Integer value);
 }

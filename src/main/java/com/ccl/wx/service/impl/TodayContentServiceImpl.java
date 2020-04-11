@@ -153,7 +153,9 @@ public class TodayContentServiceImpl implements TodayContentService {
             todayContent.setHeadImage(imagePath);
         }
         // 更新圈子主题总数 + 1
-        circleInfoService.updateThemeNumberByCircleId(todayContent.getCircleId(), Integer.parseInt(EnumCommon.UPDATE_ADD.getValue()));
+        CircleInfo circleInfo = new CircleInfo();
+        circleInfo.setThemeSum(0);
+        circleInfoService.updateCircleData(circleInfo, circleId, EnumCommon.UPDATE_ADD.getData());
         // 插入数据
         int i = todayContentMapper.insertSelective(todayContent);
         if (i == 1) {
@@ -174,7 +176,9 @@ public class TodayContentServiceImpl implements TodayContentService {
         CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
         if (circleInfo.getThemeSum() > 1) {
             // 圈子主题-1
-            circleInfoService.updateThemeNumberByCircleId(circleId, Integer.parseInt(EnumCommon.UPDATE_SUB.getValue()));
+            CircleInfo circleInfoData = new CircleInfo();
+            circleInfoData.setThemeSum(0);
+            circleInfoService.updateCircleData(circleInfoData, circleId, EnumCommon.UPDATE_SUB.getData());
         }
         // 设置删除主题后，更新全部主题状态为主题删除状态并且仅仅自己可见
         userDiaryService.updateDiaryStatusByThemeId(themeId.intValue(), EnumUserDiary.USER_DIARY_THEME_DELETE.getValue());

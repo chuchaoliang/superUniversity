@@ -26,15 +26,6 @@ public interface CircleInfoService {
     int updateByPrimaryKey(CircleInfo record);
 
     /**
-     * 根据圈子id 更新圈子主题总数
-     *
-     * @param circleId 圈子id
-     * @param value    需要+ - 的值 + 1 - 1
-     * @return
-     */
-    int updateThemeNumberByCircleId(Long circleId, Integer value);
-
-    /**
      * 获取圈子内的主页面加载的全部内容
      *
      * @param circleId 圈子id
@@ -42,38 +33,6 @@ public interface CircleInfoService {
      * @return 圈子全部内容json字符串
      */
     String getCircleIndexAllContent(String userId, Integer circleId);
-
-    /**
-     * 根据关键词模糊查询数据
-     *
-     * @param likeCircleName 圈子查询关键词
-     * @return
-     */
-    List<CircleInfo> selectAllLikeAndCircleName(String likeCircleName);
-
-    /**
-     * 挑选圈子的所有名称
-     *
-     * @return
-     */
-    List<String> selectAllCircleName();
-
-    /**
-     * 根据圈子类型查询圈子数据
-     *
-     * @param tid
-     * @return
-     */
-    List<CircleInfo> findAllByCircleLocation(int tid);
-
-    /**
-     * 根据圈子类型和关键字查询圈子数据
-     *
-     * @param keyword 关键字
-     * @param tid     圈子类型
-     * @return
-     */
-    List<CircleInfo> selectAllByCircleNameLikeAndCircleLocation(String keyword, int tid);
 
     /**
      * 创建圈子
@@ -149,6 +108,36 @@ public interface CircleInfoService {
      * @return
      */
     int updateCircleData(CircleInfo circleInfo, Long circleId, Integer value);
+
+    /**
+     * 根据圈子类型和关键词查询数据
+     *
+     * @param keyword 关键词
+     * @param type    圈子类型
+     * @param userId  用户id
+     * @param page    页数
+     * @return
+     */
+    String searchCircleByTypeKeyWord(String keyword, Integer type, String userId, Integer page);
+
+    /**
+     * 查询圈子
+     *
+     * @param keyword 关键词
+     * @param type    类型（位置）
+     * @return
+     */
+    List<CircleInfo> selectSearchCircleInfo(String keyword, Integer type);
+
+    /**
+     * 根据关键词搜索圈子数据
+     *
+     * @param keyword 圈子关键词
+     * @param userId  用户id
+     * @param page    页数
+     * @return
+     */
+    String searchCircleByKeyWord(String keyword, String userId, Integer page);
 }
 
 

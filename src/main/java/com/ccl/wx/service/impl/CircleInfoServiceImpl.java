@@ -83,31 +83,6 @@ public class CircleInfoServiceImpl implements CircleInfoService {
     }
 
     @Override
-    public int updateThemeNumberByCircleId(Long circleId, Integer value) {
-        return circleInfoMapper.updateThemeNumberByCircleId(circleId, value);
-    }
-
-    @Override
-    public List<CircleInfo> selectAllLikeAndCircleName(String likeCircleName) {
-        return circleInfoMapper.selectAllLikeAndCircleName(likeCircleName);
-    }
-
-    @Override
-    public List<String> selectAllCircleName() {
-        return circleInfoMapper.selectAllCircleName();
-    }
-
-    @Override
-    public List<CircleInfo> findAllByCircleLocation(int tid) {
-        return circleInfoMapper.findAllByCircleLocation(tid);
-    }
-
-    @Override
-    public List<CircleInfo> selectAllByCircleNameLikeAndCircleLocation(String keyword, int tid) {
-        return circleInfoMapper.selectAllByCircleNameLikeAndCircleLocation(keyword, tid);
-    }
-
-    @Override
     public String getCircleIndexAllContent(String userId, Integer circleId) {
         CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(Long.valueOf(circleId));
         // 创建circleInfoDTO对象
@@ -237,7 +212,7 @@ public class CircleInfoServiceImpl implements CircleInfoService {
 
     @Override
     public String selectCircleByType(Integer type, String userId, Integer page) {
-        List<CircleInfo> circles = circleInfoMapper.findAllByCircleLocation(type);
+        List<CircleInfo> circles = circleInfoMapper.selectSearchCircleInfo(null, type);
         return selectAdornCircle(circles, userId, circles.size(), page);
     }
 
@@ -271,6 +246,23 @@ public class CircleInfoServiceImpl implements CircleInfoService {
     @Override
     public int updateCircleData(CircleInfo circleInfo, Long circleId, Integer value) {
         return circleInfoMapper.updateCircleData(circleInfo, circleId, value);
+    }
+
+    @Override
+    public String searchCircleByTypeKeyWord(String keyword, Integer type, String userId, Integer page) {
+        List<CircleInfo> circleInfos = circleInfoMapper.selectSearchCircleInfo(keyword, type);
+        return selectAdornCircle(circleInfos, userId, circleInfos.size(), page);
+    }
+
+    @Override
+    public List<CircleInfo> selectSearchCircleInfo(String keyword, Integer type) {
+        return circleInfoMapper.selectSearchCircleInfo(keyword, type);
+    }
+
+    @Override
+    public String searchCircleByKeyWord(String keyword, String userId, Integer page) {
+        List<CircleInfo> circleInfos = circleInfoMapper.selectSearchCircleInfo(keyword, null);
+        return selectAdornCircle(circleInfos, userId, circleInfos.size(), page);
     }
 }
 

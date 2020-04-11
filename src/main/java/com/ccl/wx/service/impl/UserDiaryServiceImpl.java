@@ -361,6 +361,10 @@ public class UserDiaryServiceImpl implements UserDiaryService {
             // 设置用户打卡列表
             joinCircle.setClockinCalendar(finDateList);
         }
+        // 圈子日志 -1
+        CircleInfo circleInfo = new CircleInfo();
+        circleInfo.setDiarySum(0);
+        circleInfoService.updateCircleData(circleInfo, circleId, EnumCommon.UPDATE_SUB.getData());
         // 更新用户数据
         joinCircleService.updateByPrimaryKeySelective(joinCircle);
         return EnumResultStatus.SUCCESS.getValue();

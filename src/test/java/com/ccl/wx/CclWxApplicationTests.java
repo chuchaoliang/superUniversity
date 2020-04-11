@@ -21,6 +21,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -75,10 +77,8 @@ public class CclWxApplicationTests {
     @SneakyThrows
     @Test
     public void test1() {
-        CircleInfo circleInfo = new CircleInfo();
-        circleInfo.setCircleMember(0).setThemeSum(0).setDiarySum(0);
-        int i = circleInfoMapper.updateCircleData(circleInfo, 17L, 1);
-        System.out.println(i);
+        List<CircleInfo> circleInfo = circleInfoMapper.selectSearchCircleInfo("算法", 1);
+        System.out.println(circleInfo);
     }
 
     @SneakyThrows
