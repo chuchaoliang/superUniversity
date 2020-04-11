@@ -179,35 +179,6 @@ public class CircleInfoController {
         return ResponseMsgUtil.success(joinCircleService.selectUserFoundCircle(userId, page));
     }
 
-    ///**
-    // * TODO API
-    // * 查询用户全部的圈子
-    // *
-    // * @param userid 用户id
-    // * @return
-    // */
-    //@GetMapping("/sallcircle")
-    //public String searchAllCircle(@RequestParam(value = "userid", required = false) String userid) {
-    //    if (StringUtils.isEmpty(userid)) {
-    //        return "fail";
-    //    } else {
-    //        ArrayList<Long> circleids = new ArrayList<>();
-    //        ArrayList<CircleInfo> circleInfos = new ArrayList<>();
-    //        List<JoinCircle> circles = joinCircleService.selectAllByUserIdAndUserPermission(userid, 0);
-    //        List<JoinCircle> foundCircles = joinCircleService.selectAllByUserIdAndUserPermission(userid, 2);
-    //        circles.addAll(foundCircles);
-    //        for (JoinCircle circle : circles) {
-    //            circleids.add(circle.getCircleId());
-    //        }
-    //        for (Long circleid : circleids) {
-    //            CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleid);
-    //            circleInfos.add(circleInfo);
-    //        }
-    //        String circlesDTO = circleInfoService.selectAdornCircle(circleInfos);
-    //        return circlesDTO;
-    //    }
-    //}
-
     /**
      * 判断用户是否可以直接进入私密圈子
      *

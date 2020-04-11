@@ -94,15 +94,6 @@ public interface CircleInfoService {
     boolean checkCircleName(String circleName);
 
     /**
-     * 更新圈子人数
-     *
-     * @param circleId 圈子id
-     * @param value    要增加的值人
-     * @return
-     */
-    Integer updateCircleMemberByCircleId(Long circleId, int value);
-
-    /**
      * 圈子装饰方法
      *
      * @param circles 需要装饰的圈子信息
@@ -139,6 +130,25 @@ public interface CircleInfoService {
      * @return
      */
     List<CircleInfo> selectByAll(CircleInfo circleInfo);
+
+    /**
+     * 判断用户是否为圈主
+     *
+     * @param userId   用户id
+     * @param circleId 圈子id
+     * @return true(是) false(不是)
+     */
+    Boolean judgeUserIsCircleMaster(String userId, Long circleId);
+
+    /**
+     * 更新圈子中的数据
+     *
+     * @param circleInfo 圈子信息
+     * @param circleId   圈子id
+     * @param value      要添加的值
+     * @return
+     */
+    int updateCircleData(CircleInfo circleInfo, Long circleId, Integer value);
 }
 
 

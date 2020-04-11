@@ -3,6 +3,7 @@ package com.ccl.wx.entity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -11,7 +12,7 @@ import java.util.Date;
  * @author 褚超亮
  * @date 2020/4/10 15:42
  */
-
+@Accessors(chain = true)
 @ApiModel(value = "com-ccl-wx-entity-CircleInfo")
 @Data
 public class CircleInfo implements Serializable {

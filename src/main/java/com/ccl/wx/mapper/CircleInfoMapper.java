@@ -1,7 +1,10 @@
 package com.ccl.wx.mapper;
 
 import com.ccl.wx.entity.CircleInfo;
-import org.apache.ibatis.annotations.Mapper;import org.apache.ibatis.annotations.Param;import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @author 褚超亮
@@ -71,13 +74,14 @@ public interface CircleInfoMapper {
     List<String> selectAllCircleName();
 
     /**
-     * 更新圈子成员
+     * 更新圈子中数据
      *
-     * @param circleId 圈子id
-     * @param value    需要加或者减的值 + value - value
+     * @param circleInfo 圈子信息
+     * @param circleId   圈子id
+     * @param value      需要增加的值
      * @return
      */
-    int updateCircleMemberByCircleId(@Param("circleId") Long circleId, @Param("value") Integer value);
+    int updateCircleData(@Param("circleInfo") CircleInfo circleInfo, @Param("circleId") Long circleId, @Param("value") Integer value);
 
     /**
      * 悲观锁

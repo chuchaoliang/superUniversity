@@ -313,7 +313,9 @@ public class JoinCircleServiceImpl implements JoinCircleService {
                 !circle.getCircleSet().equals(EnumCircle.AGREE_JOIN.getValue()));
         if (judgeJoin) {
             // 圈子中人数 +1
-            circleInfoService.updateCircleMemberByCircleId(circleId, 1);
+            CircleInfo circleInfo = new CircleInfo();
+            circleInfo.setCircleMember(0);
+            circleInfoService.updateCircleData(circleInfo, circleId, EnumCommon.UPDATE_ADD.getData());
         }
         if (circleUser != null) {
             // 用户曾经加入过圈子，TODO 这里可以设置用户是否可以加入被淘汰的圈子，或者其他的限制
@@ -374,14 +376,24 @@ public class JoinCircleServiceImpl implements JoinCircleService {
 
     @Override
     public String exitCircle(Long circleId, String userId) {
-        // 退出圈子，圈子人数-1
-        circleInfoService.updateCircleMemberByCircleId(circleId, -1);
         JoinCircle circleInfo = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+        if (circleInfo == null || circleInfoService.judgeUserIsCircleMaster(userId, circleId)) {
+            // 是圈主人失败
+            return EnumResultStatus.FAIL.getValue();
+        }
+        // 退出圈子，圈子人数-1
+        if (circleInfo.getUserStatus().equals(EnumUserCircle.USER_NORMAL_STATUS.getValue())) {
+            CircleInfo circleInfoData = new CircleInfo();
+            circleInfoData.setCircleMember(0);
+            circleInfoService.updateCircleData(circleInfoData, circleId, EnumCommon.UPDATE_SUB.getData());
+        }
         circleInfo.setExitTime(new Date());
         circleInfo.setUserStatus(EnumUserCircle.USER_EXIT_STATUS.getValue());
-        System.out.println(circleInfo);
-        joinCircleMapper.updateByPrimaryKeySelective(circleInfo);
-        return "success";
+        int i = joinCircleMapper.updateByPrimaryKeySelective(circleInfo);
+        if (i == 1) {
+            return EnumResultStatus.SUCCESS.getValue();
+        }
+        return EnumResultStatus.FAIL.getValue();
     }
 
     @Override

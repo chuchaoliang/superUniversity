@@ -206,12 +206,6 @@ public class CircleInfoServiceImpl implements CircleInfoService {
     }
 
     @Override
-    public Integer updateCircleMemberByCircleId(Long circleId, int value) {
-        int i = circleInfoMapper.updateCircleMemberByCircleId(circleId, value);
-        return i;
-    }
-
-    @Override
     public String selectAdornCircle(List<CircleInfo> circles, String userId, Integer number, Integer page) {
         Integer pageNumber = EnumPage.PAGE_NUMBER.getValue();
         List<CircleInfo> disposeCircles = circles.stream().sorted(new CircleInfoComparator())
@@ -263,6 +257,20 @@ public class CircleInfoServiceImpl implements CircleInfoService {
     @Override
     public List<CircleInfo> selectByAll(CircleInfo circleInfo) {
         return circleInfoMapper.selectByAll(circleInfo);
+    }
+
+    @Override
+    public Boolean judgeUserIsCircleMaster(String userId, Long circleId) {
+        CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleId);
+        if (circleInfo.getCircleUserid().equals(userId)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int updateCircleData(CircleInfo circleInfo, Long circleId, Integer value) {
+        return circleInfoMapper.updateCircleData(circleInfo, circleId, value);
     }
 }
 

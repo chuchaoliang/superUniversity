@@ -7,10 +7,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.common.DiaryStatusList;
 import com.ccl.wx.dto.CommentDTO;
 import com.ccl.wx.dto.UserDiaryDTO;
-import com.ccl.wx.entity.JoinCircle;
-import com.ccl.wx.entity.TodayContent;
-import com.ccl.wx.entity.UserDiary;
-import com.ccl.wx.entity.UserInfo;
+import com.ccl.wx.entity.*;
 import com.ccl.wx.enums.*;
 import com.ccl.wx.mapper.UserDiaryMapper;
 import com.ccl.wx.pojo.DiaryHideComment;
@@ -68,6 +65,9 @@ public class UserDiaryServiceImpl implements UserDiaryService {
 
     @Resource
     private DefaultProperties defaultProperties;
+
+    @Resource
+    private CircleInfoService circleInfoService;
 
     /**
      * 多少个小时内，用户可以再次增加浏览量
@@ -393,7 +393,7 @@ public class UserDiaryServiceImpl implements UserDiaryService {
             return CclUtil.listToString(dateList, ',') + EnumCommon.STRING_JOINT.getValue();
         }
         dateList.remove(index);
-        if (dateList.size() != 0) {
+        if (!dateList.isEmpty()) {
             return CclUtil.listToString(dateList, ',') + EnumCommon.STRING_JOINT.getValue();
         }
         return "";
@@ -425,8 +425,7 @@ public class UserDiaryServiceImpl implements UserDiaryService {
             disposeDateList.add(date.split(splitStr)[0]);
         }
         // 得到在列表中的位置
-        int index = disposeDateList.indexOf(createTime);
-        return index;
+        return disposeDateList.indexOf(createTime);
     }
 
     @Override
@@ -446,14 +445,14 @@ public class UserDiaryServiceImpl implements UserDiaryService {
                 return EnumResultStatus.FAIL.getValue();
             }
         }
-        JoinCircle circleInfo = joinCircleService.selectByPrimaryKey(circleId, userId);
+        JoinCircle joinCircle = joinCircleService.selectByPrimaryKey(circleId, userId);
         // 若此用户完成全部打卡则提示您已经完成全部打卡主题
-        if (!circleInfo.getUserSignStatus().equals(EnumUserClockIn.USER_ALL_CLOCK_IN_SUCCESS.getValue())) {
+        if (!joinCircle.getUserSignStatus().equals(EnumUserClockIn.USER_ALL_CLOCK_IN_SUCCESS.getValue())) {
             List<String> themeList = new ArrayList<>();
             // 判断此用户的打卡主题是否为空
-            if (!StringUtils.isEmpty(circleInfo.getThemeId())) {
+            if (!StringUtils.isEmpty(joinCircle.getThemeId())) {
                 // 获取全部打卡列表
-                themeList = new ArrayList<>(Arrays.asList(circleInfo.getThemeId().split(",")));
+                themeList = new ArrayList<>(Arrays.asList(joinCircle.getThemeId().split(",")));
             }
             // 添加主题到主题列表中（理论上无需判断此种情况不会出现！）
             if (!themeList.contains(String.valueOf(userDiary.getThemeId()))) {
@@ -463,34 +462,34 @@ public class UserDiaryServiceImpl implements UserDiaryService {
                 return EnumResultStatus.FAIL.getValue();
             }
             // 设置主题id
-            circleInfo.setThemeId(CclUtil.listToString(themeList, ','));
+            joinCircle.setThemeId(CclUtil.listToString(themeList, ','));
             // 判断此主题用户是否发表过日记
             int countDiary = userDiaryMapper.countByUserIdAndCircleIdAndThemeId(userId, circleId, themeId);
             if (countDiary == 0) {
                 // 此日记对应的主题是用户今天第一次发表，活跃度+5
-                circleInfo.setUserVitality(circleInfo.getUserVitality() + EnumUserVitality.USER_NO_CONTINUOUS_CLOCK_IN.getValue());
+                joinCircle.setUserVitality(joinCircle.getUserVitality() + EnumUserVitality.USER_NO_CONTINUOUS_CLOCK_IN.getValue());
             }
             // 获取圈子中全部的主题总数 + 1 因为每个圈子中都存在一个无主题的情况
             int themes = todayContentService.countByCircleIdAndContentStatus(circleId, EnumThemeStatus.DELETE_STATUS.getValue()) + 1;
             // 设置打卡主题为1
-            circleInfo.setUserSignStatus(EnumUserClockIn.USER_CLOCK_IN_SUCCESS.getValue());
+            joinCircle.setUserSignStatus(EnumUserClockIn.USER_CLOCK_IN_SUCCESS.getValue());
             // 判断用户是否完成全部主题的打卡
             if (themeList.size() == themes || themes == 0) {
                 // 此用户已经完成全部打卡
-                circleInfo.setUserSignStatus(EnumUserClockIn.USER_ALL_CLOCK_IN_SUCCESS.getValue());
+                joinCircle.setUserSignStatus(EnumUserClockIn.USER_ALL_CLOCK_IN_SUCCESS.getValue());
             }
             // 格式化今天的日期
             String signInTime = DateUtil.format(new Date(), DatePattern.NORM_DATE_PATTERN);
             // 判断此用户今天第一次打卡 主题列表中为1，并且此日记不是用户删除之后再打卡的
             if (themeList.size() == 1) {
                 // 获取用户第一次打卡后是否被删除，再次重新打卡
-                circleInfo.setUserSigninDay(circleInfo.getUserSigninDay() + 1);
+                joinCircle.setUserSigninDay(joinCircle.getUserSigninDay() + 1);
                 // 用户连续打卡天数+1
-                circleInfo.setUserSignin(circleInfo.getUserSignin() + 1);
+                joinCircle.setUserSignin(joinCircle.getUserSignin() + 1);
                 // 判断是否为连续打卡
-                boolean judgeClockIn = circleInfo.getUserSignin() % EnumUserVitality.INTEGRATION_PERIOD.getValue() == 0;
+                boolean judgeClockIn = joinCircle.getUserSignin() % EnumUserVitality.INTEGRATION_PERIOD.getValue() == 0;
                 // 获取用户打卡日历
-                String clockinCalendar = circleInfo.getClockinCalendar();
+                String clockinCalendar = joinCircle.getClockinCalendar();
                 // 更新用户连续打卡列表信息
                 StringBuilder sb = new StringBuilder();
                 if (judgeClockIn) {
@@ -504,7 +503,7 @@ public class UserDiaryServiceImpl implements UserDiaryService {
                             .append(EnumCommon.STRING_JOINT.getValue());
                 }
                 // 设置用户打卡日期列表
-                circleInfo.setClockinCalendar(sb.toString());
+                joinCircle.setClockinCalendar(sb.toString());
                 // 判断是否为今天第一次打卡
                 if (countDiary == 0) {
                     // 得到用户今天打卡的日记数目
@@ -513,18 +512,22 @@ public class UserDiaryServiceImpl implements UserDiaryService {
                         // 判断是否为连续打卡
                         if (judgeClockIn) {
                             // 获取用户的活跃度
-                            Long userVitality = circleInfo.getUserVitality();
+                            Long userVitality = joinCircle.getUserVitality();
                             // 是连续第7天打卡，活跃度额外增加
-                            circleInfo.setUserVitality(userVitality + EnumUserVitality.USER_CONTINUOUS_CLOCK_IN.getValue());
+                            joinCircle.setUserVitality(userVitality + EnumUserVitality.USER_CONTINUOUS_CLOCK_IN.getValue());
                             continuous = true;
                         }
                     }
                 }
             }
             // 设置用户最后打卡时间
-            circleInfo.setUserSignTime(new Date());
+            joinCircle.setUserSignTime(new Date());
+            // 日志总数 +1
+            CircleInfo circleInfo = new CircleInfo();
+            circleInfo.setDiarySum(0);
+            circleInfoService.updateCircleData(circleInfo, circleId, EnumCommon.UPDATE_ADD.getData());
             // 更新用户加入圈子信息
-            joinCircleService.updateByPrimaryKeySelective(circleInfo);
+            joinCircleService.updateByPrimaryKeySelective(joinCircle);
             // 将日志数据保存到数据库中
             userDiaryMapper.insertSelective(userDiary);
             List<Object> diaryList = new ArrayList<>();

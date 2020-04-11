@@ -2,6 +2,7 @@ package com.ccl.wx.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.ccl.wx.annotation.ParamCheck;
+import com.ccl.wx.common.EnumResultCode;
 import com.ccl.wx.common.Result;
 import com.ccl.wx.enums.EnumPage;
 import com.ccl.wx.enums.EnumResultStatus;
@@ -188,10 +189,13 @@ public class JoinCircleController {
      * @return
      */
     @GetMapping("/exit")
-    public String exitCircle(@RequestParam(value = "token", required = false) Long circleId,
-                             @RequestParam(value = "userId", required = false) String userId) {
+    public Result<String> exitCircle(@RequestParam(value = "circleId", required = false) Long circleId,
+                                     @RequestHeader(value = "token", required = false) String userId) {
         String result = joinCircleService.exitCircle(circleId, userId);
-        return result;
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
     }
 }
 
