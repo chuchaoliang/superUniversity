@@ -4,7 +4,7 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.ccl.wx.common.DiaryStatusList;
+import com.ccl.wx.common.list.DiaryStatusList;
 import com.ccl.wx.dto.CommentDTO;
 import com.ccl.wx.dto.UserDiaryDTO;
 import com.ccl.wx.entity.*;

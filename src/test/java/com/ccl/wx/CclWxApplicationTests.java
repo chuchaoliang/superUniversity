@@ -1,6 +1,6 @@
 package com.ccl.wx;
 
-import com.ccl.wx.entity.CircleInfo;
+import com.ccl.wx.common.list.UserPermissionList;
 import com.ccl.wx.mapper.*;
 import com.ccl.wx.properties.DefaultProperties;
 import com.ccl.wx.properties.FileUploadProperties;
@@ -12,19 +12,17 @@ import com.ccl.wx.service.UserDiaryService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Slf4j
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 @SpringBootTest
 public class CclWxApplicationTests {
 
@@ -77,11 +75,10 @@ public class CclWxApplicationTests {
     @SneakyThrows
     @Test
     public void test1() {
-        List<CircleInfo> circleInfo = circleInfoMapper.selectSearchCircleInfo("算法", 1);
-        System.out.println(circleInfo);
+        List<Integer> integers = UserPermissionList.circleAdmin();
+        System.out.println(integers.toString());
     }
 
-    @SneakyThrows
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Test
     public void test() throws Exception {

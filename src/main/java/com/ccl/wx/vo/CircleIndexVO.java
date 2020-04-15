@@ -62,6 +62,11 @@ public class CircleIndexVO implements Serializable {
     private Boolean circleNotice;
 
     /**
+     * 是否需要申请才能加入圈子
+     */
+    private Boolean applyJoin;
+
+    /**
      * 圈子通知内容
      */
     private String circleNoticeContent;

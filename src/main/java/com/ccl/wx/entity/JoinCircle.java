@@ -2,13 +2,14 @@ package com.ccl.wx.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * @author 褚超亮
- * @date 2020/3/7 17:19
+ * @date 2020/4/11 20:52
  */
 
 @ApiModel(value = "com-ccl-wx-entity-JoinCircle")
@@ -33,9 +34,9 @@ public class JoinCircle implements Serializable {
     private Date joinTime;
 
     /**
-     * 用户状态（0正常 1待加入圈子需要圈主同意 2淘汰 3加入圈子被拒绝）
+     * 用户状态（0正常 1待加入圈子需要圈主同意 2淘汰 3加入圈子被拒绝 4退出）
      */
-    @ApiModelProperty(value = "用户状态（0正常 1待加入圈子需要圈主同意 2淘汰 3加入圈子被拒绝）")
+    @ApiModelProperty(value = "用户状态（0正常 1待加入圈子需要圈主同意 2淘汰 3加入圈子被拒绝 4退出）")
     private Integer userStatus;
 
     /**
@@ -69,9 +70,9 @@ public class JoinCircle implements Serializable {
     private Date userSignTime;
 
     /**
-     * 0未签到 1签到成功
+     * 0未签到 1签到成功 2打卡全部主题
      */
-    @ApiModelProperty(value = "0未签到 1签到成功")
+    @ApiModelProperty(value = "0未签到 1签到成功 2打卡全部主题")
     private Integer userSignStatus;
 
     /**
@@ -109,6 +110,12 @@ public class JoinCircle implements Serializable {
      */
     @ApiModelProperty(value = "打卡的主题id")
     private String themeId;
+
+    /**
+     * 申请理由
+     */
+    @ApiModelProperty(value = "申请理由")
+    private String applyReason;
 
     private static final long serialVersionUID = 1L;
 }

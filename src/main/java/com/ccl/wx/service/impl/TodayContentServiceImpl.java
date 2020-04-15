@@ -4,7 +4,8 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.ccl.wx.common.DiaryStatusList;
+import com.ccl.wx.common.list.DiaryStatusList;
+import com.ccl.wx.common.list.UserPermissionList;
 import com.ccl.wx.dto.CircleTodayContentDTO;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.entity.JoinCircle;
@@ -220,7 +221,6 @@ public class TodayContentServiceImpl implements TodayContentService {
 
     @Override
     public void addCircleThemeBrowse(String userId, Long themeId) {
-        // 增加浏览量 TODO
         TodayContent todayContent = todayContentMapper.selectByPrimaryKey(themeId);
         boolean flag = false;
         // 判断内容用户是否为空
@@ -319,12 +319,8 @@ public class TodayContentServiceImpl implements TodayContentService {
         themeList.add(circleThemeVOS);
         themeList.add(nextPage);
         if (!signIn) {
-            // 获取圈子的管理人员信息
-            List<Integer> permissionList = new ArrayList<>();
-            permissionList.add(EnumUserPermission.ADMIN_USER.getValue());
-            permissionList.add(EnumUserPermission.MASTER_USER.getValue());
             // 判断是否为圈子管理人员（管理员、圈主）
-            themeList.add(joinCircleService.judgeUserIsCircleManage(circleId.intValue(), permissionList, userId));
+            themeList.add(joinCircleService.judgeUserIsCircleManage(circleId.intValue(), UserPermissionList.circleAdmin(), userId));
         }
         return JSON.toJSONStringWithDateFormat(themeList, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
     }

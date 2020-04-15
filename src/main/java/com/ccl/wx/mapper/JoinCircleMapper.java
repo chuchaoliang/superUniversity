@@ -2,14 +2,11 @@ package com.ccl.wx.mapper;
 
 import com.ccl.wx.entity.JoinCircle;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-import java.util.Map;
+import org.apache.ibatis.annotations.Param;import java.util.List;import java.util.Map;
 
 /**
  * @author 褚超亮
- * @date 2020/3/7 17:19
+ * @date 2020/4/11 20:52
  */
 
 @Mapper
@@ -50,15 +47,6 @@ public interface JoinCircleMapper {
      * @return
      */
     List<String> selectUserIdByCircleId(@Param("circleId") Long circleId);
-
-    /**
-     * 根据圈子和用户状态查询圈子数据
-     *
-     * @param circleId   圈子id
-     * @param userStatus 用户状态
-     * @return
-     */
-    List<JoinCircle> selectAllByCircleIdAndUserStatus(@Param("circleId") Long circleId, @Param("userStatus") Integer userStatus);
 
     /**
      * 更新圈子状态
@@ -115,10 +103,6 @@ public interface JoinCircleMapper {
      * @return
      */
     List<JoinCircle> selectAllByUserIdAndUserPermission(@Param("userId") String userId, @Param("userPermission") List<Integer> userPermission);
-
-    /**
-     * TODO 以下6个查询方法待重构(重复)!!!!!!
-     */
 
     /**
      * 用户活跃度排行榜

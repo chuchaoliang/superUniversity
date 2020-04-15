@@ -9,15 +9,12 @@ import com.ccl.wx.common.Result;
 import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.mapper.JoinCircleMapper;
-import com.ccl.wx.service.CircleService;
 import com.ccl.wx.service.UserInfoService;
 import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -38,9 +35,6 @@ public class UserInfoController {
 
     @Resource
     private JoinCircleMapper joinCircleMapper;
-
-    @Resource
-    private CircleService circleService;
 
     @Resource
     private UserInfoService userInfoService;
@@ -76,29 +70,6 @@ public class UserInfoController {
     public String getUserIntegral(@RequestParam(value = "userid", required = false) String userid) {
         int integral = joinCircleMapper.sumUserVitalityByUserid(userid);
         return String.valueOf(integral);
-    }
-
-
-    /**
-     * 获取用户在圈子中的信息
-     *
-     * @param userid   用户id
-     * @param circleid 圈子id
-     * @return
-     */
-    @ApiOperation(value = "获取用户加入圈子的信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "userid", value = "用户id", dataType = "String"),
-            @ApiImplicitParam(name = "circleid", value = "圈子id", dataType = "Long", example = "5")
-    })
-    @GetMapping("/getuserincircleinfo")
-    public String test(@RequestParam(value = "userid", required = false) String userid,
-                       @RequestParam(value = "circleid", required = false) Long circleid) {
-        if (StringUtils.isEmpty(userid) || StringUtils.isEmpty(circleid)) {
-            return "fail";
-        } else {
-            return circleService.getUserInCircleInfo(userid, circleid);
-        }
     }
 
     /**

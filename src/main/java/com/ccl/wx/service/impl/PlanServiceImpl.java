@@ -70,7 +70,6 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     public boolean judgePlanTimeClash(String starttime, String endtime, String userid, String titleTime) {
-        // TODO 过滤掉状态为 删除状态 的计划 未添加（未启用）
         SimpleDateFormat format = new SimpleDateFormat("HH:mm");
         List<Plan> plans = planMapper.findAllByUseridAndTitleTime(userid, titleTime);
         try {
@@ -94,7 +93,6 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     public Long judgePlanTimeClashRetuenId(String starttime, String endtime, String userid, String titleTime) {
-        // TODO 过滤掉状态为 删除状态 的计划 未添加（未启用）
         SimpleDateFormat format = new SimpleDateFormat("HH:mm");
         List<Plan> plans = planMapper.findAllByUseridAndTitleTime(userid, titleTime);
         try {

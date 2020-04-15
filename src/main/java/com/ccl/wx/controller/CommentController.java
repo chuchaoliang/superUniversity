@@ -66,7 +66,6 @@ public class CommentController {
 
     /**
      * 获取某篇日记的评论
-     * TODO
      *
      * @param diaryId 日记id
      * @return

@@ -44,7 +44,6 @@ public class CircleThemeController {
     private TodayContentService todayContentService;
 
     /**
-     * TODO
      * 根据每日内容id获取今天的内容
      *
      * @param themeId 每日内容id
@@ -127,7 +126,6 @@ public class CircleThemeController {
     }
 
     /**
-     * TODO
      * 删除每日的内容，将内容状态设置为2
      *
      * @param contentId 删除内容的id
@@ -147,7 +145,6 @@ public class CircleThemeController {
     }
 
     /**
-     * TODO
      * 保存圈子每日内容
      * 1. 设置文本内容可以为空、设置创建时间、设置圈子id、设置状态为0
      * 2. 将这个圈子以前为0的那个状态设置为1
@@ -208,7 +205,6 @@ public class CircleThemeController {
     }
 
     /**
-     * TODO
      * 上传每日内容的图片
      *
      * @param image  图片

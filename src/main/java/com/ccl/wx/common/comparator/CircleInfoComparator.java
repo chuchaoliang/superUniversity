@@ -1,4 +1,4 @@
-package com.ccl.wx.common;
+package com.ccl.wx.common.comparator;
 
 import com.ccl.wx.entity.CircleInfo;
 

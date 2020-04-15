@@ -62,7 +62,7 @@ public class UserDiaryController {
 
     /**
      * 根据日志的id查询日志的信息
-     * TODO 暂时不使用
+     * @deprecated 不使用
      *
      * @param diaryId 日志id
      * @return （与此日志相关的全部评论、点赞、点评信息）

@@ -1,4 +1,4 @@
-package com.ccl.wx.common;
+package com.ccl.wx.common.list;
 
 import com.ccl.wx.enums.EnumUserDiary;
 

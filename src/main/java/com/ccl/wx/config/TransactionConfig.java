@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 
 /**
  * @Author 王震
- * @Description //TODO 指定事务管理器
+ * @Description
  * @Date 11:42 2019/1/26
  * @Param 
  * @return 

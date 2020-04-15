@@ -5,7 +5,8 @@ import cn.hutool.core.lang.PatternPool;
 import cn.hutool.core.lang.Validator;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.ccl.wx.common.CircleInfoComparator;
+import com.ccl.wx.common.comparator.CircleInfoComparator;
+import com.ccl.wx.common.list.UserPermissionList;
 import com.ccl.wx.dto.CircleInfoDTO;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.enums.*;
@@ -91,16 +92,15 @@ public class CircleInfoServiceImpl implements CircleInfoService {
         // 判断用户是否加入圈子
         Boolean userJoin = joinCircleService.judgeUserInCircle(circleId, userId);
         // 判断用户是否为圈或者圈子管理员
-        ArrayList<Integer> userPermission = new ArrayList<>();
-        userPermission.add(EnumUserPermission.ADMIN_USER.getValue());
-        userPermission.add(EnumUserPermission.MASTER_USER.getValue());
-        Boolean userMaster = joinCircleService.judgeUserIsCircleManage(circleId, userPermission, userId);
+        Boolean userMaster = joinCircleService.judgeUserIsCircleManage(circleId, UserPermissionList.circleAdmin(), userId);
         // 获取圈子中的总人数
         Integer sumMember = joinCircleService.countByCircleIdAndUserStatus(Long.valueOf(circleId), EnumUserCircle.USER_NORMAL_STATUS.getValue());
         // 设置圈子中总人数
         circleInfoDTO.setCircleMember(sumMember);
         // 设置用户在此圈子中的状态
         circleInfoDTO.setUserJoin(userJoin);
+        // 设置圈子是否可以直接加入
+        circleInfoDTO.setApplyJoin(circleInfo.getCircleSet().equals(EnumCircle.AGREE_JOIN.getValue()));
         // 设置是否为圈主
         circleInfoDTO.setUserMaster(userMaster);
         // 设置圈子日志总数
@@ -153,7 +153,7 @@ public class CircleInfoServiceImpl implements CircleInfoService {
             int insert = circleInfoMapper.insertSelective(circleInfo);
             if (insert == 1) {
                 // 加入圈子
-                String result = joinCircleService.joinCircle(circleInfo.getCircleId(), circleInfo.getCircleUserid());
+                String result = joinCircleService.joinCircle(circleInfo.getCircleId(), circleInfo.getCircleUserid(), null);
                 if (EnumResultStatus.FAIL.getValue().equals(result)) {
                     return EnumResultStatus.FAIL.getValue();
                 } else {
@@ -195,12 +195,8 @@ public class CircleInfoServiceImpl implements CircleInfoService {
             circleInfoVO.setPrivacy(circle.getCircleSet().equals(EnumCircle.PASSWORD_JOIN.getValue()));
             // 设置用户是否加入圈子
             circleInfoVO.setJoin(joinCircleService.judgeUserInCircle(circle.getCircleId().intValue(), userId));
-            // 设置用户的圈子权限
-            ArrayList<Integer> userPermission = new ArrayList<>();
-            userPermission.add(EnumUserPermission.ADMIN_USER.getValue());
-            userPermission.add(EnumUserPermission.MASTER_USER.getValue());
             // 设置用户是否为圈子管理人员
-            circleInfoVO.setManage(joinCircleService.judgeUserIsCircleManage(circle.getCircleId().intValue(), userPermission, userId));
+            circleInfoVO.setManage(joinCircleService.judgeUserIsCircleManage(circle.getCircleId().intValue(), UserPermissionList.circleAdmin(), userId));
             circleInfoVOS.add(circleInfoVO);
         }
         // 判断是否存在下一页
