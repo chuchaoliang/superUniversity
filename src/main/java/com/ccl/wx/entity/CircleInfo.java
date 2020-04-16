@@ -3,18 +3,16 @@ package com.ccl.wx.entity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author 褚超亮
- * @date 2020/3/6 15:36
+ * @date 2020/4/10 15:42
  */
-
+@Accessors(chain = true)
 @ApiModel(value = "com-ccl-wx-entity-CircleInfo")
 @Data
 public class CircleInfo implements Serializable {
@@ -28,8 +26,6 @@ public class CircleInfo implements Serializable {
      * 圈子名称
      */
     @ApiModelProperty(value = "圈子名称")
-    @Size(max = 20, message = "圈子名称不能超过20个字符")
-    @NotBlank(message = "圈子名称不能为空")
     private String circleName;
 
     /**
@@ -63,9 +59,9 @@ public class CircleInfo implements Serializable {
     private Date circleUpdatetime;
 
     /**
-     * 圈子最新主题id
+     * 圈子公告
      */
-    @ApiModelProperty(value = "圈子最新主题id")
+    @ApiModelProperty(value = "圈子公告")
     private String circleTask;
 
     /**
@@ -99,10 +95,9 @@ public class CircleInfo implements Serializable {
     private Integer circleSign;
 
     /**
-     * 圈子所在位置（1技能 2考研 3生活 4阅读 5健身 6学校 7考试 8科研 9竞赛 10更多 ）
+     * 圈子所在位置（0开发者圈子 1 技能 2 考研 3生活 4阅读 5健身 6学校 7考试 8科研 9竞赛 10更多 ）
      */
-    @ApiModelProperty(value = "圈子所在位置（1技能 2考研 3生活 4阅读 5健身 6学校 7考试 8科研 9竞赛 10更多 ）")
-    @NotNull(message = "圈子所在位置不能为空!")
+    @ApiModelProperty(value = "圈子所在位置（0开发者圈子 1 技能 2 考研 3生活 4阅读 5健身 6学校 7考试 8科研 9竞赛 10更多 ）")
     private Integer circleLocation;
 
     /**
@@ -121,7 +116,6 @@ public class CircleInfo implements Serializable {
      * 圈子标签
      */
     @ApiModelProperty(value = "圈子标签")
-    @NotBlank(message = "圈子标签不能为空!")
     private String circleLabel;
 
     /**
@@ -141,6 +135,30 @@ public class CircleInfo implements Serializable {
      */
     @ApiModelProperty(value = "主题总数")
     private Integer themeSum;
+
+    /**
+     * 日志总数
+     */
+    @ApiModelProperty(value = "日志总数")
+    private Integer diarySum;
+
+    /**
+     * 乐观锁
+     */
+    @ApiModelProperty(value = "乐观锁")
+    private Integer version;
+
+    /**
+     * 圈主音频介绍
+     */
+    @ApiModelProperty(value = "圈主音频介绍")
+    private String userVoice;
+
+    /**
+     * 圈子音频介绍
+     */
+    @ApiModelProperty(value = "圈子音频介绍")
+    private String circleVoice;
 
     private static final long serialVersionUID = 1L;
 }

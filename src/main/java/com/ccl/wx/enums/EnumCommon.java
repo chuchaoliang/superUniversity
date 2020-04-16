@@ -13,20 +13,30 @@ public enum EnumCommon {
     /**
      * 更新时的加值
      */
-    UPDATE_ADD("1"),
+    UPDATE_ADD(1),
 
     /**
      * 更新时候的减值
      */
-    UPDATE_SUB("-1");
+    UPDATE_SUB(-1);
 
     private String value;
+
+    private int data;
 
     EnumCommon(String value) {
         this.value = value;
     }
 
+    EnumCommon(int data) {
+        this.data = data;
+    }
+
     public String getValue() {
         return value;
+    }
+
+    public int getData() {
+        return data;
     }
 }

@@ -2,6 +2,7 @@ package com.ccl.wx.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.ccl.wx.annotation.ParamCheck;
+import com.ccl.wx.common.EnumResultCode;
 import com.ccl.wx.common.Result;
 import com.ccl.wx.enums.EnumPage;
 import com.ccl.wx.enums.EnumResultStatus;
@@ -12,6 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.xml.ws.Response;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -143,6 +145,107 @@ public class JoinCircleController {
     }
 
     /**
+     * 获取圈子正常用户信息
+     *
+     * @param circleId 圈子id
+     * @param page     页数
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/menu/manager/normal")
+    public Result<String> getCircleNormalUser(@RequestParam(value = "circleId", required = false) Long circleId,
+                                              @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
+        String result = joinCircleService.getCircleNormalUser(circleId, page);
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
+     * 淘汰圈子中用户
+     *
+     * @param circleId  圈子id
+     * @param outUserId 被淘汰用户人id
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/menu/manager/normal/out")
+    public Result<String> outCircleUser(@RequestParam(value = "circleId", required = false) Long circleId,
+                                        @RequestParam(value = "userId", required = false) String outUserId,
+                                        @RequestHeader(value = "token", required = false) String userId) {
+        String result = joinCircleService.outCircleUser(circleId, outUserId, userId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        } else if (EnumResultStatus.UNKNOWN.getValue().equals(result)) {
+            // 无权限操作
+            return ResponseMsgUtil.fail(EnumResultCode.UNAUTHORIZED);
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    /**
+     * 获取圈子中被拒绝的成员信息
+     *
+     * @param circleId 圈子id
+     * @param page     页数
+     * @return
+     */
+    @GetMapping("/menu/manager/refuse")
+    public Result<String> getCircleRefuseUser(@RequestParam(value = "circleId", required = false) Long circleId,
+                                              @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
+        String result = joinCircleService.getCircleRefuseUser(circleId, page);
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
+     * 挑选圈子待审核成员
+     *
+     * @param circleId 圈子id
+     * @param page     页数
+     * @return
+     */
+    @GetMapping("/menu/manager/audit")
+    public Result<String> getCircleAuditUser(@RequestParam(value = "circleId", required = false) Long circleId,
+                                             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
+        String result = joinCircleService.getCircleAuditUser(circleId, page);
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
+     * 同意用户加入圈子
+     *
+     * @param circleId    圈子id
+     * @param applyUserId 申请用户id
+     * @return
+     */
+    @GetMapping("/menu/manager/audit/agree")
+    public Result<String> agreeJoinCircle(@RequestParam(value = "circleId", required = false) Long circleId,
+                                          @RequestParam(value = "userId", required = false) String applyUserId) {
+        String result = joinCircleService.agreeJoinApply(applyUserId, circleId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    /**
+     * 拒绝用户加入圈子
+     *
+     * @param circleId     圈子id
+     * @param applyUserId  申请用户id
+     * @param refuseReason 拒绝理由
+     * @return
+     */
+    @GetMapping("/menu/manager/audit/refuse")
+    public Result<String> refuseJoinCircle(@ParamCheck @RequestParam(value = "circleId", required = false) Long circleId,
+                                           @ParamCheck @RequestParam(value = "userId", required = false) String applyUserId,
+                                           @RequestParam(value = "reason", required = false) String refuseReason) {
+        String result = joinCircleService.refuseJoinCircle(circleId, applyUserId, refuseReason);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    /**
      * 加入圈子
      *
      * @param circleId 圈子id
@@ -152,8 +255,9 @@ public class JoinCircleController {
     @ParamCheck
     @GetMapping("/join")
     public Result<String> joinCircle(@RequestParam(value = "circleId", required = false) Long circleId,
+                                     @RequestParam(value = "reason", required = false) String applyReason,
                                      @RequestHeader(value = "token", required = false) String userId) {
-        String result = joinCircleService.joinCircle(circleId, userId);
+        String result = joinCircleService.joinCircle(circleId, userId, applyReason);
         if (EnumResultStatus.FAIL.getValue().equals(result)) {
             ResponseMsgUtil.fail("加入圈子失败！");
         }
@@ -178,6 +282,23 @@ public class JoinCircleController {
             return ResponseMsgUtil.fail("加入失败！密码错误！");
         }
         return ResponseMsgUtil.success(result);
+    }
+
+    /**
+     * 退出圈子
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    @GetMapping("/exit")
+    public Result<String> exitCircle(@RequestParam(value = "circleId", required = false) Long circleId,
+                                     @RequestHeader(value = "token", required = false) String userId) {
+        String result = joinCircleService.exitCircle(circleId, userId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
     }
 }
 

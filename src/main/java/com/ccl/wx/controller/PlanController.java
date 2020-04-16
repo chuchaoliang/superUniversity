@@ -93,7 +93,6 @@ public class PlanController {
     public String getUserPlans(@RequestParam(value = "userid", required = false) String userid,
                                @RequestParam(value = "date", required = false) String time,
                                @RequestParam(value = "loginstatus", required = false) String loginstatus) {
-        //TODO 需要重构，仅仅查询自定义计划，后面需要加上圈子的。。
         System.out.println(loginstatus);
         if (StringUtils.isEmpty(loginstatus)) {
             return "fail";
@@ -183,7 +182,6 @@ public class PlanController {
      * -2.时间有冲突 返回 @+冲突的事件名称
      * -3.前端传送来的有的数据为空，返回 fail
      * -4.正常更新数据，返回success
-     * TODO 可重构，与插入数据代码重复！！！
      *
      * @return
      */

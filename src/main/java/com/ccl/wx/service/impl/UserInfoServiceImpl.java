@@ -164,7 +164,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         JSONObject strJson = JSONObject.parseObject(sourceStr);
         String sessionKey = strJson.getString("session_key");
         String openid = strJson.getString("openid");
-        // TODO 获取session_key的hash值 可以重构用更好的的方式处理。。。
         if (StringUtils.isEmpty(sessionKey) || StringUtils.isEmpty(openid)) {
             return EnumResultStatus.FAIL.getValue();
         }

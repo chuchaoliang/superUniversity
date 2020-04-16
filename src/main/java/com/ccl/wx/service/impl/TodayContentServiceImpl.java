@@ -4,7 +4,8 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.ccl.wx.common.DiaryStatusList;
+import com.ccl.wx.common.list.DiaryStatusList;
+import com.ccl.wx.common.list.UserPermissionList;
 import com.ccl.wx.dto.CircleTodayContentDTO;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.entity.JoinCircle;
@@ -153,7 +154,9 @@ public class TodayContentServiceImpl implements TodayContentService {
             todayContent.setHeadImage(imagePath);
         }
         // 更新圈子主题总数 + 1
-        circleInfoService.updateThemeNumberByCircleId(todayContent.getCircleId(), Integer.parseInt(EnumCommon.UPDATE_ADD.getValue()));
+        CircleInfo circleInfo = new CircleInfo();
+        circleInfo.setThemeSum(0);
+        circleInfoService.updateCircleData(circleInfo, circleId, EnumCommon.UPDATE_ADD.getData());
         // 插入数据
         int i = todayContentMapper.insertSelective(todayContent);
         if (i == 1) {
@@ -174,7 +177,9 @@ public class TodayContentServiceImpl implements TodayContentService {
         CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
         if (circleInfo.getThemeSum() > 1) {
             // 圈子主题-1
-            circleInfoService.updateThemeNumberByCircleId(circleId, Integer.parseInt(EnumCommon.UPDATE_SUB.getValue()));
+            CircleInfo circleInfoData = new CircleInfo();
+            circleInfoData.setThemeSum(0);
+            circleInfoService.updateCircleData(circleInfoData, circleId, EnumCommon.UPDATE_SUB.getData());
         }
         // 设置删除主题后，更新全部主题状态为主题删除状态并且仅仅自己可见
         userDiaryService.updateDiaryStatusByThemeId(themeId.intValue(), EnumUserDiary.USER_DIARY_THEME_DELETE.getValue());
@@ -216,7 +221,6 @@ public class TodayContentServiceImpl implements TodayContentService {
 
     @Override
     public void addCircleThemeBrowse(String userId, Long themeId) {
-        // 增加浏览量 TODO
         TodayContent todayContent = todayContentMapper.selectByPrimaryKey(themeId);
         boolean flag = false;
         // 判断内容用户是否为空
@@ -315,12 +319,8 @@ public class TodayContentServiceImpl implements TodayContentService {
         themeList.add(circleThemeVOS);
         themeList.add(nextPage);
         if (!signIn) {
-            // 获取圈子的管理人员信息
-            List<Integer> permissionList = new ArrayList<>();
-            permissionList.add(EnumUserPermission.ADMIN_USER.getValue());
-            permissionList.add(EnumUserPermission.MASTER_USER.getValue());
             // 判断是否为圈子管理人员（管理员、圈主）
-            themeList.add(joinCircleService.judgeUserIsCircleManage(circleId.intValue(), permissionList, userId));
+            themeList.add(joinCircleService.judgeUserIsCircleManage(circleId.intValue(), UserPermissionList.circleAdmin(), userId));
         }
         return JSON.toJSONStringWithDateFormat(themeList, DatePattern.CHINESE_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
     }

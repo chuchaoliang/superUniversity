@@ -34,7 +34,7 @@ public interface PlanService {
 
     /**
      * 检测时间段是否冲突，没有冲突返回0L，否则返回冲突的id
-     * TODO 返回的可以是，所有冲突的名称，考虑！！！。。。。0.0.1
+     *
      * @param starttime 开始时间
      * @param endtime   结束时间
      * @param userid    用于openid
@@ -46,6 +46,7 @@ public interface PlanService {
     /**
      * 检测时间段是否冲突（开始时间大于结束时间）
      * 冲突返回 true 否则false
+     *
      * @param starttime 开始时间
      * @param endtime   结束时间
      * @return
@@ -55,14 +56,16 @@ public interface PlanService {
     /**
      * 检测日期时间段是否冲突(开始日期大于结束日期)
      * 冲突返回true 否则false
+     *
      * @param startdate 开始日期
-     * @param enddate 结束日期
+     * @param enddate   结束日期
      * @return
      */
     boolean judgePlanDateClash(String startdate, String enddate);
 
     /**
      * 将需要判断的属性值，加入列表中
+     *
      * @param plan 需要检测侧的计划
      * @return
      */

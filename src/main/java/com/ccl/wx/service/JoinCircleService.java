@@ -48,15 +48,6 @@ public interface JoinCircleService {
     int updateByCircleIdAndUserSignStatus(Long circleId, Integer userSignStatus);
 
     /**
-     * 更新圈子全部成员打卡状态
-     *
-     * @param circleId     圈子id
-     * @param signInStatus 打卡状态
-     * @return
-     */
-    int updateCircleSignInStatus(Long circleId, Integer signInStatus);
-
-    /**
      * 根据圈子用户状态获取总人数
      *
      * @param circleId
@@ -189,7 +180,7 @@ public interface JoinCircleService {
      * @param circleId       圈子id
      * @param userPermission 用户权限
      * @param userId         用户id
-     * @return
+     * @return true是 false不是
      */
     Boolean judgeUserIsCircleManage(Integer circleId, List<Integer> userPermission, String userId);
 
@@ -198,18 +189,9 @@ public interface JoinCircleService {
      *
      * @param circleId 圈子id
      * @param userId   用户id
-     * @return
+     * @return true(是) false(不是)
      */
     Boolean judgeUserInCircle(Integer circleId, String userId);
-
-    /**
-     * 查找用户加入的圈子
-     *
-     * @param userId         用户id
-     * @param userPermission 圈子状态
-     * @return
-     */
-    List<JoinCircle> selectAllByUserIdAndUserPermission(String userId, int userPermission);
 
     /**
      * 根据圈子id和用户状态得到用户圈子总活跃度
@@ -234,11 +216,12 @@ public interface JoinCircleService {
     /**
      * 加入圈子
      *
-     * @param circleId 圈子id
-     * @param userId   用户id
+     * @param circleId    圈子id
+     * @param userId      用户id
+     * @param applyReason 申请理由
      * @return
      */
-    String joinCircle(Long circleId, String userId);
+    String joinCircle(Long circleId, String userId, String applyReason);
 
     /**
      * 根据密码加入圈子
@@ -249,4 +232,108 @@ public interface JoinCircleService {
      * @return
      */
     String joinCircleByPassword(Long circleId, String userId, String password);
+
+    /**
+     * 退出圈子
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    String exitCircle(Long circleId, String userId);
+
+    /**
+     * 我加入的圈子
+     *
+     * @param userId 用户id
+     * @param page   页数
+     * @return
+     */
+    String selectUserJoinCircle(String userId, Integer page);
+
+    /**
+     * 我创建的圈子
+     *
+     * @param userId 用户id
+     * @param page   页数
+     * @return
+     */
+    String selectUserFoundCircle(String userId, Integer page);
+
+    /**
+     * 获取圈子正常用户信息
+     *
+     * @param circleId 圈子id
+     * @param page     页数
+     * @return
+     */
+    String getCircleNormalUser(Long circleId, Integer page);
+
+    /**
+     * 加入圈子装饰
+     *
+     * @param joinCircles 所要加强的数据
+     * @param number      总数
+     * @param page        页数
+     * @return
+     */
+    String selectAdornNormalJoinCircle(List<JoinCircle> joinCircles, Integer number, Integer page);
+
+    /**
+     * 待审核和拒绝用户装饰
+     *
+     * @param joinCircles 所要加强的数据
+     * @param number      总数
+     * @param page        页数
+     * @return
+     */
+    String selectAdornJoinCircle(List<JoinCircle> joinCircles, Integer number, Integer page);
+
+    /**
+     * 获取圈子被拒绝用户信息
+     *
+     * @param circleId 圈子id
+     * @param page     页数
+     * @return
+     */
+    String getCircleRefuseUser(Long circleId, Integer page);
+
+    /**
+     * 获取圈子待加入用户信息
+     *
+     * @param circleId 圈子id
+     * @param page     页数
+     * @return
+     */
+    String getCircleAuditUser(Long circleId, Integer page);
+
+    /**
+     * 同意用户加入圈子申请
+     *
+     * @param applyUserId 申请人用户id
+     * @param circleId    圈子id
+     * @return
+     */
+    String agreeJoinApply(String applyUserId, Long circleId);
+
+    /**
+     * 拒绝用户加入圈子申请
+     *
+     * @param circleId     圈子id
+     * @param applyUserId  申请人用户id
+     * @param refuseReason 拒绝理由
+     * @return
+     */
+    String refuseJoinCircle(Long circleId, String applyUserId, String refuseReason);
+
+    /**
+     * 淘汰圈子中用户
+     *
+     * @param circleId  圈子id
+     * @param outUserId 被淘汰用户人id
+     * @param userId
+     * @return
+     */
+    String outCircleUser(Long circleId, String outUserId, String userId);
 }
+

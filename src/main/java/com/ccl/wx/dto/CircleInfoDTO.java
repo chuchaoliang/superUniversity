@@ -142,4 +142,9 @@ public class CircleInfoDTO {
      * 圈子通知内容
      */
     private String circleNoticeContent;
+
+    /**
+     * 是否需要申请才能加入圈子
+     */
+    private Boolean applyJoin;
 }

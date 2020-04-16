@@ -107,7 +107,7 @@ public class CirclesDTO {
     private Long sumDiary;
 
     /**
-     * 是否为圈主 TODO 待添加 目前前端判断
+     * 是否为圈主
      */
     //private Boolean circleMaster;
 }

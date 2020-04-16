@@ -5,26 +5,21 @@ import com.ccl.wx.annotation.ParamCheck;
 import com.ccl.wx.common.EnumResultCode;
 import com.ccl.wx.common.Result;
 import com.ccl.wx.entity.CircleInfo;
-import com.ccl.wx.entity.JoinCircle;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.service.CircleInfoService;
 import com.ccl.wx.service.JoinCircleService;
-import com.ccl.wx.service.impl.CircleServiceImpl;
 import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -41,9 +36,6 @@ public class CircleInfoController {
 
     @Resource
     private JoinCircleService joinCircleService;
-
-    @Resource
-    private CircleServiceImpl circleService;
 
     @Resource
     private CircleInfoService circleInfoService;
@@ -106,185 +98,100 @@ public class CircleInfoController {
     }
 
     /**
-     * 根据圈子类型获取圈子数据
+     * 根据圈子类型获取圈子
      *
-     * @param tid 圈子类型
+     * @param type   圈子类型
+     * @param userId 用户id
+     * @param page   第几页
      * @return
      */
-    @GetMapping("/getcircletype")
-    public String getCircleByType(@RequestParam(value = "tid", required = false) String tid) {
-        if (StringUtils.isEmpty(tid)) {
-            return "fail";
-        } else {
-            List<CircleInfo> circles = circleInfoService.findAllByCircleLocation(Integer.parseInt(tid));
-            String circlesDTO = circleService.selectCircleDTO(circles);
-            return circlesDTO;
-        }
+    @ParamCheck
+    @GetMapping("/get/type")
+    public Result<String> getCircleByType(@RequestParam(value = "type", required = false) Integer type,
+                                          @RequestHeader(value = "token", required = false) String userId,
+                                          @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
+        return ResponseMsgUtil.success(circleInfoService.selectCircleByType(type, userId, page));
     }
 
     /**
      * 根据关键词搜索圈子数据
      *
      * @param keyword 圈子关键词
+     * @param userId  用户id
+     * @param page    页数
      * @return
      */
-    @GetMapping("/sqzkeyword")
-    public String searchCircleByKeyWord(@RequestParam(value = "keyword", required = false) String keyword) {
-        if (StringUtils.isEmpty(keyword)) {
-            return "fail";
-        } else {
-            List<CircleInfo> circles = circleInfoService.selectAllLikeAndCircleName(keyword);
-            String circlesDTO = circleService.selectCircleDTO(circles);
-            return circlesDTO;
-        }
+    @ParamCheck
+    @GetMapping("/search/keyword")
+    public Result<String> searchCircleByKeyWord(@RequestParam(value = "keyword", required = false) String keyword,
+                                                @RequestHeader(value = "token", required = false) String userId,
+                                                @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
+        String result = circleInfoService.searchCircleByKeyWord(keyword, userId, page);
+        return ResponseMsgUtil.success(result);
     }
+
 
     /**
      * 根据圈子类型和关键词查询数据
      *
      * @param keyword 关键词
-     * @param ctype   圈子类型
+     * @param type    圈子类型
+     * @param page    页数
      * @return
      */
-    @GetMapping("/sqzlkeyword")
-    public String searchCircleByLocationKeyWord(@RequestParam(value = "keyword", required = false) String keyword,
-                                                @RequestParam(value = "ctype", required = false) String ctype) {
-        if (StringUtils.isEmpty(keyword) || StringUtils.isEmpty(ctype)) {
-            return "fail";
-        }
-        List<CircleInfo> circles = circleInfoService.selectAllByCircleNameLikeAndCircleLocation(keyword, Integer.parseInt(ctype));
-        String circlesDTO = circleService.selectCircleDTO(circles);
-        return circlesDTO;
+    @ParamCheck
+    @GetMapping("/search/keyword/type")
+    public Result<String> searchCircleByTypeKeyWord(@RequestParam(value = "keyword", required = false) String keyword,
+                                                    @RequestParam(value = "type", required = false) Integer type,
+                                                    @RequestHeader(value = "token", required = false) String userId,
+                                                    @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
+        String result = circleInfoService.searchCircleByTypeKeyWord(keyword, type, userId, page);
+        return ResponseMsgUtil.success(result);
+    }
+
+
+    /**
+     * 我加入的圈子
+     *
+     * @param userId 用户id
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/get/my/join")
+    public Result<String> searchJoinCircle(@RequestHeader(value = "token", required = false) String userId,
+                                           @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
+        return ResponseMsgUtil.success(joinCircleService.selectUserJoinCircle(userId, page));
     }
 
     /**
-     * TODO API 待重构
-     * 查找用户所加入的圈子
+     * 我创建的圈子
      *
-     * @param userid 用户id
+     * @param userId 用户id
      * @return
      */
-    @GetMapping("/sjoincircle")
-    public String searchJoinCircle(@RequestParam(value = "userid", required = false) String userid) {
-        if (StringUtils.isEmpty(userid)) {
-            return "fail";
-        } else {
-            ArrayList<Long> circleids = new ArrayList<>();
-            ArrayList<CircleInfo> circleInfos = new ArrayList<>();
-            List<JoinCircle> circles = joinCircleService.selectAllByUserIdAndUserPermission(userid, 0);
-            for (JoinCircle circle : circles) {
-                circleids.add(circle.getCircleId());
-            }
-            for (Long circleid : circleids) {
-                CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleid);
-                circleInfos.add(circleInfo);
-            }
-            String circlesDTO = circleService.selectCircleDTO(circleInfos);
-            return circlesDTO;
-        }
+    @ParamCheck
+    @GetMapping("/get/my/found")
+    public Result<String> searchFoundCircle(@RequestHeader(value = "token", required = false) String userId,
+                                            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
+        return ResponseMsgUtil.success(joinCircleService.selectUserFoundCircle(userId, page));
     }
 
     /**
-     * TODO API 待重构
-     * 查找用户创建的圈子
+     * 判断用户是否可以直接进入私密圈子
      *
-     * @param userid 用户id
+     * @param userId   用户id
+     * @param circleId 圈子id
      * @return
      */
-    @GetMapping("/sfoundcircle")
-    public String searchFoundCircle(@RequestParam(value = "userid", required = false) String userid) {
-        if (StringUtils.isEmpty(userid)) {
-            return "fail";
-        } else {
-            ArrayList<Long> circleids = new ArrayList<>();
-            ArrayList<CircleInfo> circleInfos = new ArrayList<>();
-            List<JoinCircle> circles = joinCircleService.selectAllByUserIdAndUserPermission(userid, 2);
-            for (JoinCircle circle : circles) {
-                circleids.add(circle.getCircleId());
-            }
-            for (Long circleid : circleids) {
-                CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleid);
-                circleInfos.add(circleInfo);
-            }
-            String circlesDTO = circleService.selectCircleDTO(circleInfos);
-            return circlesDTO;
+    @ParamCheck
+    @GetMapping("/check/privacy")
+    public Result<String> judgeUserIntoPrivacyCircle(@RequestHeader(value = "token", required = false) String userId,
+                                                     @RequestParam(value = "circleId", required = false) Long circleId) {
+        String result = circleInfoService.judgeUserIntoPrivacyCircle(userId, circleId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("进入圈子失败！");
         }
-    }
-
-    /**
-     * TODO API
-     * 查询用户全部的圈子
-     *
-     * @param userid 用户id
-     * @return
-     */
-    @GetMapping("/sallcircle")
-    public String searchAllCircle(@RequestParam(value = "userid", required = false) String userid) {
-        if (StringUtils.isEmpty(userid)) {
-            return "fail";
-        } else {
-            ArrayList<Long> circleids = new ArrayList<>();
-            ArrayList<CircleInfo> circleInfos = new ArrayList<>();
-            List<JoinCircle> circles = joinCircleService.selectAllByUserIdAndUserPermission(userid, 0);
-            List<JoinCircle> foundCircles = joinCircleService.selectAllByUserIdAndUserPermission(userid, 2);
-            circles.addAll(foundCircles);
-            for (JoinCircle circle : circles) {
-                circleids.add(circle.getCircleId());
-            }
-            for (Long circleid : circleids) {
-                CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleid);
-                circleInfos.add(circleInfo);
-            }
-            String circlesDTO = circleService.selectCircleDTO(circleInfos);
-            return circlesDTO;
-        }
-    }
-
-    /**
-     * 根据圈子id获取数据
-     * 前端数据有的为空fail 否则返回圈子信息
-     *
-     * @param circleid 圈子id
-     * @return
-     */
-    @GetMapping("/getcirclebyid")
-    public String getCircleInfoById(@RequestParam(value = "circleid", required = false) String circleid) {
-        if (StringUtils.isEmpty(circleid)) {
-            return "fail";
-        } else {
-            CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(Long.valueOf(circleid));
-            return JSON.toJSONString(circleInfo);
-        }
-    }
-
-    /**
-     * 修改或者插入圈子标签
-     * 前端数据有的为空 fail 否则返回success
-     *
-     * @param circleid    圈子id
-     * @param circlelabel 圈子标签
-     * @return
-     */
-    @GetMapping("/editcirclelabel")
-    public String editCircleLabel(@RequestParam(value = "circleid", required = false) String circleid,
-                                  @RequestParam(value = "circlelabel", required = false) String circlelabel) {
-        String nullStr = "undefined";
-        if (StringUtils.isEmpty(circleid)) {
-            return "fail";
-        } else {
-            CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(Long.valueOf(circleid));
-            if (nullStr.equals(circlelabel) || "".equals(circlelabel) || circlelabel == null) {
-                // 删除圈子标签
-                circleInfo.setCircleLabel("");
-                circleInfoService.updateByPrimaryKeySelective(circleInfo);
-                return "success";
-            } else {
-                // 添加或者修改圈子标签
-                circleInfo.setCircleLabel(circlelabel);
-                circleInfoService.updateByPrimaryKeySelective(circleInfo);
-                return "success";
-            }
-        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
     }
 }
 
