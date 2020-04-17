@@ -2,9 +2,9 @@ package com.ccl.wx;
 
 import com.ccl.wx.common.list.UserPermissionList;
 import com.ccl.wx.mapper.*;
-import com.ccl.wx.properties.DefaultProperties;
-import com.ccl.wx.properties.FileUploadProperties;
-import com.ccl.wx.properties.FtpProperties;
+import com.ccl.wx.config.properties.DefaultProperties;
+import com.ccl.wx.config.properties.FileUploadProperties;
+import com.ccl.wx.config.properties.FtpProperties;
 import com.ccl.wx.service.CircleScheduleService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.TodayContentService;

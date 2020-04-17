@@ -13,7 +13,7 @@ import com.ccl.wx.entity.TodayContent;
 import com.ccl.wx.entity.UserDiary;
 import com.ccl.wx.enums.*;
 import com.ccl.wx.mapper.TodayContentMapper;
-import com.ccl.wx.properties.DefaultProperties;
+import com.ccl.wx.config.properties.DefaultProperties;
 import com.ccl.wx.service.CircleInfoService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.TodayContentService;

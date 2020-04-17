@@ -11,7 +11,7 @@ import com.ccl.wx.dto.CircleInfoDTO;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.enums.*;
 import com.ccl.wx.mapper.CircleInfoMapper;
-import com.ccl.wx.properties.DefaultProperties;
+import com.ccl.wx.config.properties.DefaultProperties;
 import com.ccl.wx.service.*;
 import com.ccl.wx.util.CclUtil;
 import com.ccl.wx.util.FtpUtil;

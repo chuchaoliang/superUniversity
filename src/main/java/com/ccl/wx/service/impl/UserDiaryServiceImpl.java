@@ -11,7 +11,7 @@ import com.ccl.wx.entity.*;
 import com.ccl.wx.enums.*;
 import com.ccl.wx.mapper.UserDiaryMapper;
 import com.ccl.wx.pojo.DiaryHideComment;
-import com.ccl.wx.properties.DefaultProperties;
+import com.ccl.wx.config.properties.DefaultProperties;
 import com.ccl.wx.service.*;
 import com.ccl.wx.util.CclDateUtil;
 import com.ccl.wx.util.CclUtil;

@@ -1,8 +1,8 @@
 package com.ccl.wx.util;
 
-import com.ccl.wx.common.EnumResultCode;
-import com.ccl.wx.common.IResultCode;
-import com.ccl.wx.common.Result;
+import com.ccl.wx.common.api.EnumResultCode;
+import com.ccl.wx.common.api.IResultCode;
+import com.ccl.wx.common.api.Result;
 
 /**
  * @author 褚超亮
