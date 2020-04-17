@@ -274,8 +274,6 @@ public class UserDiaryServiceImpl implements UserDiaryService {
             userDiary.setDiaryAddress(userDiaryVO.getDiaryAddress());
             // 重新设置日记状态
             userDiary.setDiaryStatus(StringUtils.isEmpty(userDiaryVO.getDiaryStatus()) ? EnumUserDiary.USER_DIARY_NORMAL.getValue() : userDiaryVO.getDiaryStatus());
-            // 设置日志更新时间
-            userDiary.setDiaryUpdatetime(new Date());
             // 得到历史图片列表(先判断历史图片是否为空)
             String diaryImage = userDiary.getDiaryImage();
             List<String> historyImages = new ArrayList<>();

@@ -1,5 +1,6 @@
 package com.ccl.wx.service;
 
+import com.ccl.wx.dto.CircleIntroDTO;
 import com.ccl.wx.entity.CircleIntro;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -70,6 +71,30 @@ public interface CircleIntroService {
      * @return
      */
     String saveCircleMasterIntroImage(Long circleId, MultipartFile file, String userId);
+
+    /**
+     * 更新圈子简介信息
+     *
+     * @param circleIntroDTO
+     * @return
+     */
+    String updateCircleIntro(CircleIntroDTO circleIntroDTO);
+
+    /**
+     * 更新圈主简介信息
+     *
+     * @param circleIntroDTO
+     * @return
+     */
+    String updateCircleMasterIntro(CircleIntroDTO circleIntroDTO);
+
+    /**
+     * 获取圈子简介信息
+     *
+     * @param circleId 圈子id
+     * @return
+     */
+    String getCircleIntro(Integer circleId);
 }
 
 

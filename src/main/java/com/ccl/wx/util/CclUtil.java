@@ -574,7 +574,7 @@ public class CclUtil {
      * @return
      */
     public static String fileListDispose(List<String> newFileLists, List<String> historyFileLists) {
-        if (newFileLists.isEmpty()) {
+        if (newFileLists == null || newFileLists.isEmpty()) {
             // 前端传输的文件列表为空，删除全部历史文件
             if (!historyFileLists.isEmpty()) {
                 for (String historyFile : historyFileLists) {

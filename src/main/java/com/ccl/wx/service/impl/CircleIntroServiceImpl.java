@@ -1,15 +1,23 @@
 package com.ccl.wx.service.impl;
 
+import cn.hutool.core.date.DatePattern;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.ccl.wx.dto.CircleIntroDTO;
 import com.ccl.wx.entity.CircleIntro;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.mapper.CircleIntroMapper;
 import com.ccl.wx.service.CircleIntroService;
+import com.ccl.wx.util.CclUtil;
 import com.ccl.wx.util.FtpUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author 褚超亮
@@ -154,6 +162,67 @@ public class CircleIntroServiceImpl implements CircleIntroService {
             return fail;
         }
         return JSON.toJSONString(result);
+    }
+
+    @Override
+    public String updateCircleIntro(CircleIntroDTO circleIntroDTO) {
+        CircleIntro circleIntro = circleIntroMapper.selectByPrimaryKey(circleIntroDTO.getCircleId());
+        if (circleIntro == null) {
+            return EnumResultStatus.FAIL.getValue();
+        } else {
+            // 处理图片
+            List<String> historyImages = new ArrayList<>();
+            String circleImage = circleIntro.getCircleImage();
+            if (!StringUtils.isEmpty(circleImage)) {
+                historyImages = Arrays.asList(circleImage.split(","));
+            }
+            circleIntro.setCircleImage(CclUtil.fileListDispose(circleIntroDTO.getCircleImages(), historyImages));
+            // 处理音频
+            circleIntro.setCircleVoice(CclUtil.fileDispose(circleIntroDTO.getCircleVoice(), circleIntro.getCircleVoice()));
+            // 处理文本内容
+            circleIntro.setCircleIntro(circleIntroDTO.getCircleIntro());
+            // 更新
+            int i = circleIntroMapper.updateByPrimaryKeySelective(circleIntro);
+            if (i == 0) {
+                return EnumResultStatus.FAIL.getValue();
+            }
+            return JSON.toJSONStringWithDateFormat(circleIntro, DatePattern.NORM_DATETIME_MINUTE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+        }
+    }
+
+    @Override
+    public String updateCircleMasterIntro(CircleIntroDTO circleIntroDTO) {
+        CircleIntro circleIntro = circleIntroMapper.selectByPrimaryKey(circleIntroDTO.getCircleId());
+        if (circleIntro == null) {
+            return EnumResultStatus.FAIL.getValue();
+        } else {
+            // 处理图片
+            List<String> historyImages = new ArrayList<>();
+            String circleImage = circleIntro.getUserImage();
+            if (!StringUtils.isEmpty(circleImage)) {
+                historyImages = Arrays.asList(circleImage.split(","));
+            }
+            circleIntro.setUserImage(CclUtil.fileListDispose(circleIntroDTO.getCircleImages(), historyImages));
+            // 处理音频
+            circleIntro.setUserVoice(CclUtil.fileDispose(circleIntroDTO.getCircleVoice(), circleIntro.getUserVoice()));
+            // 处理文本内容
+            circleIntro.setUserIntro(circleIntroDTO.getUserIntro());
+            // 更新
+            int i = circleIntroMapper.updateByPrimaryKeySelective(circleIntro);
+            if (i == 0) {
+                return EnumResultStatus.FAIL.getValue();
+            }
+            return JSON.toJSONStringWithDateFormat(circleIntro, DatePattern.NORM_DATETIME_MINUTE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+        }
+    }
+
+    @Override
+    public String getCircleIntro(Integer circleId) {
+        CircleIntro circleIntro = circleIntroMapper.selectByPrimaryKey(circleId);
+        if (circleIntro == null) {
+            return EnumResultStatus.FAIL.getValue();
+        }
+        return JSON.toJSONStringWithDateFormat(circleIntro, DatePattern.NORM_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
     }
 }
 

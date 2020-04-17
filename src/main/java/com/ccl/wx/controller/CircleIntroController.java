@@ -3,6 +3,7 @@ package com.ccl.wx.controller;
 import com.ccl.wx.annotation.ParamCheck;
 import com.ccl.wx.common.EnumResultCode;
 import com.ccl.wx.common.Result;
+import com.ccl.wx.dto.CircleIntroDTO;
 import com.ccl.wx.entity.CircleIntro;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.service.CircleIntroService;
@@ -146,6 +147,59 @@ public class CircleIntroController {
         String result = circleIntroService.saveCircleMasterIntroVoice(circleId, file, userId);
         if (EnumResultStatus.FAIL.getValue().equals(result)) {
             return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
+     * 更新圈子简介
+     *
+     * @param circleIntroDTO
+     * @return
+     */
+    @PostMapping("/intro/update")
+    public Result<String> updateCircleIntro(@RequestBody(required = false) CircleIntroDTO circleIntroDTO,
+                                            BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseMsgUtil.fail(Objects.requireNonNull(result.getFieldError()).getDefaultMessage());
+        }
+        String resultResponse = circleIntroService.updateCircleIntro(circleIntroDTO);
+        if (EnumResultStatus.FAIL.getValue().equals(resultResponse)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(resultResponse);
+    }
+
+    /**
+     * 更新圈主简介
+     *
+     * @param circleIntroDTO
+     * @return
+     */
+    @PostMapping("/intro/master/update")
+    public Result<String> updateCircleMasterIntro(@RequestBody(required = false) CircleIntroDTO circleIntroDTO,
+                                                  BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseMsgUtil.fail(Objects.requireNonNull(result.getFieldError()).getDefaultMessage());
+        }
+        String resultResponse = circleIntroService.updateCircleMasterIntro(circleIntroDTO);
+        if (EnumResultStatus.FAIL.getValue().equals(resultResponse)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(resultResponse);
+    }
+
+    /**
+     * 获取圈子简介信息
+     *
+     * @param circleId 圈子id
+     * @return
+     */
+    @GetMapping("/intro/get")
+    public Result<String> getCircleIntro(@ParamCheck @RequestParam(value = "circleId", required = false) Integer circleId) {
+        String result = circleIntroService.getCircleIntro(circleId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("不存在圈子简介信息！");
         }
         return ResponseMsgUtil.success(result);
     }
