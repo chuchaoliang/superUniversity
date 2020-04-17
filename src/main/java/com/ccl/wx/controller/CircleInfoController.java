@@ -7,6 +7,7 @@ import com.ccl.wx.common.Result;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.service.CircleInfoService;
+import com.ccl.wx.service.CircleIntroService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
@@ -39,6 +40,9 @@ public class CircleInfoController {
 
     @Resource
     private CircleInfoService circleInfoService;
+
+    @Resource
+    private CircleIntroService circleIntroService;
 
     /**
      * 创建圈子

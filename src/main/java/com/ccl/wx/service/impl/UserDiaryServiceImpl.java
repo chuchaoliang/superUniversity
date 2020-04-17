@@ -209,7 +209,6 @@ public class UserDiaryServiceImpl implements UserDiaryService {
             circleHomeDiaryVOS.add(circleHomeDiaryVO);
         });
         ArrayList<Object> diaryList = new ArrayList<>();
-        //diaryList.add(userDiaryDTOS);
         diaryList.add(circleHomeDiaryVOS);
         diaryList.add(nextPage);
         return JSON.toJSONStringWithDateFormat(diaryList, DatePattern.NORM_DATE_PATTERN, SerializerFeature.DisableCircularReferenceDetect);

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ccl.wx.mapper.CircleIntroMapper">
+    <resultMap id="BaseResultMap" type="com.ccl.wx.entity.CircleIntro">
+        <!--@mbg.generated-->
+        <!--@Table circle_intro-->
+        <id column="circle_id" jdbcType="INTEGER" property="circleId"/>
+        <result column="user_intro" jdbcType="LONGVARCHAR" property="userIntro"/>
+        <result column="user_voice" jdbcType="VARCHAR" property="userVoice"/>
+        <result column="circle_intro" jdbcType="LONGVARCHAR" property="circleIntro"/>
+        <result column="circle_voice" jdbcType="VARCHAR" property="circleVoice"/>
+        <result column="user_video" jdbcType="VARCHAR" property="userVideo"/>
+        <result column="circle_video" jdbcType="VARCHAR" property="circleVideo"/>
+        <result column="circle_image" jdbcType="LONGVARCHAR" property="circleImage"/>
+        <result column="user_image" jdbcType="LONGVARCHAR" property="userImage"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="delete_time" jdbcType="TIMESTAMP" property="deleteTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        circle_id, user_intro, user_voice, circle_intro, circle_voice, user_video, circle_video,
+        circle_image, user_image, create_time, update_time, delete_time
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from circle_intro
+        where circle_id = #{circleId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        <!--@mbg.generated-->
+        delete from circle_intro
+        where circle_id = #{circleId,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.ccl.wx.entity.CircleIntro">
+        <!--@mbg.generated-->
+        insert into circle_intro (circle_id, user_intro, user_voice,
+        circle_intro, circle_voice, user_video,
+        circle_video, circle_image, user_image,
+        create_time, update_time, delete_time
+        )
+        values (#{circleId,jdbcType=INTEGER}, #{userIntro,jdbcType=LONGVARCHAR}, #{userVoice,jdbcType=VARCHAR},
+        #{circleIntro,jdbcType=LONGVARCHAR}, #{circleVoice,jdbcType=VARCHAR}, #{userVideo,jdbcType=VARCHAR},
+        #{circleVideo,jdbcType=VARCHAR}, #{circleImage,jdbcType=LONGVARCHAR}, #{userImage,jdbcType=LONGVARCHAR},
+        #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{deleteTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.ccl.wx.entity.CircleIntro">
+        <!--@mbg.generated-->
+        insert into circle_intro
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="circleId != null">
+                circle_id,
+            </if>
+            <if test="userIntro != null">
+                user_intro,
+            </if>
+            <if test="userVoice != null">
+                user_voice,
+            </if>
+            <if test="circleIntro != null">
+                circle_intro,
+            </if>
+            <if test="circleVoice != null">
+                circle_voice,
+            </if>
+            <if test="userVideo != null">
+                user_video,
+            </if>
+            <if test="circleVideo != null">
+                circle_video,
+            </if>
+            <if test="circleImage != null">
+                circle_image,
+            </if>
+            <if test="userImage != null">
+                user_image,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="deleteTime != null">
+                delete_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="circleId != null">
+                #{circleId,jdbcType=INTEGER},
+            </if>
+            <if test="userIntro != null">
+                #{userIntro,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="userVoice != null">
+                #{userVoice,jdbcType=VARCHAR},
+            </if>
+            <if test="circleIntro != null">
+                #{circleIntro,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="circleVoice != null">
+                #{circleVoice,jdbcType=VARCHAR},
+            </if>
+            <if test="userVideo != null">
+                #{userVideo,jdbcType=VARCHAR},
+            </if>
+            <if test="circleVideo != null">
+                #{circleVideo,jdbcType=VARCHAR},
+            </if>
+            <if test="circleImage != null">
+                #{circleImage,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="userImage != null">
+                #{userImage,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deleteTime != null">
+                #{deleteTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ccl.wx.entity.CircleIntro">
+        <!--@mbg.generated-->
+        update circle_intro
+        <set>
+            <if test="userIntro != null">
+                user_intro = #{userIntro,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="userVoice != null">
+                user_voice = #{userVoice,jdbcType=VARCHAR},
+            </if>
+            <if test="circleIntro != null">
+                circle_intro = #{circleIntro,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="circleVoice != null">
+                circle_voice = #{circleVoice,jdbcType=VARCHAR},
+            </if>
+            <if test="userVideo != null">
+                user_video = #{userVideo,jdbcType=VARCHAR},
+            </if>
+            <if test="circleVideo != null">
+                circle_video = #{circleVideo,jdbcType=VARCHAR},
+            </if>
+            <if test="circleImage != null">
+                circle_image = #{circleImage,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="userImage != null">
+                user_image = #{userImage,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deleteTime != null">
+                delete_time = #{deleteTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where circle_id = #{circleId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ccl.wx.entity.CircleIntro">
+        <!--@mbg.generated-->
+        update circle_intro
+        set user_intro = #{userIntro,jdbcType=LONGVARCHAR},
+        user_voice = #{userVoice,jdbcType=VARCHAR},
+        circle_intro = #{circleIntro,jdbcType=LONGVARCHAR},
+        circle_voice = #{circleVoice,jdbcType=VARCHAR},
+        user_video = #{userVideo,jdbcType=VARCHAR},
+        circle_video = #{circleVideo,jdbcType=VARCHAR},
+        circle_image = #{circleImage,jdbcType=LONGVARCHAR},
+        user_image = #{userImage,jdbcType=LONGVARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        delete_time = #{deleteTime,jdbcType=TIMESTAMP}
+        where circle_id = #{circleId,jdbcType=INTEGER}
+    </update>
+    <update id="concatCircleImage">
+        update circle_intro set circle_image =
+        <choose>
+            <when test="flag">
+                concat(circle_image, #{image,jdbcType=VARCHAR})
+            </when>
+            <otherwise>
+                concat_ws(",", circle_image, #{image,jdbcType=VARCHAR})
+            </otherwise>
+        </choose>
+        where circle_id = #{circleId,jdbcType=BIGINT}
+    </update>
+    <update id="concatUserImage">
+        update circle_intro set user_image =
+        <choose>
+            <when test="flag">
+                concat(user_image, #{image,jdbcType=VARCHAR})
+            </when>
+            <otherwise>
+                concat_ws(",", user_image, #{image,jdbcType=VARCHAR})
+            </otherwise>
+        </choose>
+        where circle_id = #{circleId,jdbcType=BIGINT}
+    </update>
+</mapper>

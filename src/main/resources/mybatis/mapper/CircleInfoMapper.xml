@@ -1,328 +1,280 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ccl.wx.mapper.CircleInfoMapper">
-    <resultMap id="BaseResultMap" type="com.ccl.wx.entity.CircleInfo">
-        <!--@mbg.generated-->
-        <!--@Table circle_info-->
-        <id column="circle_id" jdbcType="BIGINT" property="circleId"/>
-        <result column="circle_name" jdbcType="VARCHAR" property="circleName"/>
-        <result column="circle_vitality" jdbcType="BIGINT" property="circleVitality"/>
-        <result column="circle_intro" jdbcType="LONGVARCHAR" property="circleIntro"/>
-        <result column="circle_signin" jdbcType="BIGINT" property="circleSignin"/>
-        <result column="circle_createtime" jdbcType="TIMESTAMP" property="circleCreatetime"/>
-        <result column="circle_updatetime" jdbcType="TIMESTAMP" property="circleUpdatetime"/>
-        <result column="circle_task" jdbcType="VARCHAR" property="circleTask"/>
-        <result column="circle_image" jdbcType="LONGVARCHAR" property="circleImage"/>
-        <result column="circle_userid" jdbcType="VARCHAR" property="circleUserid"/>
-        <result column="circle_userintro" jdbcType="LONGVARCHAR" property="circleUserintro"/>
-        <result column="circle_deltime" jdbcType="TIMESTAMP" property="circleDeltime"/>
-        <result column="circle_sign" jdbcType="INTEGER" property="circleSign"/>
-        <result column="circle_location" jdbcType="INTEGER" property="circleLocation"/>
-        <result column="circle_set" jdbcType="INTEGER" property="circleSet"/>
-        <result column="circle_himage" jdbcType="VARCHAR" property="circleHimage"/>
-        <result column="circle_label" jdbcType="VARCHAR" property="circleLabel"/>
-        <result column="circle_password" jdbcType="VARCHAR" property="circlePassword"/>
-        <result column="circle_member" jdbcType="INTEGER" property="circleMember"/>
-        <result column="theme_sum" jdbcType="INTEGER" property="themeSum"/>
-        <result column="diary_sum" jdbcType="INTEGER" property="diarySum"/>
-        <result column="version" jdbcType="INTEGER" property="version"/>
-        <result column="user_voice" jdbcType="VARCHAR" property="userVoice"/>
-        <result column="circle_voice" jdbcType="VARCHAR" property="circleVoice"/>
-    </resultMap>
-    <sql id="Base_Column_List">
-        <!--@mbg.generated-->
-        circle_id, circle_name, circle_vitality, circle_intro, circle_signin, circle_createtime,
-        circle_updatetime, circle_task, circle_image, circle_userid, circle_userintro, circle_deltime,
-        circle_sign, circle_location, circle_set, circle_himage, circle_label, circle_password,
-        circle_member, theme_sum, diary_sum, version, user_voice, circle_voice
-    </sql>
-    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-        <!--@mbg.generated-->
-        select
-        <include refid="Base_Column_List"/>
-        from circle_info
-        where circle_id = #{circleId,jdbcType=BIGINT}
-    </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        <!--@mbg.generated-->
-        delete from circle_info
-        where circle_id = #{circleId,jdbcType=BIGINT}
-    </delete>
-    <insert id="insert" keyColumn="circle_id" keyProperty="circleId" parameterType="com.ccl.wx.entity.CircleInfo"
-            useGeneratedKeys="true">
-        <!--@mbg.generated-->
-        insert into circle_info (circle_name, circle_vitality, circle_intro,
-        circle_signin, circle_createtime, circle_updatetime,
-        circle_task, circle_image, circle_userid,
-        circle_userintro, circle_deltime, circle_sign,
-        circle_location, circle_set, circle_himage,
-        circle_label, circle_password, circle_member,
-        theme_sum, diary_sum, version,
-        user_voice, circle_voice)
-        values (#{circleName,jdbcType=VARCHAR}, #{circleVitality,jdbcType=BIGINT}, #{circleIntro,jdbcType=LONGVARCHAR},
-        #{circleSignin,jdbcType=BIGINT}, #{circleCreatetime,jdbcType=TIMESTAMP}, #{circleUpdatetime,jdbcType=TIMESTAMP},
-        #{circleTask,jdbcType=VARCHAR}, #{circleImage,jdbcType=LONGVARCHAR}, #{circleUserid,jdbcType=VARCHAR},
-        #{circleUserintro,jdbcType=LONGVARCHAR}, #{circleDeltime,jdbcType=TIMESTAMP}, #{circleSign,jdbcType=INTEGER},
-        #{circleLocation,jdbcType=INTEGER}, #{circleSet,jdbcType=INTEGER}, #{circleHimage,jdbcType=VARCHAR},
-        #{circleLabel,jdbcType=VARCHAR}, #{circlePassword,jdbcType=VARCHAR}, #{circleMember,jdbcType=INTEGER},
-        #{themeSum,jdbcType=INTEGER}, #{diarySum,jdbcType=INTEGER}, #{version,jdbcType=INTEGER},
-        #{userVoice,jdbcType=VARCHAR}, #{circleVoice,jdbcType=VARCHAR})
-    </insert>
-    <insert id="insertSelective" keyColumn="circle_id" keyProperty="circleId"
-            parameterType="com.ccl.wx.entity.CircleInfo" useGeneratedKeys="true">
-        <!--@mbg.generated-->
-        insert into circle_info
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="circleName != null">
-                circle_name,
-            </if>
-            <if test="circleVitality != null">
-                circle_vitality,
-            </if>
-            <if test="circleIntro != null">
-                circle_intro,
-            </if>
-            <if test="circleSignin != null">
-                circle_signin,
-            </if>
-            <if test="circleCreatetime != null">
-                circle_createtime,
-            </if>
-            <if test="circleUpdatetime != null">
-                circle_updatetime,
-            </if>
-            <if test="circleTask != null">
-                circle_task,
-            </if>
-            <if test="circleImage != null">
-                circle_image,
-            </if>
-            <if test="circleUserid != null">
-                circle_userid,
-            </if>
-            <if test="circleUserintro != null">
-                circle_userintro,
-            </if>
-            <if test="circleDeltime != null">
-                circle_deltime,
-            </if>
-            <if test="circleSign != null">
-                circle_sign,
-            </if>
-            <if test="circleLocation != null">
-                circle_location,
-            </if>
-            <if test="circleSet != null">
-                circle_set,
-            </if>
-            <if test="circleHimage != null">
-                circle_himage,
-            </if>
-            <if test="circleLabel != null">
-                circle_label,
-            </if>
-            <if test="circlePassword != null">
-                circle_password,
-            </if>
-            <if test="circleMember != null">
-                circle_member,
-            </if>
-            <if test="themeSum != null">
-                theme_sum,
-            </if>
-            <if test="diarySum != null">
-                diary_sum,
-            </if>
-            <if test="version != null">
-                version,
-            </if>
-            <if test="userVoice != null">
-                user_voice,
-            </if>
-            <if test="circleVoice != null">
-                circle_voice,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="circleName != null">
-                #{circleName,jdbcType=VARCHAR},
-            </if>
-            <if test="circleVitality != null">
-                #{circleVitality,jdbcType=BIGINT},
-            </if>
-            <if test="circleIntro != null">
-                #{circleIntro,jdbcType=LONGVARCHAR},
-            </if>
-            <if test="circleSignin != null">
-                #{circleSignin,jdbcType=BIGINT},
-            </if>
-            <if test="circleCreatetime != null">
-                #{circleCreatetime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="circleUpdatetime != null">
-                #{circleUpdatetime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="circleTask != null">
-                #{circleTask,jdbcType=VARCHAR},
-            </if>
-            <if test="circleImage != null">
-                #{circleImage,jdbcType=LONGVARCHAR},
-            </if>
-            <if test="circleUserid != null">
-                #{circleUserid,jdbcType=VARCHAR},
-            </if>
-            <if test="circleUserintro != null">
-                #{circleUserintro,jdbcType=LONGVARCHAR},
-            </if>
-            <if test="circleDeltime != null">
-                #{circleDeltime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="circleSign != null">
-                #{circleSign,jdbcType=INTEGER},
-            </if>
-            <if test="circleLocation != null">
-                #{circleLocation,jdbcType=INTEGER},
-            </if>
-            <if test="circleSet != null">
-                #{circleSet,jdbcType=INTEGER},
-            </if>
-            <if test="circleHimage != null">
-                #{circleHimage,jdbcType=VARCHAR},
-            </if>
-            <if test="circleLabel != null">
-                #{circleLabel,jdbcType=VARCHAR},
-            </if>
-            <if test="circlePassword != null">
-                #{circlePassword,jdbcType=VARCHAR},
-            </if>
-            <if test="circleMember != null">
-                #{circleMember,jdbcType=INTEGER},
-            </if>
-            <if test="themeSum != null">
-                #{themeSum,jdbcType=INTEGER},
-            </if>
-            <if test="diarySum != null">
-                #{diarySum,jdbcType=INTEGER},
-            </if>
-            <if test="version != null">
-                #{version,jdbcType=INTEGER},
-            </if>
-            <if test="userVoice != null">
-                #{userVoice,jdbcType=VARCHAR},
-            </if>
-            <if test="circleVoice != null">
-                #{circleVoice,jdbcType=VARCHAR},
-            </if>
-        </trim>
-    </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.ccl.wx.entity.CircleInfo">
-        <!--@mbg.generated-->
-        update circle_info
-        <set>
-            <if test="circleName != null">
-                circle_name = #{circleName,jdbcType=VARCHAR},
-            </if>
-            <if test="circleVitality != null">
-                circle_vitality = #{circleVitality,jdbcType=BIGINT},
-            </if>
-            <if test="circleIntro != null">
-                circle_intro = #{circleIntro,jdbcType=LONGVARCHAR},
-            </if>
-            <if test="circleSignin != null">
-                circle_signin = #{circleSignin,jdbcType=BIGINT},
-            </if>
-            <if test="circleCreatetime != null">
-                circle_createtime = #{circleCreatetime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="circleUpdatetime != null">
-                circle_updatetime = #{circleUpdatetime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="circleTask != null">
-                circle_task = #{circleTask,jdbcType=VARCHAR},
-            </if>
-            <if test="circleImage != null">
-                circle_image = #{circleImage,jdbcType=LONGVARCHAR},
-            </if>
-            <if test="circleUserid != null">
-                circle_userid = #{circleUserid,jdbcType=VARCHAR},
-            </if>
-            <if test="circleUserintro != null">
-                circle_userintro = #{circleUserintro,jdbcType=LONGVARCHAR},
-            </if>
-            <if test="circleDeltime != null">
-                circle_deltime = #{circleDeltime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="circleSign != null">
-                circle_sign = #{circleSign,jdbcType=INTEGER},
-            </if>
-            <if test="circleLocation != null">
-                circle_location = #{circleLocation,jdbcType=INTEGER},
-            </if>
-            <if test="circleSet != null">
-                circle_set = #{circleSet,jdbcType=INTEGER},
-            </if>
-            <if test="circleHimage != null">
-                circle_himage = #{circleHimage,jdbcType=VARCHAR},
-            </if>
-            <if test="circleLabel != null">
-                circle_label = #{circleLabel,jdbcType=VARCHAR},
-            </if>
-            <if test="circlePassword != null">
-                circle_password = #{circlePassword,jdbcType=VARCHAR},
-            </if>
-            <if test="circleMember != null">
-                circle_member = #{circleMember,jdbcType=INTEGER},
-            </if>
-            <if test="themeSum != null">
-                theme_sum = #{themeSum,jdbcType=INTEGER},
-            </if>
-            <if test="diarySum != null">
-                diary_sum = #{diarySum,jdbcType=INTEGER},
-            </if>
-            <if test="version != null">
-                version = #{version,jdbcType=INTEGER},
-            </if>
-            <if test="userVoice != null">
-                user_voice = #{userVoice,jdbcType=VARCHAR},
-            </if>
-            <if test="circleVoice != null">
-                circle_voice = #{circleVoice,jdbcType=VARCHAR},
-            </if>
-        </set>
-        where circle_id = #{circleId,jdbcType=BIGINT}
-    </update>
-    <update id="updateByPrimaryKey" parameterType="com.ccl.wx.entity.CircleInfo">
-        <!--@mbg.generated-->
-        update circle_info
-        set circle_name = #{circleName,jdbcType=VARCHAR},
+  <resultMap id="BaseResultMap" type="com.ccl.wx.entity.CircleInfo">
+    <!--@mbg.generated-->
+    <!--@Table circle_info-->
+    <id column="circle_id" jdbcType="BIGINT" property="circleId" />
+    <result column="circle_name" jdbcType="VARCHAR" property="circleName" />
+    <result column="circle_vitality" jdbcType="BIGINT" property="circleVitality" />
+    <result column="circle_signin" jdbcType="BIGINT" property="circleSignin" />
+    <result column="circle_createtime" jdbcType="TIMESTAMP" property="circleCreatetime" />
+    <result column="circle_updatetime" jdbcType="TIMESTAMP" property="circleUpdatetime" />
+    <result column="circle_task" jdbcType="VARCHAR" property="circleTask" />
+    <result column="circle_image" jdbcType="LONGVARCHAR" property="circleImage" />
+    <result column="circle_userid" jdbcType="VARCHAR" property="circleUserid" />
+    <result column="circle_deltime" jdbcType="TIMESTAMP" property="circleDeltime" />
+    <result column="circle_sign" jdbcType="INTEGER" property="circleSign" />
+    <result column="circle_location" jdbcType="INTEGER" property="circleLocation" />
+    <result column="circle_set" jdbcType="INTEGER" property="circleSet" />
+    <result column="circle_himage" jdbcType="VARCHAR" property="circleHimage" />
+    <result column="circle_label" jdbcType="VARCHAR" property="circleLabel" />
+    <result column="circle_password" jdbcType="VARCHAR" property="circlePassword" />
+    <result column="circle_member" jdbcType="INTEGER" property="circleMember" />
+    <result column="theme_sum" jdbcType="INTEGER" property="themeSum" />
+    <result column="diary_sum" jdbcType="INTEGER" property="diarySum" />
+    <result column="version" jdbcType="INTEGER" property="version" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    circle_id, circle_name, circle_vitality, circle_signin, circle_createtime, circle_updatetime, 
+    circle_task, circle_image, circle_userid, circle_deltime, circle_sign, circle_location, 
+    circle_set, circle_himage, circle_label, circle_password, circle_member, theme_sum, 
+    diary_sum, version
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from circle_info
+    where circle_id = #{circleId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    <!--@mbg.generated-->
+    delete from circle_info
+    where circle_id = #{circleId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyColumn="circle_id" keyProperty="circleId" parameterType="com.ccl.wx.entity.CircleInfo" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into circle_info (circle_name, circle_vitality, circle_signin, 
+      circle_createtime, circle_updatetime, 
+      circle_task, circle_image, circle_userid, 
+      circle_deltime, circle_sign, circle_location, 
+      circle_set, circle_himage, circle_label, 
+      circle_password, circle_member, theme_sum, 
+      diary_sum, version)
+    values (#{circleName,jdbcType=VARCHAR}, #{circleVitality,jdbcType=BIGINT}, #{circleSignin,jdbcType=BIGINT}, 
+      #{circleCreatetime,jdbcType=TIMESTAMP}, #{circleUpdatetime,jdbcType=TIMESTAMP}, 
+      #{circleTask,jdbcType=VARCHAR}, #{circleImage,jdbcType=LONGVARCHAR}, #{circleUserid,jdbcType=VARCHAR}, 
+      #{circleDeltime,jdbcType=TIMESTAMP}, #{circleSign,jdbcType=INTEGER}, #{circleLocation,jdbcType=INTEGER}, 
+      #{circleSet,jdbcType=INTEGER}, #{circleHimage,jdbcType=VARCHAR}, #{circleLabel,jdbcType=VARCHAR}, 
+      #{circlePassword,jdbcType=VARCHAR}, #{circleMember,jdbcType=INTEGER}, #{themeSum,jdbcType=INTEGER}, 
+      #{diarySum,jdbcType=INTEGER}, #{version,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" keyColumn="circle_id" keyProperty="circleId" parameterType="com.ccl.wx.entity.CircleInfo" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into circle_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="circleName != null">
+        circle_name,
+      </if>
+      <if test="circleVitality != null">
+        circle_vitality,
+      </if>
+      <if test="circleSignin != null">
+        circle_signin,
+      </if>
+      <if test="circleCreatetime != null">
+        circle_createtime,
+      </if>
+      <if test="circleUpdatetime != null">
+        circle_updatetime,
+      </if>
+      <if test="circleTask != null">
+        circle_task,
+      </if>
+      <if test="circleImage != null">
+        circle_image,
+      </if>
+      <if test="circleUserid != null">
+        circle_userid,
+      </if>
+      <if test="circleDeltime != null">
+        circle_deltime,
+      </if>
+      <if test="circleSign != null">
+        circle_sign,
+      </if>
+      <if test="circleLocation != null">
+        circle_location,
+      </if>
+      <if test="circleSet != null">
+        circle_set,
+      </if>
+      <if test="circleHimage != null">
+        circle_himage,
+      </if>
+      <if test="circleLabel != null">
+        circle_label,
+      </if>
+      <if test="circlePassword != null">
+        circle_password,
+      </if>
+      <if test="circleMember != null">
+        circle_member,
+      </if>
+      <if test="themeSum != null">
+        theme_sum,
+      </if>
+      <if test="diarySum != null">
+        diary_sum,
+      </if>
+      <if test="version != null">
+        version,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="circleName != null">
+        #{circleName,jdbcType=VARCHAR},
+      </if>
+      <if test="circleVitality != null">
+        #{circleVitality,jdbcType=BIGINT},
+      </if>
+      <if test="circleSignin != null">
+        #{circleSignin,jdbcType=BIGINT},
+      </if>
+      <if test="circleCreatetime != null">
+        #{circleCreatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="circleUpdatetime != null">
+        #{circleUpdatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="circleTask != null">
+        #{circleTask,jdbcType=VARCHAR},
+      </if>
+      <if test="circleImage != null">
+        #{circleImage,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="circleUserid != null">
+        #{circleUserid,jdbcType=VARCHAR},
+      </if>
+      <if test="circleDeltime != null">
+        #{circleDeltime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="circleSign != null">
+        #{circleSign,jdbcType=INTEGER},
+      </if>
+      <if test="circleLocation != null">
+        #{circleLocation,jdbcType=INTEGER},
+      </if>
+      <if test="circleSet != null">
+        #{circleSet,jdbcType=INTEGER},
+      </if>
+      <if test="circleHimage != null">
+        #{circleHimage,jdbcType=VARCHAR},
+      </if>
+      <if test="circleLabel != null">
+        #{circleLabel,jdbcType=VARCHAR},
+      </if>
+      <if test="circlePassword != null">
+        #{circlePassword,jdbcType=VARCHAR},
+      </if>
+      <if test="circleMember != null">
+        #{circleMember,jdbcType=INTEGER},
+      </if>
+      <if test="themeSum != null">
+        #{themeSum,jdbcType=INTEGER},
+      </if>
+      <if test="diarySum != null">
+        #{diarySum,jdbcType=INTEGER},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ccl.wx.entity.CircleInfo">
+    <!--@mbg.generated-->
+    update circle_info
+    <set>
+      <if test="circleName != null">
+        circle_name = #{circleName,jdbcType=VARCHAR},
+      </if>
+      <if test="circleVitality != null">
         circle_vitality = #{circleVitality,jdbcType=BIGINT},
-        circle_intro = #{circleIntro,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="circleSignin != null">
         circle_signin = #{circleSignin,jdbcType=BIGINT},
+      </if>
+      <if test="circleCreatetime != null">
         circle_createtime = #{circleCreatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="circleUpdatetime != null">
         circle_updatetime = #{circleUpdatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="circleTask != null">
         circle_task = #{circleTask,jdbcType=VARCHAR},
+      </if>
+      <if test="circleImage != null">
         circle_image = #{circleImage,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="circleUserid != null">
         circle_userid = #{circleUserid,jdbcType=VARCHAR},
-        circle_userintro = #{circleUserintro,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="circleDeltime != null">
         circle_deltime = #{circleDeltime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="circleSign != null">
         circle_sign = #{circleSign,jdbcType=INTEGER},
+      </if>
+      <if test="circleLocation != null">
         circle_location = #{circleLocation,jdbcType=INTEGER},
+      </if>
+      <if test="circleSet != null">
         circle_set = #{circleSet,jdbcType=INTEGER},
+      </if>
+      <if test="circleHimage != null">
         circle_himage = #{circleHimage,jdbcType=VARCHAR},
+      </if>
+      <if test="circleLabel != null">
         circle_label = #{circleLabel,jdbcType=VARCHAR},
+      </if>
+      <if test="circlePassword != null">
         circle_password = #{circlePassword,jdbcType=VARCHAR},
+      </if>
+      <if test="circleMember != null">
         circle_member = #{circleMember,jdbcType=INTEGER},
+      </if>
+      <if test="themeSum != null">
         theme_sum = #{themeSum,jdbcType=INTEGER},
+      </if>
+      <if test="diarySum != null">
         diary_sum = #{diarySum,jdbcType=INTEGER},
+      </if>
+      <if test="version != null">
         version = #{version,jdbcType=INTEGER},
-        user_voice = #{userVoice,jdbcType=VARCHAR},
-        circle_voice = #{circleVoice,jdbcType=VARCHAR}
-        where circle_id = #{circleId,jdbcType=BIGINT}
-    </update>
+      </if>
+    </set>
+    where circle_id = #{circleId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ccl.wx.entity.CircleInfo">
+    <!--@mbg.generated-->
+    update circle_info
+    set circle_name = #{circleName,jdbcType=VARCHAR},
+      circle_vitality = #{circleVitality,jdbcType=BIGINT},
+      circle_signin = #{circleSignin,jdbcType=BIGINT},
+      circle_createtime = #{circleCreatetime,jdbcType=TIMESTAMP},
+      circle_updatetime = #{circleUpdatetime,jdbcType=TIMESTAMP},
+      circle_task = #{circleTask,jdbcType=VARCHAR},
+      circle_image = #{circleImage,jdbcType=LONGVARCHAR},
+      circle_userid = #{circleUserid,jdbcType=VARCHAR},
+      circle_deltime = #{circleDeltime,jdbcType=TIMESTAMP},
+      circle_sign = #{circleSign,jdbcType=INTEGER},
+      circle_location = #{circleLocation,jdbcType=INTEGER},
+      circle_set = #{circleSet,jdbcType=INTEGER},
+      circle_himage = #{circleHimage,jdbcType=VARCHAR},
+      circle_label = #{circleLabel,jdbcType=VARCHAR},
+      circle_password = #{circlePassword,jdbcType=VARCHAR},
+      circle_member = #{circleMember,jdbcType=INTEGER},
+      theme_sum = #{themeSum,jdbcType=INTEGER},
+      diary_sum = #{diarySum,jdbcType=INTEGER},
+      version = #{version,jdbcType=INTEGER}
+    where circle_id = #{circleId,jdbcType=BIGINT}
+  </update>
     <!--auto generated by MybatisCodeHelper on 2020-04-01-->
     <select id="selectByCircleName" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List" />
         from circle_info
         where circle_name=#{circleName,jdbcType=VARCHAR}
     </select>
@@ -330,7 +282,7 @@
     <!--auto generated by MybatisCodeHelper on 2020-04-10-->
     <select id="selectByAll" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List" />
         from circle_info
         <where>
             <if test="circleId != null">

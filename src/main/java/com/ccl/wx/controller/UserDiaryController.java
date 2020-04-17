@@ -49,7 +49,8 @@ public class UserDiaryController {
      * @return
      */
     @PostMapping("/diary/update")
-    public Result<String> updateCircleDiary(@Validated @RequestBody(required = false) UserDiaryVO userDiaryVO, BindingResult result) {
+    public Result<String> updateCircleDiary(@Validated @RequestBody(required = false) UserDiaryVO userDiaryVO,
+                                            BindingResult result) {
         if (result.hasErrors()) {
             return ResponseMsgUtil.fail(Objects.requireNonNull(result.getFieldError()).getDefaultMessage());
         }
@@ -62,10 +63,10 @@ public class UserDiaryController {
 
     /**
      * 根据日志的id查询日志的信息
-     * @deprecated 不使用
      *
      * @param diaryId 日志id
      * @return （与此日志相关的全部评论、点赞、点评信息）
+     * @deprecated 不使用
      */
     @GetMapping("/diary/get/one")
     public Result<String> getDiaryInfoByDiaryId(@ParamCheck @RequestParam(value = "diaryId", required = false) String diaryId) {
