@@ -154,72 +154,81 @@ public class UserDiaryServiceImpl implements UserDiaryService {
      * @return
      */
     public String adornDiaryInfo(List<UserDiary> userDiaries, String userId, Long diarySum, Integer page, boolean index) {
-        List<UserDiaryDTO> userDiaryDTOS = new ArrayList<>();
-        for (UserDiary userDiary : userDiaries) {
-            UserDiaryDTO userDiaryDTO = new UserDiaryDTO();
-            BeanUtils.copyProperties(userDiary, userDiaryDTO);
-            Boolean ellipsis = CclUtil.judgeTextEllipsis(userDiary.getDiaryContent());
-            userDiaryDTO.setEllipsis(ellipsis);
-            if (!StringUtils.isEmpty(userDiary.getDiaryImage())) {
-                userDiaryDTO.setImages(Arrays.asList(userDiary.getDiaryImage().split(",")));
-            }
-            // 设置日记评论和回复的总数
-            userDiaryDTO.setCommentSum(commentService.getDiaryAllComment(userDiary.getId()));
-            // 获取圈子id
-            Long circleId = userDiary.getCircleId();
-            // 查找日志点赞人，点赞人信息
-            List<DiaryLikeVO> likeUserInfo = userLikeService.getAllLikeUserNickName(userId, String.valueOf(circleId), userDiary.getId());
-            // 查找全部的评论
-            List<CommentDTO> diaryComment = commentService.getDiaryComment(userDiary.getId(), 0, true);
-            // 查找全部的点评
-            List<CommentDTO> masterComment = commentService.getMasterComment(userDiary.getId());
-            // 设置评论
-            userDiaryDTO.setComments(diaryComment);
-            // 设置点评
-            userDiaryDTO.setMasterComments(masterComment);
-            // 设置点赞人信息
-            userDiaryDTO.setLikeUserInfos(likeUserInfo);
-            // 设置点赞状态
-            userDiaryDTO.setLikeStatus(userLikeService.judgeDiaryLikeStatus(userId, String.valueOf(circleId), userDiary.getId()));
-            // 获取用户信息
-            UserInfo userInfo = userInfoService.selectByPrimaryKey(userDiary.getUserId());
-            // 设置用户昵称
-            userInfo.setNickname(joinCircleService.getUserJoinCircleNickname(userId, circleId));
-            // 设置创建时间
-            userDiaryDTO.setFormatCreateTime(DateUtil.format(userDiary.getDiaryCreatetime(), DatePattern.NORM_DATETIME_PATTERN));
-            // 设置用户头像
-            userDiaryDTO.setUserHeadImage(userInfo.getAvatarurl());
-            // 设置用户性别
-            userDiaryDTO.setUserGender(userInfo.getGender());
-            JoinCircle joinCircle = joinCircleService.selectByPrimaryKey(circleId, userDiary.getUserId());
-            // 设置用户打卡天数
-            userDiaryDTO.setUserSignNumber(joinCircle.getUserSigninDay());
-            // 设置用户处理后的创建时间 （几天前）
-            userDiaryDTO.setCreateTime(CclDateUtil.todayDate(userDiary.getDiaryCreatetime()));
-            TodayContent todayContent = todayContentService.selectByPrimaryKey(userDiary.getThemeId().longValue());
-            if (todayContent != null && userDiary.getThemeId() != 0) {
-                CircleHomeThemeVO circleHomeThemeVO = new CircleHomeThemeVO();
-                BeanUtils.copyProperties(todayContent, circleHomeThemeVO);
-                userDiaryDTO.setThemeInfo(circleHomeThemeVO);
-            }
-            if (index) {
-                CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
-                CircleVO circleVO = new CircleVO();
-                BeanUtils.copyProperties(circleInfo, circleVO);
-                userDiaryDTO.setCircleInfo(circleVO);
-            }
-            userDiaryDTOS.add(userDiaryDTO);
-        }
         ArrayList<CircleHomeDiaryVO> circleHomeDiaryVOS = new ArrayList<>();
-        userDiaryDTOS.forEach(userDiaryDTO -> {
-            CircleHomeDiaryVO circleHomeDiaryVO = new CircleHomeDiaryVO();
-            BeanUtils.copyProperties(userDiaryDTO, circleHomeDiaryVO);
-            circleHomeDiaryVOS.add(circleHomeDiaryVO);
-        });
+        for (UserDiary userDiary : userDiaries) {
+            CircleHomeDiaryVO userDiaryVO = getUserDiaryVO(userId, index, userDiary);
+            circleHomeDiaryVOS.add(userDiaryVO);
+        }
         ArrayList<Object> diaryList = new ArrayList<>();
         diaryList.add(circleHomeDiaryVOS);
         diaryList.add(CclUtil.judgeNextPage(diarySum.intValue(), EnumPage.PAGE_NUMBER.getValue(), page));
         return JSON.toJSONStringWithDateFormat(diaryList, DatePattern.NORM_DATE_PATTERN, SerializerFeature.DisableCircularReferenceDetect);
+    }
+
+    /**
+     * 日志对象加强方法
+     *
+     * @param userId    用户id
+     * @param index     是否为用户主页
+     * @param userDiary 日志id
+     * @return
+     */
+    private CircleHomeDiaryVO getUserDiaryVO(String userId, boolean index, UserDiary userDiary) {
+        UserDiaryDTO userDiaryDTO = new UserDiaryDTO();
+        BeanUtils.copyProperties(userDiary, userDiaryDTO);
+        Boolean ellipsis = CclUtil.judgeTextEllipsis(userDiary.getDiaryContent());
+        userDiaryDTO.setEllipsis(ellipsis);
+        if (!StringUtils.isEmpty(userDiary.getDiaryImage())) {
+            userDiaryDTO.setImages(Arrays.asList(userDiary.getDiaryImage().split(",")));
+        }
+        // 设置日记评论和回复的总数
+        userDiaryDTO.setCommentSum(commentService.getDiaryAllComment(userDiary.getId()));
+        // 获取圈子id
+        Long circleId = userDiary.getCircleId();
+        // 查找日志点赞人，点赞人信息
+        List<DiaryLikeVO> likeUserInfo = userLikeService.getAllLikeUserNickName(userId, String.valueOf(circleId), userDiary.getId());
+        // 查找全部的评论
+        List<CommentDTO> diaryComment = commentService.getDiaryComment(userDiary.getId(), 0, true);
+        // 查找全部的点评
+        List<CommentDTO> masterComment = commentService.getMasterComment(userDiary.getId());
+        // 设置评论
+        userDiaryDTO.setComments(diaryComment);
+        // 设置点评
+        userDiaryDTO.setMasterComments(masterComment);
+        // 设置点赞人信息
+        userDiaryDTO.setLikeUserInfos(likeUserInfo);
+        // 设置点赞状态
+        userDiaryDTO.setLikeStatus(userLikeService.judgeDiaryLikeStatus(userId, String.valueOf(circleId), userDiary.getId()));
+        // 获取用户信息
+        UserInfo userInfo = userInfoService.selectByPrimaryKey(userDiary.getUserId());
+        // 设置用户昵称
+        userInfo.setNickname(joinCircleService.getUserJoinCircleNickname(userId, circleId));
+        // 设置创建时间
+        userDiaryDTO.setFormatCreateTime(DateUtil.format(userDiary.getDiaryCreatetime(), DatePattern.NORM_DATETIME_PATTERN));
+        // 设置用户头像
+        userDiaryDTO.setUserHeadImage(userInfo.getAvatarurl());
+        // 设置用户性别
+        userDiaryDTO.setUserGender(userInfo.getGender());
+        JoinCircle joinCircle = joinCircleService.selectByPrimaryKey(circleId, userDiary.getUserId());
+        // 设置用户打卡天数
+        userDiaryDTO.setUserSignNumber(joinCircle.getUserSigninDay());
+        // 设置用户处理后的创建时间 （几天前）
+        userDiaryDTO.setCreateTime(CclDateUtil.todayDate(userDiary.getDiaryCreatetime()));
+        TodayContent todayContent = todayContentService.selectByPrimaryKey(userDiary.getThemeId().longValue());
+        if (todayContent != null && userDiary.getThemeId() != 0) {
+            CircleHomeThemeVO circleHomeThemeVO = new CircleHomeThemeVO();
+            BeanUtils.copyProperties(todayContent, circleHomeThemeVO);
+            userDiaryDTO.setThemeInfo(circleHomeThemeVO);
+        }
+        if (index) {
+            CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
+            CircleVO circleVO = new CircleVO();
+            BeanUtils.copyProperties(circleInfo, circleVO);
+            userDiaryDTO.setCircleInfo(circleVO);
+        }
+        CircleHomeDiaryVO circleHomeDiaryVO = new CircleHomeDiaryVO();
+        BeanUtils.copyProperties(userDiaryDTO, circleHomeDiaryVO);
+        return circleHomeDiaryVO;
     }
 
     @Override
@@ -644,7 +653,11 @@ public class UserDiaryServiceImpl implements UserDiaryService {
     }
 
     @Override
-    public String getDiaryInfoById(Long diaryId) {
-        return "";
+    public String getDiaryInfoById(Long diaryId, String userId) {
+        UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(diaryId);
+        if (userDiary == null) {
+            return EnumResultStatus.FAIL.getValue();
+        }
+        return JSON.toJSONString(getUserDiaryVO(userId, false, userDiary));
     }
 }

@@ -3,18 +3,16 @@ package com.ccl.wx.controller.user;
 import cn.hutool.core.date.DatePattern;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.ccl.wx.global.annotation.ParamCheck;
 import com.ccl.wx.common.api.EnumResultCode;
 import com.ccl.wx.common.api.Result;
 import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.enums.EnumResultStatus;
+import com.ccl.wx.global.annotation.ParamCheck;
 import com.ccl.wx.mapper.JoinCircleMapper;
 import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.service.UserInfoService;
 import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -64,19 +62,6 @@ public class UserInfoController {
     //}
 
     /**
-     * 获取用户的积分
-     *
-     * @return
-     */
-    @ApiOperation(value = "获取用户的能量球（积分）", notes = "根据用户的id获取用户的能量球")
-    @ApiImplicitParam(name = "userid", value = "用户id", dataType = "String", example = "o1x2q5czO_xCH9eemeEfL41_gvMk")
-    @GetMapping("/getuserintegral")
-    public String getUserIntegral(@RequestParam(value = "userid", required = false) String userid) {
-        int integral = joinCircleMapper.sumUserVitalityByUserid(userid);
-        return String.valueOf(integral);
-    }
-
-    /**
      * 获取用户的信息
      *
      * @param userId 用户id
@@ -114,6 +99,7 @@ public class UserInfoController {
      * @param userInfo 用户信息
      * @return
      */
+    @Deprecated
     @PostMapping("/user/save")
     public Result userInfo(@Validated @RequestBody UserInfo userInfo, BindingResult result) {
         if (result.hasErrors()) {

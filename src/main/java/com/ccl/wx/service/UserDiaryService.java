@@ -291,7 +291,8 @@ public interface UserDiaryService {
      * 根据日记id查询全部的信息（点赞、评论、点评）
      *
      * @param diaryId 日志id
+     * @param userId
      * @return
      */
-    String getDiaryInfoById(Long diaryId);
+    String getDiaryInfoById(Long diaryId, String userId);
 }

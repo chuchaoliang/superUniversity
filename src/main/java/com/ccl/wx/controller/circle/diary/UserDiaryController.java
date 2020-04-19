@@ -66,12 +66,15 @@ public class UserDiaryController {
      *
      * @param diaryId 日志id
      * @return （与此日志相关的全部评论、点赞、点评信息）
-     * @deprecated 不使用
      */
     @GetMapping("/diary/get/one")
-    public Result<String> getDiaryInfoByDiaryId(@ParamCheck @RequestParam(value = "diaryId", required = false) String diaryId) {
+    public Result<String> getDiaryInfoByDiaryId(@ParamCheck @RequestParam(value = "diaryId", required = false) Long diaryId,
+                                                @RequestHeader(value = "token", required = false) String userId) {
         // 获取评论内容
-        String result = userDiaryService.getDiaryInfoById(Long.valueOf(diaryId));
+        String result = userDiaryService.getDiaryInfoById(diaryId, userId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("日志不存在！");
+        }
         return ResponseMsgUtil.success(result);
     }
 
