@@ -27,6 +27,15 @@ public interface JoinCircleService {
     int updateByPrimaryKey(JoinCircle record);
 
     /**
+     * 获取用户加入圈子昵称
+     *
+     * @param userId   用户id
+     * @param circleId 圈子id
+     * @return
+     */
+    String getUserJoinCircleNickname(String userId, Long circleId);
+
+    /**
      * 拼接圈子id
      *
      * @param circleId 圈子id

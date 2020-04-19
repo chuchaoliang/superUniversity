@@ -1,6 +1,7 @@
 package com.ccl.wx.dto;
 
 import com.ccl.wx.vo.CircleHomeThemeVO;
+import com.ccl.wx.vo.CircleVO;
 import com.ccl.wx.vo.DiaryLikeVO;
 import lombok.Data;
 
@@ -65,7 +66,7 @@ public class UserDiaryDTO {
     /**
      * 创建时间的加工 几天前 几个月前 几个小时前
      */
-    private String createTimeRelative;
+    private String createTime;
 
     /**
      * 日记的图片列表
@@ -123,11 +124,6 @@ public class UserDiaryDTO {
     private List<DiaryLikeVO> likeUserInfos;
 
     /**
-     * 点赞用户全部昵称
-     */
-    private String likeUserInfosStr;
-
-    /**
      * 是否还有更多数据
      */
     private Boolean hasMoreData;
@@ -136,16 +132,6 @@ public class UserDiaryDTO {
      * 是否省略文本内容
      */
     private Boolean ellipsis;
-
-    /**
-     * 固定 是否省略文本内容
-     */
-    private Boolean judgeEllipsis;
-
-    /**
-     * 是否隐藏评论信息
-     */
-    private Boolean hideComment;
 
     /**
      * 日志评论和回复的总数
@@ -161,4 +147,9 @@ public class UserDiaryDTO {
      * 圈子主题
      */
     private CircleHomeThemeVO themeInfo;
+
+    /**
+     * 圈子信息
+     */
+    private CircleVO circleInfo;
 }

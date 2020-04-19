@@ -1,17 +1,23 @@
 package com.ccl.wx.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.ccl.wx.dto.ReplyDTO;
 import com.ccl.wx.entity.Comment;
 import com.ccl.wx.entity.Reply;
+import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.mapper.ReplyMapper;
 import com.ccl.wx.service.CommentService;
 import com.ccl.wx.service.ReplyService;
+import com.ccl.wx.service.UserInfoService;
+import com.ccl.wx.util.CclDateUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +35,12 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Resource
     private CommentService commentService;
+
+    @Resource
+    private UserInfoService userInfoService;
+
+    @Resource
+    private JoinCircleServiceImpl joinCircleService;
 
     @Override
     public int deleteByPrimaryKey(Long id) {
@@ -61,11 +73,6 @@ public class ReplyServiceImpl implements ReplyService {
     }
 
     @Override
-    public List<Long> selectIdByDiaryId(Long diaryId) {
-        return replyMapper.selectIdByDiaryId(diaryId);
-    }
-
-    @Override
     public String replyDiaryComment(Reply reply) {
         Comment comment = commentService.selectByPrimaryKey(reply.getCommentId());
         if (comment == null) {
@@ -88,12 +95,50 @@ public class ReplyServiceImpl implements ReplyService {
     }
 
     @Override
-    public List<Reply> selectAllByCommentId(Long commentId, int start, Integer pageNumber) {
-        return replyMapper.selectAllByCommentId(commentId, start, pageNumber);
+    public List<Reply> selectReply(Long commentId, int start, Integer pageNumber) {
+        return replyMapper.selectReply(commentId, start, pageNumber);
     }
 
     @Override
     public Long countByDiaryId(Long diaryId) {
         return replyMapper.countByDiaryId(diaryId);
+    }
+
+    @Override
+    public List<ReplyDTO> adornReply(List<Reply> replies) {
+        ArrayList<ReplyDTO> replyDTOS = new ArrayList<>();
+        for (Reply reply : replies) {
+            ReplyDTO replyDTO = new ReplyDTO();
+            // 回复人信息
+            UserInfo replyUserInfo = userInfoService.selectByPrimaryKey(reply.getReplyUserid());
+            // 目标人信息
+            UserInfo targetUserInfo = userInfoService.selectByPrimaryKey(reply.getTargetUserid());
+            // 设置回复人、目标人昵称
+            replyUserInfo.setNickname(joinCircleService.getUserJoinCircleNickname(replyUserInfo.getId(), reply.getCircleId()));
+            targetUserInfo.setNickname(joinCircleService.getUserJoinCircleNickname(targetUserInfo.getId(), reply.getCircleId()));
+            BeanUtils.copyProperties(reply, replyDTO);
+            // 设置回复人信息
+            replyDTO.setRNickName(replyUserInfo.getNickname());
+            replyDTO.setRGender(replyUserInfo.getGender());
+            replyDTO.setRHeadImage(replyUserInfo.getAvatarurl());
+            // 设置目标人信息
+            replyDTO.setTNickName(targetUserInfo.getNickname());
+            replyDTO.setTGender(targetUserInfo.getGender());
+            replyDTO.setTHeadImage(targetUserInfo.getAvatarurl());
+            // 设置回复创建时间
+            replyDTO.setCreateTime(CclDateUtil.todayDate(reply.getReplyCreatetime()));
+            replyDTOS.add(replyDTO);
+        }
+        return replyDTOS;
+    }
+
+    @Override
+    public List<Long> selectIdByDiaryId(Long diaryId) {
+        return replyMapper.selectIdByDiaryId(diaryId);
+    }
+
+    @Override
+    public Long countByCommentId(Long commentId) {
+        return replyMapper.countByCommentId(commentId);
     }
 }

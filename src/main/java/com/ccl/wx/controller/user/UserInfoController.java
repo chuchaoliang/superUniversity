@@ -9,6 +9,7 @@ import com.ccl.wx.common.api.Result;
 import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.mapper.JoinCircleMapper;
+import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.service.UserInfoService;
 import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
@@ -38,6 +39,9 @@ public class UserInfoController {
 
     @Resource
     private UserInfoService userInfoService;
+
+    @Resource
+    private UserDiaryService userDiaryService;
 
     ///**
     // * 获取用户的基本信息
@@ -119,6 +123,21 @@ public class UserInfoController {
             userInfoService.saveUserInfo(userInfo);
             return ResponseMsgUtil.success(JSON.toJSONString(userInfo));
         }
+    }
+
+    /**
+     * 获取用户主页的日志动态消息
+     *
+     * @param userId 用户id
+     * @param page   页数
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/home/diary")
+    public Result<String> getUserHomeDiaryInfo(@RequestParam(value = "userId", required = false) String userId,
+                                               @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
+        String userIndexDiaryInfo = userDiaryService.getUserIndexDiaryInfo(userId, page);
+        return ResponseMsgUtil.success(userIndexDiaryInfo);
     }
 }
 

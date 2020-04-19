@@ -107,7 +107,7 @@ public class CircleInfoServiceImpl implements CircleInfoService {
         ArrayList<Integer> diaryStatus = new ArrayList<>();
         diaryStatus.add(EnumUserDiary.USER_DIARY_NORMAL.getValue());
         diaryStatus.add(EnumUserDiary.USER_DIARY_PERMISSION.getValue());
-        int diaryNumber = userDiaryService.selectAllByCircleIdAndDiaryStatus(circleId.longValue(), diaryStatus).size();
+        int diaryNumber = userDiaryService.selectAllByCircleIdAndDiaryStatus(circleId.longValue(), diaryStatus, null).size();
         circleInfoDTO.setDiaryNumber(diaryNumber);
         // 设置圈子总活跃度
         circleInfoDTO.setCircleVitality(joinCircleService.sumUserVitalityByCircleIdAndUserStatus(circleId.longValue(), EnumUserCircle.USER_NORMAL_STATUS.getValue()));

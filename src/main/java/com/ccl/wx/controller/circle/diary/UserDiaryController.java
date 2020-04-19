@@ -214,7 +214,7 @@ public class UserDiaryController {
     @GetMapping("/diary/get/all")
     public Result<String> getDiaryInfo(@RequestParam(value = "circleId", required = false) Long circleId,
                                        @RequestHeader(value = "token", required = false) String userId,
-                                       @RequestParam(value = "page", required = false) Integer page) {
+                                       @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
         return ResponseMsgUtil.success(userDiaryService.getAllDiaryInfo(circleId, userId, page));
     }
 
@@ -231,7 +231,7 @@ public class UserDiaryController {
     @GetMapping("/menu/diary/get/user")
     public Result<String> getAssignDiaryInfo(@RequestParam(value = "circleId", required = false) Long circleId,
                                              @RequestHeader(value = "token", required = false) String userId,
-                                             @RequestParam(value = "page", required = false) Integer page) {
+                                             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
         String result = userDiaryService.getAssignDiaryInfo(circleId, userId, page);
         return ResponseMsgUtil.success(result);
     }

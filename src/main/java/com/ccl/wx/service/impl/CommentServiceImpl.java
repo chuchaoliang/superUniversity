@@ -7,12 +7,15 @@ import com.ccl.wx.entity.Comment;
 import com.ccl.wx.entity.Reply;
 import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.enums.EnumComment;
+import com.ccl.wx.enums.EnumPage;
+import com.ccl.wx.enums.EnumReply;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.mapper.CommentMapper;
-import com.ccl.wx.pojo.DiaryHideComment;
 import com.ccl.wx.service.CommentService;
+import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.ReplyService;
 import com.ccl.wx.service.UserInfoService;
+import com.ccl.wx.util.CclDateUtil;
 import com.ccl.wx.vo.CircleHomeCommentVO;
 import com.ccl.wx.vo.CircleHomeReplyVO;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +44,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Resource
     private ReplyService replyService;
+
+    @Resource
+    private JoinCircleService joinCircleService;
 
     /**
      * 评论数量
@@ -88,38 +94,26 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDTO> getOneDiaryCommentInfoById(Long diaryId) {
-        // 获取子评论
-        List<Comment> comments = commentMapper.selectAllByDiaryIdAndCommentTypeOrderByCommentCreatetimeDesc(diaryId, 0, 0, 10);
+    public List<CommentDTO> getDiaryComment(Long diaryId, Integer page, Boolean home) {
+        int value = EnumPage.PAGE_NUMBER.getValue();
+        int number = value;
+        if (home) {
+            number = EnumPage.CIRCLE_HOME_THEME.getValue();
+        }
+        List<Comment> comments = commentMapper.selectComment(diaryId, EnumComment.COMMENT_USER.getValue(), page * value, number);
+        return adornComment(comments);
+    }
+
+    public List<CommentDTO> adornComment(List<Comment> comments) {
         ArrayList<CommentDTO> commentDTOS = new ArrayList<>();
         for (Comment comment : comments) {
             CommentDTO commentDTO = new CommentDTO();
-            // 查询此评论下的子评论
-            List<Reply> replies = replyService.selectAllByCommentId(comment.getId(), 0, COMMENT_REPLY_NUMBER);
-            ArrayList<ReplyDTO> replyDTOS = new ArrayList<>();
-            for (Reply reply : replies) {
-                ReplyDTO replyDTO = new ReplyDTO();
-                // 回复人信息
-                UserInfo userInfo = userInfoService.selectByPrimaryKey(reply.getReplyUserid());
-                // 目标用户信息
-                UserInfo targetUserInfo = userInfoService.selectByPrimaryKey(reply.getTargetUserid());
-                BeanUtils.copyProperties(reply, replyDTO);
-                // 设置回复人昵称
-                replyDTO.setNickName(userInfo.getNickname());
-                // 设置回复人性别
-                replyDTO.setGender(userInfo.getGender());
-                // 设置回复人头像
-                replyDTO.setHeadImage(userInfo.getAvatarurl());
-                // 设置目标人昵称
-                replyDTO.setTargetNickName(targetUserInfo.getNickname());
-                // 设置目标人性别
-                replyDTO.setTargetGender(targetUserInfo.getGender());
-                // 设置目标人头像
-                replyDTO.setTargetHeadImage(targetUserInfo.getAvatarurl());
-                replyDTOS.add(replyDTO);
-            }
+            List<Reply> replies = replyService.selectReply(comment.getId(), 0, EnumReply.REPLY_SHOW.getValue());
+            // 获取全部子评论
+            List<ReplyDTO> replyDTOS = replyService.adornReply(replies);
             // 获取用户信息
             UserInfo userInfo = userInfoService.selectByPrimaryKey(comment.getUserId());
+            userInfo.setNickname(joinCircleService.getUserJoinCircleNickname(userInfo.getId(), comment.getCircleId()));
             BeanUtils.copyProperties(comment, commentDTO);
             // 设置用户昵称
             commentDTO.setNickName(userInfo.getNickname());
@@ -128,40 +122,27 @@ public class CommentServiceImpl implements CommentService {
             // 设置用户性别
             commentDTO.setGender(userInfo.getGender());
             // 设置此评论的回复
-            commentDTO.setReplyDTOS(replyDTOS);
+            commentDTO.setReplyList(replyDTOS);
+            // 设置创建时间
+            commentDTO.setCreateTime(CclDateUtil.todayDate(comment.getCommentCreatetime()));
+            // 设置回复总数
+            commentDTO.setReplyNumber(replyService.countByCommentId(comment.getId()));
             commentDTOS.add(commentDTO);
-            if (commentDTOS.size() == COMMENT_NUMBER) {
-                break;
-            }
         }
         return commentDTOS;
     }
 
     @Override
-    public Integer getUserCommentSumById(Long id) {
-        return null;
-    }
-
-    @Override
-    public DiaryHideComment judgeHideCommentById(Long diaryId) {
-        // 日志数
-        Long commentSum = commentMapper.countByDiaryId(diaryId);
-        Long replySum = replyService.countByDiaryId(diaryId);
-        DiaryHideComment diaryHideComment = new DiaryHideComment();
-        long sum = commentSum + replySum;
-        diaryHideComment.setCommentSum(sum);
-        if (sum > COMMENT_NUMBER * COMMENT_REPLY_NUMBER) {
-            diaryHideComment.setHideComment(true);
-        } else {
-            diaryHideComment.setHideComment(false);
-        }
-        return diaryHideComment;
+    public Long getDiaryAllComment(Long diaryId) {
+        Long commentNumber = commentMapper.countByDiaryId(diaryId);
+        Long replyNumber = replyService.countByDiaryId(diaryId);
+        return commentNumber + replyNumber;
     }
 
     @Override
     public List<CommentDTO> getMasterComment(Long diaryId) {
         // 获取日记的点评
-        List<Comment> comments = commentMapper.selectAllByDiaryIdAndCommentTypeOrderByCommentCreatetimeDesc(diaryId, 1, 0, 5);
+        List<Comment> comments = commentMapper.selectComment(diaryId, 1, 0, EnumComment.COMMENT_MAX_NUMBER.getValue());
         ArrayList<CommentDTO> commentDTOS = new ArrayList<>();
         for (Comment comment : comments) {
             if (EnumComment.COMMENT_DELETE_STATUS.getValue().equals(comment.getCommentStatus())) {
@@ -170,6 +151,7 @@ public class CommentServiceImpl implements CommentService {
             }
             CommentDTO commentDTO = new CommentDTO();
             UserInfo userInfo = userInfoService.selectByPrimaryKey(comment.getUserId());
+            userInfo.setNickname(joinCircleService.getUserJoinCircleNickname(userInfo.getId(), comment.getCircleId()));
             BeanUtils.copyProperties(comment, commentDTO);
             // 设置用户昵称
             commentDTO.setNickName(userInfo.getNickname());
@@ -198,7 +180,7 @@ public class CommentServiceImpl implements CommentService {
         if (comment != null) {
             // 删除评论
             commentMapper.deleteByPrimaryKey(commentId.longValue());
-            List<Reply> replies = replyService.selectAllByCommentId(commentId.longValue(), 0, Integer.MAX_VALUE);
+            List<Reply> replies = replyService.selectReply(commentId.longValue(), 0, Integer.MAX_VALUE);
             for (Reply reply : replies) {
                 replyService.deleteByPrimaryKey(reply.getId());
             }
@@ -220,7 +202,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<CircleHomeCommentVO> getAllComment(Long diaryId, Integer page) {
         // 获取子评论
-        List<Comment> comments = commentMapper.selectAllByDiaryIdAndCommentTypeOrderByCommentCreatetimeDesc(diaryId, 0, 0, 10);
+        List<Comment> comments = commentMapper.selectComment(diaryId, 0, 0, 10);
         List<CircleHomeCommentVO> circleHomeCommentVOS = new ArrayList<>();
         for (Comment comment : comments) {
             if (EnumComment.COMMENT_DELETE_STATUS.getValue().equals(comment.getCommentStatus())) {
@@ -229,7 +211,7 @@ public class CommentServiceImpl implements CommentService {
             }
             CircleHomeCommentVO circleHomeCommentVO = new CircleHomeCommentVO();
             // 查询此评论下的全部子评论
-            List<Reply> replies = replyService.selectAllByCommentId(comment.getId(), 0, 3);
+            List<Reply> replies = replyService.selectReply(comment.getId(), 0, 3);
             List<CircleHomeReplyVO> circleHomeReplyVOS = new ArrayList<>();
             for (Reply reply : replies) {
                 CircleHomeReplyVO circleHomeReplyVO = new CircleHomeReplyVO();

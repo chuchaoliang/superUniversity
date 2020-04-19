@@ -1,9 +1,11 @@
 package com.ccl.wx.global.aop;
 
-import com.ccl.wx.global.annotation.ParamCheck;
 import com.ccl.wx.entity.CircleInfo;
+import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.exception.CircleIsNullException;
 import com.ccl.wx.exception.ParamIsNullException;
+import com.ccl.wx.exception.UserIsNullException;
+import com.ccl.wx.global.annotation.ParamCheck;
 import com.ccl.wx.service.CircleInfoService;
 import com.ccl.wx.service.UserInfoService;
 import lombok.extern.slf4j.Slf4j;
@@ -83,6 +85,9 @@ public class ParamCheckAop {
                 if ("circleid".equals(paramNames[i]) || "circleId".equals(paramNames[i])) {
                     circleIsNull(Long.valueOf(String.valueOf(paramValues[i])), value[0]);
                 }
+                if ("userid".equals(paramNames[i]) || "userId".equals(paramNames[i])) {
+                    userIsNull(String.valueOf(paramValues[i]), value[0]);
+                }
             }
         }
         result = pjp.proceed();
@@ -91,6 +96,13 @@ public class ParamCheckAop {
         log.info("方法名：" + signature.getName() + "->方法执行时间：" + (afterTime - beforeTime) + "-->请求的Url：\'" + value[0] + "\'");
         // 无需后置通知、处理异常通知 paramIsNull方法处理
         return result;
+    }
+
+    private void userIsNull(String userId, String url) {
+        UserInfo userInfo = userInfoService.selectByPrimaryKey(userId);
+        if (userInfo == null) {
+            throw new UserIsNullException(userId, url);
+        }
     }
 
     private void circleIsNull(Long circleId, String url) {

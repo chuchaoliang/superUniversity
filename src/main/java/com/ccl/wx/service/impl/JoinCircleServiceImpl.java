@@ -88,6 +88,17 @@ public class JoinCircleServiceImpl implements JoinCircleService {
     }
 
     @Override
+    public String getUserJoinCircleNickname(String userId, Long circleId) {
+        JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+        if (joinCircle == null || StringUtils.isEmpty(joinCircle.getUserNickName())) {
+            UserInfo userInfo = userInfoService.selectByPrimaryKey(userId);
+            return userInfo.getNickname();
+        } else {
+            return joinCircle.getUserNickName();
+        }
+    }
+
+    @Override
     public int concatCircleTheme(Long circleId, String userId, String themeId, Boolean flag) {
         return joinCircleMapper.concatCircleTheme(circleId, userId, themeId, flag);
     }

@@ -1,7 +1,7 @@
 package com.ccl.wx.service;
 
-import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.entity.UserLike;
+import com.ccl.wx.vo.DiaryLikeVO;
 
 import java.util.List;
 
@@ -40,15 +40,7 @@ public interface UserLikeService {
      * @param userId   用户id
      * @return
      */
-    List<UserInfo> getAllLikeUserNickName(String userId, String circleId, Long diaryId);
-
-    /**
-     * 根据点赞用户昵称拼接其昵称
-     *
-     * @param userInfos
-     * @return
-     */
-    String getAllLikeUserNickName(List<UserInfo> userInfos);
+    List<DiaryLikeVO> getAllLikeUserNickName(String userId, String circleId, Long diaryId);
 
     /**
      * 获取此日记的点赞状态

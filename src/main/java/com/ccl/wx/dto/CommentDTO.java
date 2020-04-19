@@ -2,7 +2,6 @@ package com.ccl.wx.dto;
 
 import lombok.Data;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,11 +16,6 @@ public class CommentDTO {
     private Long id;
 
     /**
-     * 日志id
-     */
-    private Long diaryId;
-
-    /**
      * 评论内容（200个字以内）
      */
     private String commentContent;
@@ -34,17 +28,7 @@ public class CommentDTO {
     /**
      * 创建时间
      */
-    private Date commentCreatetime;
-
-    /**
-     * 删除时间
-     */
-    private Date commentDeltime;
-
-    /**
-     * 评论状态(0正常 1已删除)
-     */
-    private Integer commentStatus;
+    private String createTime;
 
     /**
      * 评论点赞数
@@ -52,24 +36,9 @@ public class CommentDTO {
     private Long commentLike;
 
     /**
-     * 评论类型(0普通评论 1管理员评论)
-     */
-    private Integer commentType;
-
-    /**
-     * 圈子id
-     */
-    private Long circleId;
-
-    /**
      * 评论照片
      */
     private String commentImage;
-
-    /**
-     * 是否是点评状态
-     */
-    private Boolean remarkStatus;
 
     /**
      * 评论人昵称
@@ -87,7 +56,12 @@ public class CommentDTO {
     private String gender;
 
     /**
-     * 评论表列表
+     * 回复总数
      */
-    private List<ReplyDTO> replyDTOS;
+    private Long replyNumber;
+
+    /**
+     * 回复列表
+     */
+    private List<ReplyDTO> replyList;
 }

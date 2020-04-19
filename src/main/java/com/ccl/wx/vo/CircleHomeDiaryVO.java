@@ -34,11 +34,6 @@ public class CircleHomeDiaryVO implements Serializable {
     private Integer diaryLike;
 
     /**
-     * 日志评论数
-     */
-    private Integer diaryComment;
-
-    /**
      * 日志的位置信息
      */
     private String diaryAddress;
@@ -49,14 +44,14 @@ public class CircleHomeDiaryVO implements Serializable {
     private String diaryVoice;
 
     /**
-     * 日志所在的圈子id
+     * 日志视频地址
      */
-    private Long circleId;
+    private String diaryVideo;
 
     /**
      * 创建时间的加工 几天前 几个月前 几个小时前
      */
-    private String createTimeRelative;
+    private String createTime;
 
     /**
      * 日记的图片列表
@@ -104,24 +99,9 @@ public class CircleHomeDiaryVO implements Serializable {
     private List<UserInfo> likeUserInfos;
 
     /**
-     * 点赞用户全部昵称
-     */
-    private String likeUserInfosStr;
-
-    /**
      * 是否省略文本内容
      */
     private Boolean ellipsis;
-
-    /**
-     * 固定 是否省略文本内容
-     */
-    private Boolean judgeEllipsis;
-
-    /**
-     * 是否隐藏评论信息
-     */
-    private Boolean hideComment;
 
     /**
      * 日志评论和回复的总数
@@ -129,7 +109,12 @@ public class CircleHomeDiaryVO implements Serializable {
     private Long commentSum;
 
     /**
-     * 是否隐藏点赞信息
+     * 圈子主题
      */
-    private Boolean likeComment;
+    private CircleHomeThemeVO themeInfo;
+
+    /**
+     * 圈子信息
+     */
+    private CircleVO circleInfo;
 }
