@@ -83,6 +83,9 @@ public class ParamCheckAop {
                     paramIsNull(paramNames[i], paramValues[i], parameterTypes[i] == null ? null : parameterTypes[i].getName(), value[0]);
                 }
                 if ("circleid".equals(paramNames[i]) || "circleId".equals(paramNames[i])) {
+                    if (paramValues[i] == null) {
+                        paramValues[i] = -1;
+                    }
                     circleIsNull(Long.valueOf(String.valueOf(paramValues[i])), value[0]);
                 }
                 if ("userid".equals(paramNames[i]) || "userId".equals(paramNames[i])) {

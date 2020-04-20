@@ -1,11 +1,11 @@
 package com.ccl.wx.controller.circle;
 
 import com.alibaba.fastjson.JSON;
-import com.ccl.wx.global.annotation.ParamCheck;
 import com.ccl.wx.common.api.EnumResultCode;
 import com.ccl.wx.common.api.Result;
 import com.ccl.wx.enums.EnumPage;
 import com.ccl.wx.enums.EnumResultStatus;
+import com.ccl.wx.global.annotation.ParamCheck;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
@@ -240,6 +240,79 @@ public class JoinCircleController {
         String result = joinCircleService.refuseJoinCircle(circleId, applyUserId, refuseReason);
         if (EnumResultStatus.FAIL.getValue().equals(result)) {
             return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    /**
+     * 添加圈子昵称
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/menu/nickname/add")
+    public Result<String> saveCircleNickname(@RequestParam(value = "circleId", required = false) Long circleId,
+                                             @RequestHeader(value = "token", required = false) String userId,
+                                             @RequestParam(value = "nickname", required = false) String nickname) {
+        String result = joinCircleService.saveCircleNickname(userId, circleId, nickname);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    /**
+     * 设置用户加入圈子昵称为默认值
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    @GetMapping("/menu/nickname/default")
+    public Result<String> updateCircleNicknameDefault(@ParamCheck @RequestParam(value = "circleId", required = false) Long circleId,
+                                                      @RequestHeader(value = "token", required = false) String userId) {
+        String result = joinCircleService.updateCircleNicknameDefault(userId, circleId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("用户未加入圈子，或者状态异常！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    /**
+     * 检测圈子昵称是否存在
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    @GetMapping("/menu/nickname/check")
+    public Result<String> checkUserCircleNickname(@ParamCheck @RequestParam(value = "circleId", required = false) Long circleId,
+                                                  @RequestHeader(value = "token", required = false) String userId) {
+        String result = joinCircleService.checkUserCircleNickname(circleId, userId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("用户未加入圈子，或者状态异常！");
+        }
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
+     * 更新圈子昵称
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param nickname 圈子昵称
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/menu/nickname/update")
+    public Result<String> updateUserCircleNickname(@RequestParam(value = "circleId", required = false) Long circleId,
+                                                   @RequestHeader(value = "token", required = false) String userId,
+                                                   @RequestParam(value = "nickname", required = false) String nickname) {
+        String result = joinCircleService.updateUserCircleNickname(circleId, userId, nickname);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("用户未加入圈子，或者状态异常！");
         }
         return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
     }

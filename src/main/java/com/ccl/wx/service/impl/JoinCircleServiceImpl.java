@@ -736,5 +736,87 @@ public class JoinCircleServiceImpl implements JoinCircleService {
             }
         }
     }
+
+    @Override
+    public String saveCircleNickname(String userId, Long circleId, String nickname) {
+        JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+        if (joinCircle == null || !joinCircle.getUserStatus().equals(EnumUserCircle.USER_NORMAL_STATUS.getValue())
+                || !StringUtils.isEmpty(joinCircle.getUserNickName()) || StringUtils.isEmpty(nickname)) {
+            return EnumResultStatus.FAIL.getValue();
+        } else {
+            joinCircle.setUserNickName(nickname);
+            int i = joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
+            if (i == 0) {
+                return EnumResultStatus.FAIL.getValue();
+            } else {
+                return EnumResultStatus.SUCCESS.getValue();
+            }
+        }
+    }
+
+    @Override
+    public String updateCircleNicknameDefault(String userId, Long circleId) {
+        if (judgeUserJoinCircleStatus(userId, circleId)) {
+            // 状态正常
+            JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+            joinCircle.setUserNickName("");
+            int i = joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
+            if (i == 0) {
+                return EnumResultStatus.FAIL.getValue();
+            } else {
+                return EnumResultStatus.SUCCESS.getValue();
+            }
+        }
+        return EnumResultStatus.FAIL.getValue();
+    }
+
+    @Override
+    public String checkUserCircleNickname(Long circleId, String userId) {
+        if (judgeUserJoinCircleStatus(userId, circleId)) {
+            JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+            HashMap<String, Object> hashMap = new HashMap<>();
+            String userNickName = joinCircle.getUserNickName();
+            if (StringUtils.isEmpty(userNickName)) {
+                // 昵称为空
+                hashMap.put("nicknameIsNull", true);
+            } else {
+                hashMap.put("nicknameIsNull", false);
+                hashMap.put("nickname", userNickName);
+            }
+            return JSON.toJSONString(hashMap);
+        }
+        return EnumResultStatus.FAIL.getValue();
+    }
+
+    @Override
+    public String updateUserCircleNickname(Long circleId, String userId, String nickname) {
+        if (judgeUserJoinCircleStatus(userId, circleId) && !StringUtils.isEmpty(nickname)) {
+            JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+            joinCircle.setUserNickName(nickname);
+            int i = joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
+            if (i == 0) {
+                return EnumResultStatus.FAIL.getValue();
+            } else {
+                return EnumResultStatus.SUCCESS.getValue();
+            }
+        }
+        return EnumResultStatus.FAIL.getValue();
+    }
+
+    /**
+     * 判断用户加入圈子状态是否正常
+     *
+     * @param userId   用户id
+     * @param circleId 圈子id
+     * @return
+     */
+    private boolean judgeUserJoinCircleStatus(String userId, Long circleId) {
+        JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+        if (joinCircle == null || !joinCircle.getUserStatus().equals(EnumUserCircle.USER_NORMAL_STATUS.getValue())) {
+            return false;
+        }
+        return true;
+    }
 }
+
 

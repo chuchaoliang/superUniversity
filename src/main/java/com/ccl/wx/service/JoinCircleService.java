@@ -340,9 +340,48 @@ public interface JoinCircleService {
      *
      * @param circleId  圈子id
      * @param outUserId 被淘汰用户人id
-     * @param userId
+     * @param userId    用户id
      * @return
      */
     String outCircleUser(Long circleId, String outUserId, String userId);
+
+    /**
+     * 保存用户所在圈子昵称
+     *
+     * @param userId   用户id
+     * @param circleId 圈子id
+     * @param nickname 用户昵称
+     * @return
+     */
+    String saveCircleNickname(String userId, Long circleId, String nickname);
+
+    /**
+     * 更新用户所在圈子昵称为默认值
+     *
+     * @param userId   用户id
+     * @param circleId 圈子id
+     * @return
+     */
+    String updateCircleNicknameDefault(String userId, Long circleId);
+
+    /**
+     * 检测用户是否设置了圈子昵称
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    String checkUserCircleNickname(Long circleId, String userId);
+
+    /**
+     * 更新用户圈子昵称
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param nickname
+     * @return
+     */
+    String updateUserCircleNickname(Long circleId, String userId, String nickname);
 }
+
 
