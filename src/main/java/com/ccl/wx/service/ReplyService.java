@@ -1,5 +1,6 @@
 package com.ccl.wx.service;
 
+import com.ccl.wx.dto.ReplyDTO;
 import com.ccl.wx.entity.Reply;
 
 import java.util.List;
@@ -23,8 +24,6 @@ public interface ReplyService {
     int updateByPrimaryKeySelective(Reply record);
 
     int updateByPrimaryKey(Reply record);
-
-    List<Long> selectIdByDiaryId(Long diaryId);
 
     /**
      * 回复评论
@@ -50,7 +49,7 @@ public interface ReplyService {
      * @param pageNumber 多少个数据
      * @return
      */
-    List<Reply> selectAllByCommentId(Long commentId, int start, Integer pageNumber);
+    List<Reply> selectReply(Long commentId, int start, Integer pageNumber);
 
     /**
      * 根据日记id查询回复的条数
@@ -59,4 +58,27 @@ public interface ReplyService {
      * @return
      */
     Long countByDiaryId(Long diaryId);
+
+    /**
+     * 装饰回复
+     *
+     * @param replies 回复列表
+     * @return
+     */
+    List<ReplyDTO> adornReply(List<Reply> replies);
+
+    /**
+     * 根据日记id查询全部的回复
+     * @param diaryId
+     * @return
+     */
+    List<Long> selectIdByDiaryId(Long diaryId);
+
+    /**
+     * 根据评论id获取全部回复总数
+     *
+     * @param commentId 评论id
+     * @return
+     */
+    Long countByCommentId(Long commentId);
 }

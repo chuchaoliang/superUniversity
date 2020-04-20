@@ -76,9 +76,10 @@ public interface UserDiaryService {
      *
      * @param circleId    圈子id
      * @param diaryStatus 日志状态
+     * @param userId
      * @return
      */
-    List<UserDiary> selectAllByCircleIdAndDiaryStatus(@Param("circleId") Long circleId, @Param("diaryStatusList") List<Integer> diaryStatus);
+    List<UserDiary> selectAllByCircleIdAndDiaryStatus(@Param("circleId") Long circleId, @Param("diaryStatusList") List<Integer> diaryStatus, String userId);
 
     /**
      * 删除用户日志信息
@@ -236,23 +237,23 @@ public interface UserDiaryService {
     String getAssignDiaryInfo(Long circleId, String userId, Integer page);
 
     /**
-     * 获取圈子中日志信息
+     * 获取用户主页日志信息
      *
-     * @param userDiaries 用户日志
-     * @param loginUserId 登录的用户id
-     * @param nextPage    是否还有下一页
+     * @param userId   用户id
+     * @param page     页数
      * @return
      */
-    String getCircleDiaryInfo(List<UserDiary> userDiaries, String loginUserId, Boolean nextPage);
+    String getUserIndexDiaryInfo(String userId, Integer page);
 
     /**
      * 根据圈子id 和日志状态获取日志总数
      *
      * @param circleId    圈子id
      * @param diaryStatus 日志状态
+     * @param userId
      * @return
      */
-    Long countByCircleIdAndDiaryStatus(Long circleId, List<Integer> diaryStatus);
+    Long countByCircleIdAndUserIdAndDiaryStatus(Long circleId, List<Integer> diaryStatus, String userId);
 
     /**
      * 保存日志音频文件
@@ -290,7 +291,8 @@ public interface UserDiaryService {
      * 根据日记id查询全部的信息（点赞、评论、点评）
      *
      * @param diaryId 日志id
+     * @param userId
      * @return
      */
-    String getDiaryInfoById(Long diaryId);
+    String getDiaryInfoById(Long diaryId, String userId);
 }

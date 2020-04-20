@@ -11,11 +11,8 @@ import com.ccl.wx.dto.CircleInfoDTO;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.enums.*;
 import com.ccl.wx.mapper.CircleInfoMapper;
-import com.ccl.wx.properties.DefaultProperties;
-import com.ccl.wx.service.CircleInfoService;
-import com.ccl.wx.service.JoinCircleService;
-import com.ccl.wx.service.TodayContentService;
-import com.ccl.wx.service.UserDiaryService;
+import com.ccl.wx.config.properties.DefaultProperties;
+import com.ccl.wx.service.*;
 import com.ccl.wx.util.CclUtil;
 import com.ccl.wx.util.FtpUtil;
 import com.ccl.wx.vo.CircleIndexVO;
@@ -52,6 +49,9 @@ public class CircleInfoServiceImpl implements CircleInfoService {
 
     @Resource
     private DefaultProperties defaultProperties;
+
+    @Resource
+    private CircleIntroService circleIntroService;
 
     @Override
     public int deleteByPrimaryKey(Long circleId) {
@@ -107,7 +107,7 @@ public class CircleInfoServiceImpl implements CircleInfoService {
         ArrayList<Integer> diaryStatus = new ArrayList<>();
         diaryStatus.add(EnumUserDiary.USER_DIARY_NORMAL.getValue());
         diaryStatus.add(EnumUserDiary.USER_DIARY_PERMISSION.getValue());
-        int diaryNumber = userDiaryService.selectAllByCircleIdAndDiaryStatus(circleId.longValue(), diaryStatus).size();
+        int diaryNumber = userDiaryService.selectAllByCircleIdAndDiaryStatus(circleId.longValue(), diaryStatus, null).size();
         circleInfoDTO.setDiaryNumber(diaryNumber);
         // 设置圈子总活跃度
         circleInfoDTO.setCircleVitality(joinCircleService.sumUserVitalityByCircleIdAndUserStatus(circleId.longValue(), EnumUserCircle.USER_NORMAL_STATUS.getValue()));
@@ -261,5 +261,6 @@ public class CircleInfoServiceImpl implements CircleInfoService {
         return selectAdornCircle(circleInfos, userId, circleInfos.size(), page);
     }
 }
+
 
 

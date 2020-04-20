@@ -21,6 +21,7 @@ import com.ccl.wx.util.CclDateUtil;
 import com.ccl.wx.util.CclUtil;
 import com.ccl.wx.vo.CircleNormalUserInfoVO;
 import com.ccl.wx.vo.CircleUserInfoVO;
+import com.ccl.wx.vo.UserVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,9 @@ public class JoinCircleServiceImpl implements JoinCircleService {
 
     @Resource
     private UserInfoService userInfoService;
+
+    @Resource
+    private JoinCircleService joinCircleService;
 
     @Override
     public int deleteByPrimaryKey(Long circleId, String userId) {
@@ -88,6 +92,17 @@ public class JoinCircleServiceImpl implements JoinCircleService {
     }
 
     @Override
+    public String getUserJoinCircleNickname(String userId, Long circleId) {
+        JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+        if (joinCircle == null || StringUtils.isEmpty(joinCircle.getUserNickName())) {
+            UserInfo userInfo = userInfoService.selectByPrimaryKey(userId);
+            return userInfo.getNickname();
+        } else {
+            return joinCircle.getUserNickName();
+        }
+    }
+
+    @Override
     public int concatCircleTheme(Long circleId, String userId, String themeId, Boolean flag) {
         return joinCircleMapper.concatCircleTheme(circleId, userId, themeId, flag);
     }
@@ -118,13 +133,8 @@ public class JoinCircleServiceImpl implements JoinCircleService {
     }
 
     @Override
-    public List<JoinCircle> selectUserIdByUserPermission(Integer circleId, List<Integer> userPermission) {
-        return joinCircleMapper.selectUserIdByUserPermission(circleId, userPermission);
-    }
-
-    @Override
     public Boolean judgeUserIsCircleManage(Integer circleId, List<Integer> userPermission, String userId) {
-        List<JoinCircle> joinCircles = joinCircleMapper.selectUserIdByUserPermission(circleId, userPermission);
+        List<JoinCircle> joinCircles = joinCircleMapper.selectUserIdByUserPermission(circleId, userPermission, 0, EnumCircle.ADMIN_MAX_NUMBER.getValue());
         List<String> userIds = joinCircles.stream().map(JoinCircle::getUserId).collect(Collectors.toList());
         if (userIds.contains(userId)) {
             return true;
@@ -166,8 +176,12 @@ public class JoinCircleServiceImpl implements JoinCircleService {
             } else {
                 Map userInfo = userVitalityInfo.get(0);
                 userInfo.put("rowNum", "9999");
+                userInfo.put("nickname", joinCircleService.getUserJoinCircleNickname(String.valueOf(userInfo.get("userId")), circleId));
                 return userVitalityInfo;
             }
+        }
+        for (Map map : userVitalityRankingInfo) {
+            map.put("nickname", joinCircleService.getUserJoinCircleNickname(String.valueOf(map.get("userId")), circleId));
         }
         return userVitalityRankingInfo;
     }
@@ -183,8 +197,12 @@ public class JoinCircleServiceImpl implements JoinCircleService {
             } else {
                 Map userInfo = userSignInInfo.get(0);
                 userInfo.put("rowNum", "9999");
+                userInfo.put("nickname", joinCircleService.getUserJoinCircleNickname(String.valueOf(userInfo.get("userId")), circleId));
                 return userSignInInfo;
             }
+        }
+        for (Map map : userSignInRankingInfo) {
+            map.put("nickname", joinCircleService.getUserJoinCircleNickname(String.valueOf(map.get("userId")), circleId));
         }
         return userSignInRankingInfo;
     }
@@ -197,6 +215,9 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         boolean judgeNextPage = CclUtil.judgeNextPage(userAmount, EnumPage.PAGE_NUMBER.getValue(), page);
         // 获取用户活跃度排行数据
         List<Map> userVitalityRanking = getUserVitalityRanking(circleId, page * EnumPage.PAGE_NUMBER.getValue(), EnumPage.PAGE_NUMBER.getValue());
+        for (Map map : userVitalityRanking) {
+            map.put("nickname", joinCircleService.getUserJoinCircleNickname(String.valueOf(map.get("userId")), circleId));
+        }
         // 定义返回数据列表
         ArrayList<Object> userVitalityData = new ArrayList<>();
         userVitalityData.add(userVitalityRanking);
@@ -211,6 +232,9 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         // 判断是否存在下一页
         boolean judgeNextPage = CclUtil.judgeNextPage(userAmount, EnumPage.PAGE_NUMBER.getValue(), page);
         List<Map> userSignInRanking = getUserSignInRanking(circleId, page * EnumPage.PAGE_NUMBER.getValue(), EnumPage.PAGE_NUMBER.getValue());
+        for (Map map : userSignInRanking) {
+            map.put("nickname", joinCircleService.getUserJoinCircleNickname(String.valueOf(map.get("userId")), circleId));
+        }
         // 定义返回数据列表
         ArrayList<Object> userSignInData = new ArrayList<>();
         userSignInData.add(userSignInRanking);
@@ -240,6 +264,7 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         List<Map> userSuccessSignInByDate = joinCircleMapper.getUserSuccessSignInByDate(circleId, formatDate, page * pageNumber, pageNumber);
         ArrayList<UserSignSuccessDTO> userSignSuccessDTOS = new ArrayList<>();
         for (Map userSuccessInfo : userSuccessSignInByDate) {
+            userSuccessInfo.put("nickname", joinCircleService.getUserJoinCircleNickname(userId, circleId));
             // 将Map中的数据复制到Bean中
             UserSignSuccessDTO userSignSuccessDTO = BeanUtil.fillBeanWithMap(userSuccessInfo, new UserSignSuccessDTO(), false);
             JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userSignSuccessDTO.getUserId());
@@ -279,6 +304,9 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         int pageNumber = EnumPage.PAGE_NUMBER.getValue();
         // 获取未打卡用户数据
         List<Map> userFailSignInByDate = joinCircleMapper.getUserFailSignInByDate(circleId, formatDate, pageNumber * page, pageNumber);
+        for (Map map : userFailSignInByDate) {
+            map.put("nickname", joinCircleService.getUserJoinCircleNickname(String.valueOf(map.get("userId")), circleId));
+        }
         // 获取今天的打卡人数
         int signInNumber = userDiaryService.countThemeUserNumberByDate(circleId, date);
         // 获取圈子总人数
@@ -558,6 +586,7 @@ public class JoinCircleServiceImpl implements JoinCircleService {
                 log.error("出现错误，存在用户未在用户列表中！！！！");
                 continue;
             } else {
+                userInfo.setNickname(joinCircleService.getUserJoinCircleNickname(userInfo.getId(), joinCircle.getCircleId()));
                 // 设置用户昵称
                 circleNormalUserInfoVO.setNickname(userInfo.getNickname());
                 // 设置用户头像
@@ -703,5 +732,168 @@ public class JoinCircleServiceImpl implements JoinCircleService {
             }
         }
     }
+
+    @Override
+    public String saveCircleNickname(String userId, Long circleId, String nickname) {
+        JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+        if (joinCircle == null || !joinCircle.getUserStatus().equals(EnumUserCircle.USER_NORMAL_STATUS.getValue())
+                || !StringUtils.isEmpty(joinCircle.getUserNickName()) || StringUtils.isEmpty(nickname)) {
+            return EnumResultStatus.FAIL.getValue();
+        } else {
+            joinCircle.setUserNickName(nickname);
+            int i = joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
+            if (i == 0) {
+                return EnumResultStatus.FAIL.getValue();
+            } else {
+                return EnumResultStatus.SUCCESS.getValue();
+            }
+        }
+    }
+
+    @Override
+    public String updateCircleNicknameDefault(String userId, Long circleId) {
+        if (judgeUserJoinCircleStatus(userId, circleId)) {
+            // 状态正常
+            JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+            joinCircle.setUserNickName("");
+            int i = joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
+            if (i == 0) {
+                return EnumResultStatus.FAIL.getValue();
+            } else {
+                return EnumResultStatus.SUCCESS.getValue();
+            }
+        }
+        return EnumResultStatus.FAIL.getValue();
+    }
+
+    @Override
+    public String checkUserCircleNickname(Long circleId, String userId) {
+        if (judgeUserJoinCircleStatus(userId, circleId)) {
+            JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+            HashMap<String, Object> hashMap = new HashMap<>();
+            String userNickName = joinCircle.getUserNickName();
+            if (StringUtils.isEmpty(userNickName)) {
+                // 昵称为空
+                hashMap.put("nicknameIsNull", true);
+            } else {
+                hashMap.put("nicknameIsNull", false);
+                hashMap.put("nickname", userNickName);
+            }
+            return JSON.toJSONString(hashMap);
+        }
+        return EnumResultStatus.FAIL.getValue();
+    }
+
+    @Override
+    public String updateUserCircleNickname(Long circleId, String userId, String nickname) {
+        if (judgeUserJoinCircleStatus(userId, circleId) && !StringUtils.isEmpty(nickname)) {
+            JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+            joinCircle.setUserNickName(nickname);
+            int i = joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
+            if (i == 0) {
+                return EnumResultStatus.FAIL.getValue();
+            } else {
+                return EnumResultStatus.SUCCESS.getValue();
+            }
+        }
+        return EnumResultStatus.FAIL.getValue();
+    }
+
+    @Override
+    public String getCircleAdminInfo(Long circleId) {
+        List<JoinCircle> joinCircles = joinCircleMapper.selectUserIdByUserPermission(circleId.intValue(), UserPermissionList.circleAdminOutMaster(), 0, EnumCircle.ADMIN_MAX_NUMBER.getValue());
+        return JSON.toJSONString(adornUserInfo(joinCircles));
+    }
+
+    @Override
+    public String getCircleGeneralUserInfo(Long circleId, Integer page) {
+        int pageNumber = EnumPage.PAGE_NUMBER.getValue();
+        List<JoinCircle> joinCircles = joinCircleMapper.selectUserIdByUserPermission(circleId.intValue(), UserPermissionList.circleGeneral(), page * pageNumber, pageNumber);
+        // 获取圈子全部普通用户总数
+        Integer circleAllUserNumber = joinCircleMapper.countByCircleIdAndUserPermission(circleId, UserPermissionList.circleGeneral());
+        List<UserVO> userVOS = adornUserInfo(joinCircles);
+        ArrayList<Object> result = new ArrayList<>();
+        result.add(userVOS);
+        result.add(CclUtil.judgeNextPage(circleAllUserNumber, EnumPage.PAGE_NUMBER.getValue(), page));
+        return JSON.toJSONString(result);
+    }
+
+    @Override
+    public String checkAddCircleAdmin(Long circleId) {
+        Integer adminNumber = joinCircleMapper.countByCircleIdAndUserPermission(circleId, UserPermissionList.circleAdminOutMaster());
+        if (adminNumber >= EnumCircle.ADMIN_MAX_NUMBER.getValue()) {
+            return EnumResultStatus.FAIL.getValue();
+        } else {
+            return EnumResultStatus.SUCCESS.getValue();
+        }
+    }
+
+    @Override
+    public String addCircleAdmin(Long circleId, String userId) {
+        JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+        String fail = EnumResultStatus.FAIL.getValue();
+        if (judgeUserJoinCircleStatus(userId, circleId) && !joinCircle.getUserPermission().equals(EnumUserPermission.MASTER_USER.getValue())) {
+            joinCircle.setUserPermission(EnumUserPermission.ADMIN_USER.getValue());
+            int i = joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
+            if (i == 0) {
+                return fail;
+            }
+            return EnumResultStatus.SUCCESS.getValue();
+        }
+        return fail;
+    }
+
+    @Override
+    public String outCircleAdminInfo(Long circleId, String userId) {
+        String fail = EnumResultStatus.FAIL.getValue();
+        if (judgeUserJoinCircleStatus(userId, circleId)) {
+            JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+            if (!joinCircle.getUserPermission().equals(EnumUserPermission.MASTER_USER.getValue())) {
+                joinCircle.setUserPermission(EnumUserPermission.ORDINARY_USER.getValue());
+                int i = joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
+                if (i == 0) {
+                    return fail;
+                }
+                return EnumResultStatus.SUCCESS.getValue();
+            } else {
+                return fail;
+            }
+        }
+        return fail;
+    }
+
+    /**
+     * 装饰用户信息
+     *
+     * @param joinCircles 用户加入圈子信息列表
+     * @return
+     */
+    private List<UserVO> adornUserInfo(List<JoinCircle> joinCircles) {
+        List<String> userIds = joinCircles.stream().map(JoinCircle::getUserId).collect(Collectors.toList());
+        ArrayList<UserVO> userVOS = new ArrayList<>();
+        for (String userId : userIds) {
+            UserInfo userInfo = userInfoService.selectByPrimaryKey(userId);
+            UserVO userVO = new UserVO();
+            BeanUtils.copyProperties(userInfo, userVO);
+            userVOS.add(userVO);
+        }
+        return userVOS;
+    }
+
+    /**
+     * 判断用户加入圈子状态是否正常
+     *
+     * @param userId   用户id
+     * @param circleId 圈子id
+     * @return
+     */
+    private boolean judgeUserJoinCircleStatus(String userId, Long circleId) {
+        JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+        if (joinCircle == null || !joinCircle.getUserStatus().equals(EnumUserCircle.USER_NORMAL_STATUS.getValue())) {
+            return false;
+        }
+        return true;
+    }
 }
+
 

@@ -26,7 +26,18 @@ public interface CommentMapper {
     int updateByPrimaryKey(Comment record);
 
     /**
-     * 根据日记id查找日记评论、点评
+     * 查找日记评论、点评
+     *
+     * @param diaryId     日记id
+     * @param commentType 评论类型
+     * @param start       起始页
+     * @param number      查找个数
+     * @return
+     */
+    List<Comment> selectComment(@Param("diaryId") Long diaryId, @Param("commentType") Integer commentType, @Param("start") Integer start, @Param("number") Integer number);
+
+    /**
+     * 根据日记id查询全部评论信息
      *
      * @param diaryId 日志id
      * @return
@@ -34,37 +45,18 @@ public interface CommentMapper {
     List<Comment> selectAllByDiaryId(@Param("diaryId") Long diaryId);
 
     /**
-     * 查找日记评论、点评
+     * 获取评论总数
      *
-     * @param diaryId     日记id
-     * @param commentType 评论类型
-     * @param start       页面开始
-     * @param end         页面结束
+     * @param diaryId 日记id
      * @return
      */
-    List<Comment> selectAllByDiaryIdAndCommentTypeOrderByCommentCreatetimeDesc(@Param("diaryId") Long diaryId, @Param("commentType") Integer commentType, @Param("start") Integer start, @Param("end") Integer end);
+    Long countByDiaryId(Long diaryId);
 
     /**
-     * 根据圈子id查询全部评论信息
+     * 根据日记id查询所有的评论id
      *
-     * @param circleId 圈子id
+     * @param diaryId 日记id
      * @return
      */
-    List<Comment> selectAllByCircleId(@Param("circleId") Long circleId);
-
-    /**
-     * 根据日志id查询全部评论id列表
-     *
-     * @param diaryId 日志id
-     * @return
-     */
-    List<Long> selectIdByDiaryId(@Param("diaryId") Long diaryId);
-
-    /**
-     * 根据日记id查询存在多少评论
-     *
-     * @param diaryId 日志id
-     * @return
-     */
-    Long countByDiaryId(@Param("diaryId") Long diaryId);
+    List<Long> selectIdByDiaryId(Long diaryId);
 }

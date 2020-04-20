@@ -11,11 +11,11 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.mapper.UserInfoMapper;
-import com.ccl.wx.pojo.LoginData;
+import com.ccl.wx.config.properties.LoginData;
 import com.ccl.wx.pojo.UserSession;
-import com.ccl.wx.properties.DefaultProperties;
-import com.ccl.wx.properties.FileUploadProperties;
-import com.ccl.wx.properties.FtpProperties;
+import com.ccl.wx.config.properties.DefaultProperties;
+import com.ccl.wx.config.properties.FileUploadProperties;
+import com.ccl.wx.config.properties.FtpProperties;
 import com.ccl.wx.service.UserInfoService;
 import com.ccl.wx.util.CclUtil;
 import com.ccl.wx.util.FtpUtil;
@@ -194,4 +194,5 @@ public class UserInfoServiceImpl implements UserInfoService {
         return EnumResultStatus.SUCCESS.getValue();
     }
 }
+
 

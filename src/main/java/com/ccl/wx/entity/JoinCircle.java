@@ -2,14 +2,13 @@ package com.ccl.wx.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Data;
 
 /**
  * @author 褚超亮
- * @date 2020/4/11 20:52
+ * @date 2020/4/20 10:20
  */
 
 @ApiModel(value = "com-ccl-wx-entity-JoinCircle")
@@ -116,6 +115,12 @@ public class JoinCircle implements Serializable {
      */
     @ApiModelProperty(value = "申请理由")
     private String applyReason;
+
+    /**
+     * 更新时间
+     */
+    @ApiModelProperty(value = "更新时间")
+    private Date updateTime;
 
     private static final long serialVersionUID = 1L;
 }

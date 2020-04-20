@@ -1,207 +1,208 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ccl.wx.mapper.ReplyMapper">
-  <resultMap id="BaseResultMap" type="com.ccl.wx.entity.Reply">
-    <!--@mbg.generated-->
-    <!--@Table reply-->
-    <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="comment_id" jdbcType="BIGINT" property="commentId" />
-    <result column="reply_type" jdbcType="INTEGER" property="replyType" />
-    <result column="reply_content" jdbcType="VARCHAR" property="replyContent" />
-    <result column="reply_userid" jdbcType="VARCHAR" property="replyUserid" />
-    <result column="target_userid" jdbcType="VARCHAR" property="targetUserid" />
-    <result column="reply_createtime" jdbcType="TIMESTAMP" property="replyCreatetime" />
-    <result column="reply_deltime" jdbcType="TIMESTAMP" property="replyDeltime" />
-    <result column="reply_status" jdbcType="INTEGER" property="replyStatus" />
-    <result column="reply_like" jdbcType="BIGINT" property="replyLike" />
-    <result column="circle_id" jdbcType="BIGINT" property="circleId" />
-    <result column="reply_image" jdbcType="VARCHAR" property="replyImage" />
-    <result column="diary_id" jdbcType="BIGINT" property="diaryId" />
-  </resultMap>
-  <sql id="Base_Column_List">
-    <!--@mbg.generated-->
-    id, comment_id, reply_type, reply_content, reply_userid, target_userid, reply_createtime, 
-    reply_deltime, reply_status, reply_like, circle_id, reply_image, diary_id
-  </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    <!--@mbg.generated-->
-    select 
-    <include refid="Base_Column_List" />
-    from reply
-    where id = #{id,jdbcType=BIGINT}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    <!--@mbg.generated-->
-    delete from reply
-    where id = #{id,jdbcType=BIGINT}
-  </delete>
-  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.Reply" useGeneratedKeys="true">
-    <!--@mbg.generated-->
-    insert into reply (comment_id, reply_type, reply_content, 
-      reply_userid, target_userid, reply_createtime, 
-      reply_deltime, reply_status, reply_like, 
-      circle_id, reply_image, diary_id
-      )
-    values (#{commentId,jdbcType=BIGINT}, #{replyType,jdbcType=INTEGER}, #{replyContent,jdbcType=VARCHAR}, 
-      #{replyUserid,jdbcType=VARCHAR}, #{targetUserid,jdbcType=VARCHAR}, #{replyCreatetime,jdbcType=TIMESTAMP}, 
-      #{replyDeltime,jdbcType=TIMESTAMP}, #{replyStatus,jdbcType=INTEGER}, #{replyLike,jdbcType=BIGINT}, 
-      #{circleId,jdbcType=BIGINT}, #{replyImage,jdbcType=VARCHAR}, #{diaryId,jdbcType=BIGINT}
-      )
-  </insert>
-  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.Reply" useGeneratedKeys="true">
-    <!--@mbg.generated-->
-    insert into reply
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="commentId != null">
-        comment_id,
-      </if>
-      <if test="replyType != null">
-        reply_type,
-      </if>
-      <if test="replyContent != null">
-        reply_content,
-      </if>
-      <if test="replyUserid != null">
-        reply_userid,
-      </if>
-      <if test="targetUserid != null">
-        target_userid,
-      </if>
-      <if test="replyCreatetime != null">
-        reply_createtime,
-      </if>
-      <if test="replyDeltime != null">
-        reply_deltime,
-      </if>
-      <if test="replyStatus != null">
-        reply_status,
-      </if>
-      <if test="replyLike != null">
-        reply_like,
-      </if>
-      <if test="circleId != null">
-        circle_id,
-      </if>
-      <if test="replyImage != null">
-        reply_image,
-      </if>
-      <if test="diaryId != null">
-        diary_id,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="commentId != null">
-        #{commentId,jdbcType=BIGINT},
-      </if>
-      <if test="replyType != null">
-        #{replyType,jdbcType=INTEGER},
-      </if>
-      <if test="replyContent != null">
-        #{replyContent,jdbcType=VARCHAR},
-      </if>
-      <if test="replyUserid != null">
-        #{replyUserid,jdbcType=VARCHAR},
-      </if>
-      <if test="targetUserid != null">
-        #{targetUserid,jdbcType=VARCHAR},
-      </if>
-      <if test="replyCreatetime != null">
-        #{replyCreatetime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="replyDeltime != null">
-        #{replyDeltime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="replyStatus != null">
-        #{replyStatus,jdbcType=INTEGER},
-      </if>
-      <if test="replyLike != null">
-        #{replyLike,jdbcType=BIGINT},
-      </if>
-      <if test="circleId != null">
-        #{circleId,jdbcType=BIGINT},
-      </if>
-      <if test="replyImage != null">
-        #{replyImage,jdbcType=VARCHAR},
-      </if>
-      <if test="diaryId != null">
-        #{diaryId,jdbcType=BIGINT},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ccl.wx.entity.Reply">
-    <!--@mbg.generated-->
-    update reply
-    <set>
-      <if test="commentId != null">
-        comment_id = #{commentId,jdbcType=BIGINT},
-      </if>
-      <if test="replyType != null">
+    <resultMap id="BaseResultMap" type="com.ccl.wx.entity.Reply">
+        <!--@mbg.generated-->
+        <!--@Table reply-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="comment_id" jdbcType="BIGINT" property="commentId"/>
+        <result column="reply_type" jdbcType="INTEGER" property="replyType"/>
+        <result column="reply_content" jdbcType="VARCHAR" property="replyContent"/>
+        <result column="reply_userid" jdbcType="VARCHAR" property="replyUserid"/>
+        <result column="target_userid" jdbcType="VARCHAR" property="targetUserid"/>
+        <result column="reply_createtime" jdbcType="TIMESTAMP" property="replyCreatetime"/>
+        <result column="reply_deltime" jdbcType="TIMESTAMP" property="replyDeltime"/>
+        <result column="reply_status" jdbcType="INTEGER" property="replyStatus"/>
+        <result column="reply_like" jdbcType="BIGINT" property="replyLike"/>
+        <result column="circle_id" jdbcType="BIGINT" property="circleId"/>
+        <result column="reply_image" jdbcType="VARCHAR" property="replyImage"/>
+        <result column="diary_id" jdbcType="BIGINT" property="diaryId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, comment_id, reply_type, reply_content, reply_userid, target_userid, reply_createtime,
+        reply_deltime, reply_status, reply_like, circle_id, reply_image, diary_id
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from reply
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        <!--@mbg.generated-->
+        delete from reply
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.Reply" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into reply (comment_id, reply_type, reply_content,
+        reply_userid, target_userid, reply_createtime,
+        reply_deltime, reply_status, reply_like,
+        circle_id, reply_image, diary_id
+        )
+        values (#{commentId,jdbcType=BIGINT}, #{replyType,jdbcType=INTEGER}, #{replyContent,jdbcType=VARCHAR},
+        #{replyUserid,jdbcType=VARCHAR}, #{targetUserid,jdbcType=VARCHAR}, #{replyCreatetime,jdbcType=TIMESTAMP},
+        #{replyDeltime,jdbcType=TIMESTAMP}, #{replyStatus,jdbcType=INTEGER}, #{replyLike,jdbcType=BIGINT},
+        #{circleId,jdbcType=BIGINT}, #{replyImage,jdbcType=VARCHAR}, #{diaryId,jdbcType=BIGINT}
+        )
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.Reply"
+            useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into reply
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="commentId != null">
+                comment_id,
+            </if>
+            <if test="replyType != null">
+                reply_type,
+            </if>
+            <if test="replyContent != null">
+                reply_content,
+            </if>
+            <if test="replyUserid != null">
+                reply_userid,
+            </if>
+            <if test="targetUserid != null">
+                target_userid,
+            </if>
+            <if test="replyCreatetime != null">
+                reply_createtime,
+            </if>
+            <if test="replyDeltime != null">
+                reply_deltime,
+            </if>
+            <if test="replyStatus != null">
+                reply_status,
+            </if>
+            <if test="replyLike != null">
+                reply_like,
+            </if>
+            <if test="circleId != null">
+                circle_id,
+            </if>
+            <if test="replyImage != null">
+                reply_image,
+            </if>
+            <if test="diaryId != null">
+                diary_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="commentId != null">
+                #{commentId,jdbcType=BIGINT},
+            </if>
+            <if test="replyType != null">
+                #{replyType,jdbcType=INTEGER},
+            </if>
+            <if test="replyContent != null">
+                #{replyContent,jdbcType=VARCHAR},
+            </if>
+            <if test="replyUserid != null">
+                #{replyUserid,jdbcType=VARCHAR},
+            </if>
+            <if test="targetUserid != null">
+                #{targetUserid,jdbcType=VARCHAR},
+            </if>
+            <if test="replyCreatetime != null">
+                #{replyCreatetime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="replyDeltime != null">
+                #{replyDeltime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="replyStatus != null">
+                #{replyStatus,jdbcType=INTEGER},
+            </if>
+            <if test="replyLike != null">
+                #{replyLike,jdbcType=BIGINT},
+            </if>
+            <if test="circleId != null">
+                #{circleId,jdbcType=BIGINT},
+            </if>
+            <if test="replyImage != null">
+                #{replyImage,jdbcType=VARCHAR},
+            </if>
+            <if test="diaryId != null">
+                #{diaryId,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ccl.wx.entity.Reply">
+        <!--@mbg.generated-->
+        update reply
+        <set>
+            <if test="commentId != null">
+                comment_id = #{commentId,jdbcType=BIGINT},
+            </if>
+            <if test="replyType != null">
+                reply_type = #{replyType,jdbcType=INTEGER},
+            </if>
+            <if test="replyContent != null">
+                reply_content = #{replyContent,jdbcType=VARCHAR},
+            </if>
+            <if test="replyUserid != null">
+                reply_userid = #{replyUserid,jdbcType=VARCHAR},
+            </if>
+            <if test="targetUserid != null">
+                target_userid = #{targetUserid,jdbcType=VARCHAR},
+            </if>
+            <if test="replyCreatetime != null">
+                reply_createtime = #{replyCreatetime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="replyDeltime != null">
+                reply_deltime = #{replyDeltime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="replyStatus != null">
+                reply_status = #{replyStatus,jdbcType=INTEGER},
+            </if>
+            <if test="replyLike != null">
+                reply_like = #{replyLike,jdbcType=BIGINT},
+            </if>
+            <if test="circleId != null">
+                circle_id = #{circleId,jdbcType=BIGINT},
+            </if>
+            <if test="replyImage != null">
+                reply_image = #{replyImage,jdbcType=VARCHAR},
+            </if>
+            <if test="diaryId != null">
+                diary_id = #{diaryId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ccl.wx.entity.Reply">
+        <!--@mbg.generated-->
+        update reply
+        set comment_id = #{commentId,jdbcType=BIGINT},
         reply_type = #{replyType,jdbcType=INTEGER},
-      </if>
-      <if test="replyContent != null">
         reply_content = #{replyContent,jdbcType=VARCHAR},
-      </if>
-      <if test="replyUserid != null">
         reply_userid = #{replyUserid,jdbcType=VARCHAR},
-      </if>
-      <if test="targetUserid != null">
         target_userid = #{targetUserid,jdbcType=VARCHAR},
-      </if>
-      <if test="replyCreatetime != null">
         reply_createtime = #{replyCreatetime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="replyDeltime != null">
         reply_deltime = #{replyDeltime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="replyStatus != null">
         reply_status = #{replyStatus,jdbcType=INTEGER},
-      </if>
-      <if test="replyLike != null">
         reply_like = #{replyLike,jdbcType=BIGINT},
-      </if>
-      <if test="circleId != null">
         circle_id = #{circleId,jdbcType=BIGINT},
-      </if>
-      <if test="replyImage != null">
         reply_image = #{replyImage,jdbcType=VARCHAR},
-      </if>
-      <if test="diaryId != null">
-        diary_id = #{diaryId,jdbcType=BIGINT},
-      </if>
-    </set>
-    where id = #{id,jdbcType=BIGINT}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.ccl.wx.entity.Reply">
-    <!--@mbg.generated-->
-    update reply
-    set comment_id = #{commentId,jdbcType=BIGINT},
-      reply_type = #{replyType,jdbcType=INTEGER},
-      reply_content = #{replyContent,jdbcType=VARCHAR},
-      reply_userid = #{replyUserid,jdbcType=VARCHAR},
-      target_userid = #{targetUserid,jdbcType=VARCHAR},
-      reply_createtime = #{replyCreatetime,jdbcType=TIMESTAMP},
-      reply_deltime = #{replyDeltime,jdbcType=TIMESTAMP},
-      reply_status = #{replyStatus,jdbcType=INTEGER},
-      reply_like = #{replyLike,jdbcType=BIGINT},
-      circle_id = #{circleId,jdbcType=BIGINT},
-      reply_image = #{replyImage,jdbcType=VARCHAR},
-      diary_id = #{diaryId,jdbcType=BIGINT}
-    where id = #{id,jdbcType=BIGINT}
-  </update>
+        diary_id = #{diaryId,jdbcType=BIGINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
 
     <!--auto generated by MybatisCodeHelper on 2020-01-20-->
-    <select id="selectAllByCommentId" resultMap="BaseResultMap">
+    <select id="selectReply" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         from reply
         where comment_id=#{commentId,jdbcType=BIGINT}
-        limit #{start,jdbcType=INTEGER},#{num,jdbcType=INTEGER}
+        limit #{start,jdbcType=INTEGER},#{number,jdbcType=INTEGER}
     </select>
 
     <!--auto generated by MybatisCodeHelper on 2020-01-21-->
     <select id="selectAllByCircleId" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         from reply
         where circle_id=#{circleId,jdbcType=BIGINT}
     </select>
@@ -218,5 +219,12 @@
         select count(1)
         from reply
         where diary_id=#{diaryId,jdbcType=BIGINT}
+    </select>
+
+    <!--auto generated by MybatisCodeHelper on 2020-04-18-->
+    <select id="countByCommentId" resultType="java.lang.Long">
+        select count(1)
+        from reply
+        where comment_id=#{commentId,jdbcType=BIGINT}
     </select>
 </mapper>

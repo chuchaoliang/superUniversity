@@ -5,21 +5,17 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.common.list.DiaryStatusList;
+import com.ccl.wx.config.properties.DefaultProperties;
 import com.ccl.wx.dto.CommentDTO;
 import com.ccl.wx.dto.UserDiaryDTO;
 import com.ccl.wx.entity.*;
 import com.ccl.wx.enums.*;
 import com.ccl.wx.mapper.UserDiaryMapper;
-import com.ccl.wx.pojo.DiaryHideComment;
-import com.ccl.wx.properties.DefaultProperties;
 import com.ccl.wx.service.*;
 import com.ccl.wx.util.CclDateUtil;
 import com.ccl.wx.util.CclUtil;
 import com.ccl.wx.util.FtpUtil;
-import com.ccl.wx.vo.CircleHomeDiaryVO;
-import com.ccl.wx.vo.CircleHomeThemeVO;
-import com.ccl.wx.vo.DiaryLikeVO;
-import com.ccl.wx.vo.UserDiaryVO;
+import com.ccl.wx.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -104,120 +100,140 @@ public class UserDiaryServiceImpl implements UserDiaryService {
         return userDiaryMapper.selectIdByDiaryStatus(value);
     }
 
+    /**
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param page     页数
+     * @return
+     */
     @Override
     public String getAllDiaryInfo(Long circleId, String userId, Integer page) {
         // 判断用户是否为圈子成员
         boolean userJoinStatus = joinCircleService.judgeUserInCircle(circleId.intValue(), userId);
         ArrayList<Integer> diaryStatus = new ArrayList<>();
         diaryStatus.add(EnumUserDiary.USER_DIARY_NORMAL.getValue());
-        if (!userJoinStatus) {
-            // 不是圈子成员
+        if (userJoinStatus) {
+            // 是圈子成员
             diaryStatus.add(EnumUserDiary.USER_DIARY_PERMISSION.getValue());
         }
         // 获取日志总数,是否过滤掉不是此圈子的日志
-        long diarySum = userDiaryMapper.countByCircleIdAndDiaryStatus(circleId, diaryStatus);
+        long diarySum = userDiaryMapper.countByCircleIdAndUserIdAndDiaryStatus(circleId, null, diaryStatus);
         int pageNumber = EnumPage.PAGE_NUMBER.getValue();
-        // 获取总页数
-        Long allPageNumber = diarySum % pageNumber == 0 ? diarySum / pageNumber : diarySum / pageNumber + 1;
         // 用户日志信息
-        List<UserDiary> userDiaries = userDiaryMapper.selectAllByCircleIdAndLimit(circleId, page * pageNumber, pageNumber, diaryStatus);
-        boolean nextPage = CclUtil.judgeNextPage(allPageNumber.intValue(), pageNumber, page);
-        return getCircleDiaryInfo(userDiaries, userId, nextPage);
+        List<UserDiary> userDiaries = userDiaryMapper.selectAllByCircleIdAndUserId(circleId, null, page * pageNumber, pageNumber, diaryStatus);
+        return adornDiaryInfo(userDiaries, userId, diarySum, page, false);
     }
 
     @Override
     public String getAssignDiaryInfo(Long circleId, String userId, Integer page) {
         // 获取日志总数
-        Long diarySum = userDiaryMapper.countByCircleIdAndUserId(circleId, userId, DiaryStatusList.userCircleDiaryStatusList());
+        List<Integer> diaryStatus = DiaryStatusList.userCircleDiaryStatusList();
+        Long diarySum = userDiaryMapper.countByCircleIdAndUserIdAndDiaryStatus(circleId, userId, diaryStatus);
         // 获取总页数
         int pageNumber = EnumPage.PAGE_NUMBER.getValue();
-        Long allPageNumber = diarySum % pageNumber == 0 ? diarySum / pageNumber : diarySum / pageNumber + 1;
         // 用户日志信息
-        List<UserDiary> userDiaries = userDiaryMapper.selectAllByCircleIdAndUserIdAndLimit(circleId, userId, page * pageNumber, pageNumber);
-        boolean nextPage = CclUtil.judgeNextPage(allPageNumber.intValue(), pageNumber, page);
-        return getCircleDiaryInfo(userDiaries, userId, nextPage);
+        List<UserDiary> userDiaries = userDiaryMapper.selectAllByCircleIdAndUserId(circleId, userId, page * pageNumber, pageNumber, diaryStatus);
+        return adornDiaryInfo(userDiaries, userId, diarySum, page, false);
     }
 
     @Override
-    public String getCircleDiaryInfo(List<UserDiary> userDiaries, String loginUserId, Boolean nextPage) {
-        List<UserDiaryDTO> userDiaryDTOS = new ArrayList<>();
-        for (UserDiary userDiary : userDiaries) {
-            UserDiaryDTO userDiaryDTO = new UserDiaryDTO();
-            BeanUtils.copyProperties(userDiary, userDiaryDTO);
-            Boolean ellipsis = CclUtil.judgeTextEllipsis(userDiary.getDiaryContent());
-            userDiaryDTO.setEllipsis(ellipsis);
-            userDiaryDTO.setJudgeEllipsis(ellipsis);
-            if (!StringUtils.isEmpty(userDiary.getDiaryImage())) {
-                userDiaryDTO.setImages(Arrays.asList(userDiary.getDiaryImage().split(",")));
-            }
-            // 判断是否需要隐藏评论
-            DiaryHideComment diaryHideComment = commentService.judgeHideCommentById(userDiary.getId());
-            userDiaryDTO.setHideComment(diaryHideComment.getHideComment());
-            // 设置日记评论和回复的总数
-            userDiaryDTO.setCommentSum(diaryHideComment.getCommentSum());
-            // 查找日志点赞人，点赞人信息
-            List<UserInfo> allLikeUserNickName = userLikeService.getAllLikeUserNickName(loginUserId, String.valueOf(userDiary.getCircleId()), userDiary.getId());
-            ArrayList<DiaryLikeVO> diaryLikeVOS = new ArrayList<>();
-            allLikeUserNickName.forEach(like -> {
-                DiaryLikeVO diaryLikeVO = new DiaryLikeVO();
-                BeanUtils.copyProperties(like, diaryLikeVO);
-                diaryLikeVOS.add(diaryLikeVO);
-            });
-            // 查找全部的评论
-            List<CommentDTO> diaryComment = commentService.getOneDiaryCommentInfoById(userDiary.getId());
-            // 查找全部的点评
-            List<CommentDTO> masterComment = commentService.getMasterComment(userDiary.getId());
-            // 查找拼接的字符串
-            String allLikeUserNickname = userLikeService.getAllLikeUserNickName(allLikeUserNickName);
-            // 设置拼接的字符串
-            userDiaryDTO.setLikeUserInfosStr(allLikeUserNickname);
-            // 设置评论
-            userDiaryDTO.setComments(diaryComment);
-            // 设置点评
-            userDiaryDTO.setMasterComments(masterComment);
-            // 设置点赞人信息
-            userDiaryDTO.setLikeUserInfos(diaryLikeVOS);
-            // 设置点赞状态
-            userDiaryDTO.setLikeStatus(userLikeService.judgeDiaryLikeStatus(loginUserId, String.valueOf(userDiary.getCircleId()), userDiary.getId()));
-            // 获取用户信息
-            UserInfo userInfo = userInfoService.selectByPrimaryKey(userDiary.getUserId());
-            JoinCircle joinCircle = joinCircleService.selectByPrimaryKey(userDiary.getCircleId(), userDiary.getUserId());
-            // 设置创建时间
-            userDiaryDTO.setFormatCreateTime(DateUtil.format(userDiary.getDiaryCreatetime(), DatePattern.NORM_DATETIME_PATTERN));
-            // 设置用户头像
-            userDiaryDTO.setUserHeadImage(userInfo.getAvatarurl());
-            // 设置用户昵称
-            userDiaryDTO.setUserNickName(userInfo.getNickname());
-            // 设置用户性别
-            userDiaryDTO.setUserGender(userInfo.getGender());
-            // 设置用户打卡天数
-            userDiaryDTO.setUserSignNumber(joinCircle.getUserSigninDay());
-            // 设置用户处理后的创建时间 （几天前）
-            userDiaryDTO.setCreateTimeRelative(CclDateUtil.todayDate(userDiary.getDiaryCreatetime()));
-            TodayContent todayContent = todayContentService.selectByPrimaryKey(userDiary.getThemeId().longValue());
-            if (todayContent != null && userDiary.getThemeId() != 0) {
-                CircleHomeThemeVO circleHomeThemeVO = new CircleHomeThemeVO();
-                BeanUtils.copyProperties(todayContent, circleHomeThemeVO);
-                userDiaryDTO.setThemeInfo(circleHomeThemeVO);
-            }
-            userDiaryDTOS.add(userDiaryDTO);
-        }
+    public String getUserIndexDiaryInfo(String userId, Integer page) {
+        int pageNumber = EnumPage.PAGE_NUMBER.getValue();
+        List<Integer> diaryStatus = DiaryStatusList.outCircleDiaryStatusList();
+        Long diarySum = userDiaryMapper.countByCircleIdAndUserIdAndDiaryStatus(null, userId, diaryStatus);
+        List<UserDiary> userDiaries = userDiaryMapper.selectAllByCircleIdAndUserId(null, userId, page * pageNumber, pageNumber, diaryStatus);
+        return adornDiaryInfo(userDiaries, userId, diarySum, page, true);
+    }
+
+    /**
+     * @param userDiaries 日志信息
+     * @param userId      访问用户id
+     * @param diarySum    日志总数
+     * @param page        当前页数
+     * @param index       访问的是否为我的页面（true是false不是）
+     * @return
+     */
+    public String adornDiaryInfo(List<UserDiary> userDiaries, String userId, Long diarySum, Integer page, boolean index) {
         ArrayList<CircleHomeDiaryVO> circleHomeDiaryVOS = new ArrayList<>();
-        userDiaryDTOS.forEach(userDiaryDTO -> {
-            CircleHomeDiaryVO circleHomeDiaryVO = new CircleHomeDiaryVO();
-            BeanUtils.copyProperties(userDiaryDTO, circleHomeDiaryVO);
-            circleHomeDiaryVOS.add(circleHomeDiaryVO);
-        });
+        for (UserDiary userDiary : userDiaries) {
+            CircleHomeDiaryVO userDiaryVO = getUserDiaryVO(userId, index, userDiary);
+            circleHomeDiaryVOS.add(userDiaryVO);
+        }
         ArrayList<Object> diaryList = new ArrayList<>();
-        //diaryList.add(userDiaryDTOS);
         diaryList.add(circleHomeDiaryVOS);
-        diaryList.add(nextPage);
+        diaryList.add(CclUtil.judgeNextPage(diarySum.intValue(), EnumPage.PAGE_NUMBER.getValue(), page));
         return JSON.toJSONStringWithDateFormat(diaryList, DatePattern.NORM_DATE_PATTERN, SerializerFeature.DisableCircularReferenceDetect);
     }
 
+    /**
+     * 日志对象加强方法
+     *
+     * @param userId    用户id
+     * @param index     是否为用户主页
+     * @param userDiary 日志id
+     * @return
+     */
+    private CircleHomeDiaryVO getUserDiaryVO(String userId, boolean index, UserDiary userDiary) {
+        UserDiaryDTO userDiaryDTO = new UserDiaryDTO();
+        BeanUtils.copyProperties(userDiary, userDiaryDTO);
+        Boolean ellipsis = CclUtil.judgeTextEllipsis(userDiary.getDiaryContent());
+        userDiaryDTO.setEllipsis(ellipsis);
+        if (!StringUtils.isEmpty(userDiary.getDiaryImage())) {
+            userDiaryDTO.setImages(Arrays.asList(userDiary.getDiaryImage().split(",")));
+        }
+        // 设置日记评论和回复的总数
+        userDiaryDTO.setCommentSum(commentService.getDiaryAllComment(userDiary.getId()));
+        // 获取圈子id
+        Long circleId = userDiary.getCircleId();
+        // 查找日志点赞人，点赞人信息
+        List<DiaryLikeVO> likeUserInfo = userLikeService.getAllLikeUserNickName(userId, String.valueOf(circleId), userDiary.getId());
+        // 查找全部的评论
+        List<CommentDTO> diaryComment = commentService.getDiaryComment(userDiary.getId(), 0, true);
+        // 查找全部的点评
+        List<CommentDTO> masterComment = commentService.getMasterComment(userDiary.getId());
+        // 设置评论
+        userDiaryDTO.setComments(diaryComment);
+        // 设置点评
+        userDiaryDTO.setMasterComments(masterComment);
+        // 设置点赞人信息
+        userDiaryDTO.setLikeUserInfos(likeUserInfo);
+        // 设置点赞状态
+        userDiaryDTO.setLikeStatus(userLikeService.judgeDiaryLikeStatus(userId, String.valueOf(circleId), userDiary.getId()));
+        // 获取用户信息
+        UserInfo userInfo = userInfoService.selectByPrimaryKey(userDiary.getUserId());
+        // 设置用户昵称
+        userInfo.setNickname(joinCircleService.getUserJoinCircleNickname(userId, circleId));
+        // 设置创建时间
+        userDiaryDTO.setFormatCreateTime(DateUtil.format(userDiary.getDiaryCreatetime(), DatePattern.NORM_DATETIME_PATTERN));
+        // 设置用户头像
+        userDiaryDTO.setUserHeadImage(userInfo.getAvatarurl());
+        // 设置用户性别
+        userDiaryDTO.setUserGender(userInfo.getGender());
+        JoinCircle joinCircle = joinCircleService.selectByPrimaryKey(circleId, userDiary.getUserId());
+        // 设置用户打卡天数
+        userDiaryDTO.setUserSignNumber(joinCircle.getUserSigninDay());
+        // 设置用户处理后的创建时间 （几天前）
+        userDiaryDTO.setCreateTime(CclDateUtil.todayDate(userDiary.getDiaryCreatetime()));
+        TodayContent todayContent = todayContentService.selectByPrimaryKey(userDiary.getThemeId().longValue());
+        if (todayContent != null && userDiary.getThemeId() != 0) {
+            CircleHomeThemeVO circleHomeThemeVO = new CircleHomeThemeVO();
+            BeanUtils.copyProperties(todayContent, circleHomeThemeVO);
+            userDiaryDTO.setThemeInfo(circleHomeThemeVO);
+        }
+        if (index) {
+            CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
+            CircleVO circleVO = new CircleVO();
+            BeanUtils.copyProperties(circleInfo, circleVO);
+            userDiaryDTO.setCircleInfo(circleVO);
+        }
+        CircleHomeDiaryVO circleHomeDiaryVO = new CircleHomeDiaryVO();
+        BeanUtils.copyProperties(userDiaryDTO, circleHomeDiaryVO);
+        return circleHomeDiaryVO;
+    }
+
     @Override
-    public Long countByCircleIdAndDiaryStatus(Long circleId, List<Integer> diaryStatus) {
-        return userDiaryMapper.countByCircleIdAndDiaryStatus(circleId, diaryStatus);
+    public Long countByCircleIdAndUserIdAndDiaryStatus(Long circleId, List<Integer> diaryStatus, String userId) {
+        return userDiaryMapper.countByCircleIdAndUserIdAndDiaryStatus(circleId, userId, diaryStatus);
     }
 
     @Override
@@ -247,8 +263,8 @@ public class UserDiaryServiceImpl implements UserDiaryService {
     }
 
     @Override
-    public List<UserDiary> selectAllByCircleIdAndDiaryStatus(Long circleId, List<Integer> diaryStatus) {
-        return userDiaryMapper.selectAllByCircleIdAndDiaryStatus(circleId, diaryStatus);
+    public List<UserDiary> selectAllByCircleIdAndDiaryStatus(Long circleId, List<Integer> diaryStatus, String userId) {
+        return userDiaryMapper.selectAllByCircleIdAndDiaryStatus(circleId, userId, diaryStatus);
     }
 
     @Override
@@ -275,8 +291,6 @@ public class UserDiaryServiceImpl implements UserDiaryService {
             userDiary.setDiaryAddress(userDiaryVO.getDiaryAddress());
             // 重新设置日记状态
             userDiary.setDiaryStatus(StringUtils.isEmpty(userDiaryVO.getDiaryStatus()) ? EnumUserDiary.USER_DIARY_NORMAL.getValue() : userDiaryVO.getDiaryStatus());
-            // 设置日志更新时间
-            userDiary.setDiaryUpdatetime(new Date());
             // 得到历史图片列表(先判断历史图片是否为空)
             String diaryImage = userDiary.getDiaryImage();
             List<String> historyImages = new ArrayList<>();
@@ -639,7 +653,11 @@ public class UserDiaryServiceImpl implements UserDiaryService {
     }
 
     @Override
-    public String getDiaryInfoById(Long diaryId) {
-        return "";
+    public String getDiaryInfoById(Long diaryId, String userId) {
+        UserDiary userDiary = userDiaryMapper.selectByPrimaryKey(diaryId);
+        if (userDiary == null) {
+            return EnumResultStatus.FAIL.getValue();
+        }
+        return JSON.toJSONString(getUserDiaryVO(userId, false, userDiary));
     }
 }

@@ -26,23 +26,26 @@ public interface UserDiaryMapper {
     int updateByPrimaryKey(UserDiary record);
 
     /**
-     * 根据圈子id 和日志状态获取日志总数
-     *
-     * @param circleId    圈子id
-     * @param diaryStatus 日志状态
-     * @return
-     */
-    Long countByCircleIdAndDiaryStatus(@Param("circleId") Long circleId, @Param("diaryStatus") List<Integer> diaryStatus);
-
-    /**
-     * 根据圈子id 和用户id 获取所有的日志总数
+     * 根据圈子id和用户id和日志状态获取日志总数
      *
      * @param circleId    圈子id
      * @param userId      用户id
-     * @param diaryStatus 日记状态列表
+     * @param diaryStatus 日志状态
      * @return
      */
-    Long countByCircleIdAndUserId(@Param("circleId") Long circleId, @Param("userId") String userId, @Param("diaryStatus") List<Integer> diaryStatus);
+    Long countByCircleIdAndUserIdAndDiaryStatus(@Param("circleId") Long circleId, @Param("userId") String userId, @Param("diaryStatus") List<Integer> diaryStatus);
+
+    /**
+     * 根据圈子id和用户id和日志状态 查找日记信息 分页
+     *
+     * @param circleId    圈子id
+     * @param userId      用户id
+     * @param start       起始数
+     * @param pageNumber  每一页的数据
+     * @param diaryStatus 日志状态列表
+     * @return
+     */
+    List<UserDiary> selectAllByCircleIdAndUserId(@Param("circleId") Long circleId, @Param("userId") String userId, @Param("start") Integer start, @Param("pageNumber") Integer pageNumber, @Param("diaryStatus") List<Integer> diaryStatus);
 
     /**
      * 拼接日记图片字符串
@@ -53,35 +56,6 @@ public interface UserDiaryMapper {
      * @return
      */
     int concatImage(@Param("id") Long id, @Param("imagePath") String imagePath, @Param("flag") Boolean flag);
-
-    /**
-     * 根据圈子id查找日记
-     *
-     * @param circleId 圈子id
-     * @return
-     */
-    List<UserDiary> selectAllByCircleId(@Param("circleId") Long circleId);
-
-    /**
-     * 根据圈子id查找日记 并且分页
-     *
-     * @param circleId   圈子id
-     * @param start      起始数
-     * @param pageNumber 每一页的数据
-     * @return
-     */
-    List<UserDiary> selectAllByCircleIdAndLimit(@Param("circleId") Long circleId, @Param("start") Integer start, @Param("pageNumber") Integer pageNumber, @Param("diaryStatus") List<Integer> diaryStatus);
-
-    /**
-     * 根据圈子id和用户id查找日记信息 分页
-     *
-     * @param circleId   圈子id
-     * @param userId     用户id
-     * @param start      起始数
-     * @param pageNumber 每一页的数据
-     * @return
-     */
-    List<UserDiary> selectAllByCircleIdAndUserIdAndLimit(@Param("circleId") Long circleId, @Param("userId") String userId, @Param("start") Integer start, @Param("pageNumber") Integer pageNumber);
 
     /**
      * 根据日志状态查询日志的全部id
@@ -194,13 +168,14 @@ public interface UserDiaryMapper {
     int countByThemeIdAndDiaryStatus(@Param("themeId") Integer themeId, @Param("circleId") Integer circleId);
 
     /**
-     * 根据圈子id和日记状态查询全部日志信息
+     * 根据圈子id,用户id 和 日记状态查询全部日志信息
      *
      * @param circleId    圈子id
+     * @param userId      用户id
      * @param diaryStatus 日志状态
      * @return
      */
-    List<UserDiary> selectAllByCircleIdAndDiaryStatus(@Param("circleId") Long circleId, @Param("diaryStatusList") List<Integer> diaryStatus);
+    List<UserDiary> selectAllByCircleIdAndDiaryStatus(@Param("circleId") Long circleId, @Param("userId") String userId, @Param("diaryStatusList") List<Integer> diaryStatus);
 
     /**
      * 查询出某位用户某一天是否在某一个主题下打卡

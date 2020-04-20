@@ -13,7 +13,12 @@ public enum EnumReply {
     /**
      * 评论删除状态
      */
-    REPLY_DELETE_STATUS(1);
+    REPLY_DELETE_STATUS(1),
+
+    /**
+     * 评论展示数量
+     */
+    REPLY_SHOW(3);
 
     public Integer value;
 

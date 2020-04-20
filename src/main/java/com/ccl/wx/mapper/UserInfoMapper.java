@@ -5,7 +5,7 @@ import org.apache.ibatis.annotations.Mapper;import java.util.List;
 
 /**
  * @author 褚超亮
- * @date 2020/4/3 23:00
+ * @date 2020/4/19 18:21
  */
 
 @Mapper
@@ -26,6 +26,7 @@ public interface UserInfoMapper {
 
     /**
      * 获取用户自增键最大值
+     *
      * @return
      */
     Integer selectMaxUserId();

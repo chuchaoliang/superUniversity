@@ -2,7 +2,7 @@ package com.ccl.wx.util;
 
 import cn.hutool.extra.ftp.Ftp;
 import com.ccl.wx.enums.EnumResultStatus;
-import com.ccl.wx.properties.FtpProperties;
+import com.ccl.wx.config.properties.FtpProperties;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTP;

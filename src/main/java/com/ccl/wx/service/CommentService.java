@@ -2,7 +2,6 @@ package com.ccl.wx.service;
 
 import com.ccl.wx.dto.CommentDTO;
 import com.ccl.wx.entity.Comment;
-import com.ccl.wx.pojo.DiaryHideComment;
 import com.ccl.wx.vo.CircleHomeCommentVO;
 
 import java.util.List;
@@ -14,29 +13,22 @@ import java.util.List;
 public interface CommentService {
 
     /**
-     * 根据用户的日志信息获取日志的全部评论信息系（其中包括回复）
+     * 获取日志评论和回复
      *
      * @param diaryId 日志id
+     * @param page    第几页
+     * @param home    是否为圈子主页
      * @return
      */
-    List<CommentDTO> getOneDiaryCommentInfoById(Long diaryId);
+    List<CommentDTO> getDiaryComment(Long diaryId, Integer page, Boolean home);
 
     /**
      * 根据日志id获取此日志的全部评论和回复总条数
      *
-     * @param diaryId
+     * @param diaryId 日志id
      * @return
      */
-    Integer getUserCommentSumById(Long diaryId);
-
-    /**
-     * 根据日志id判断是否隐藏评论
-     * 是否显示 查看全部**条评论和回复
-     *
-     * @param diaryId
-     * @return
-     */
-    DiaryHideComment judgeHideCommentById(Long diaryId);
+    Long getDiaryAllComment(Long diaryId);
 
     int deleteByPrimaryKey(Long id);
 
@@ -49,8 +41,6 @@ public interface CommentService {
     int updateByPrimaryKeySelective(Comment record);
 
     int updateByPrimaryKey(Comment record);
-
-    List<Long> selectIdByDiaryId(Long diaryId);
 
     /**
      * 获取全部的日志点评
@@ -92,5 +82,13 @@ public interface CommentService {
      * @return
      */
     List<CircleHomeCommentVO> getAllComment(Long diaryId, Integer page);
+
+    /**
+     * 根据日记id查询评论的全部id
+     *
+     * @param diaryId 日记id
+     * @return
+     */
+    List<Long> selectIdByDiaryId(Long diaryId);
 }
 

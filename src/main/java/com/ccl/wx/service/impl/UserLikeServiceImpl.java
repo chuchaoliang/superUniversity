@@ -6,9 +6,12 @@ import com.ccl.wx.enums.EnumLike;
 import com.ccl.wx.enums.EnumRedis;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.mapper.UserLikeMapper;
+import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.UserInfoService;
 import com.ccl.wx.service.UserLikeService;
+import com.ccl.wx.vo.DiaryLikeVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +42,9 @@ public class UserLikeServiceImpl implements UserLikeService {
 
     @Resource
     private UserInfoService userInfoService;
+
+    @Resource
+    private JoinCircleService joinCircleService;
 
     @Override
     public int deleteByPrimaryKey(Long id) {
@@ -86,7 +92,7 @@ public class UserLikeServiceImpl implements UserLikeService {
     }
 
     @Override
-    public List<UserInfo> getAllLikeUserNickName(String userId, String circleId, Long diaryId) {
+    public List<DiaryLikeVO> getAllLikeUserNickName(String userId, String circleId, Long diaryId) {
         // 先判断缓存中是否存在
         ArrayList<UserInfo> userInfos = new ArrayList<>();
         UserLike userLike = userLikeMapper.selectByTypeId(diaryId);
@@ -119,20 +125,14 @@ public class UserLikeServiceImpl implements UserLikeService {
                 userInfos.add(0, userInfoService.selectByPrimaryKey(userId));
             }
         }
-        return userInfos;
-    }
-
-    @Override
-    public String getAllLikeUserNickName(List<UserInfo> userInfos) {
-        StringBuffer stringBuffer = new StringBuffer();
-        if (!userInfos.isEmpty()) {
-            for (UserInfo userInfo : userInfos) {
-                stringBuffer.append(userInfo.getNickname()).append(",");
-            }
-            return String.valueOf(stringBuffer.deleteCharAt(stringBuffer.length() - 1));
-        } else {
-            return "";
-        }
+        ArrayList<DiaryLikeVO> diaryLikeVOS = new ArrayList<>();
+        userInfos.forEach(like -> {
+            like.setNickname(joinCircleService.getUserJoinCircleNickname(like.getId(), Long.valueOf(circleId)));
+            DiaryLikeVO diaryLikeVO = new DiaryLikeVO();
+            BeanUtils.copyProperties(like, diaryLikeVO);
+            diaryLikeVOS.add(diaryLikeVO);
+        });
+        return diaryLikeVOS;
     }
 
     @Override
