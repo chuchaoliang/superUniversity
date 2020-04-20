@@ -23,7 +23,12 @@ public enum EnumCircle {
     /**
      * 密码长度
      */
-    PASSWORD_LENGTH(6);
+    PASSWORD_LENGTH(6),
+
+    /**
+     * 圈子中最大管理员个数
+     */
+    ADMIN_MAX_NUMBER(10);
 
     private int value;
 

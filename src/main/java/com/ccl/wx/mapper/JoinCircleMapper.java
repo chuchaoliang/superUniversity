@@ -2,7 +2,10 @@ package com.ccl.wx.mapper;
 
 import com.ccl.wx.entity.JoinCircle;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;import java.util.List;import java.util.Map;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author 褚超亮
@@ -39,6 +42,15 @@ public interface JoinCircleMapper {
      * @return
      */
     Integer countByCircleIdAndUserStatus(@Param("circleId") Long circleId, @Param("userStatus") Integer userStatus);
+
+    /**
+     * 根据圈子id和用户权限查询圈子中人数
+     *
+     * @param circleId       圈子id
+     * @param userPermission 用户权限列表
+     * @return
+     */
+    Integer countByCircleIdAndUserPermission(@Param("circleId") Long circleId, @Param("userPermission") List<Integer> userPermission);
 
     /**
      * 根据圈子id获取全部的圈子用户id
@@ -191,9 +203,11 @@ public interface JoinCircleMapper {
      *
      * @param circleId       圈子id
      * @param userPermission 用户权限列表
+     * @param start          起始位置
+     * @param page           数据数量
      * @return
      */
-    List<JoinCircle> selectUserIdByUserPermission(@Param("circleId") Integer circleId, @Param("userPermission") List<Integer> userPermission);
+    List<JoinCircle> selectUserIdByUserPermission(@Param("circleId") Integer circleId, @Param("userPermission") List<Integer> userPermission, @Param("start") Integer start, @Param("page") Integer page);
 
     /**
      * 根据圈子id和用户状态得到用户圈子总活跃度

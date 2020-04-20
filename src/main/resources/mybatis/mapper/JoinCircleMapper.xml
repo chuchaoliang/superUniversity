@@ -484,7 +484,9 @@
             <foreach close=")" collection="userPermission" item="permission" open="user_permission in (" separator=",">
                 #{permission,jdbcType=INTEGER}
             </foreach>
+            and user_status = 0
         </where>
+        limit #{start,jdbcType=INTEGER},#{page,jdbcType=INTEGER}
     </select>
     <select id="sumUserVitalityByCircleIdAndUserStatus" resultType="java.lang.Long">
         select sum(user_vitality)
@@ -554,6 +556,16 @@
             <if test="themeId != null">
                 and theme_id=#{themeId,jdbcType=VARCHAR}
             </if>
+        </where>
+    </select>
+    <select id="countByCircleIdAndUserPermission" resultType="java.lang.Integer">
+        select count(1)
+        from join_circle
+        <where>
+            circle_id = #{circleId,jdbcType=BIGINT} and
+            <foreach collection="userPermission" item="permission" open="user_permission in (" close=")" separator=",">
+                #{permission,jdbcType=INTEGER}
+            </foreach>
         </where>
     </select>
 </mapper>

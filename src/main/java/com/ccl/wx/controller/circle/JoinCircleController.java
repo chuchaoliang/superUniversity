@@ -318,6 +318,80 @@ public class JoinCircleController {
     }
 
     /**
+     * 添加管理员
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    @GetMapping("/menu/admin/add")
+    public Result<String> addCircleAdmin(@RequestParam(value = "circleId", required = false) Long circleId,
+                                         @RequestParam(value = "userId", required = false) String userId) {
+        String result = joinCircleService.addCircleAdmin(circleId, userId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    /**
+     * 检测是否可以添加管理员
+     *
+     * @param circleId 圈子id
+     * @return
+     */
+    @GetMapping("/menu/admin/add/check")
+    public Result<String> checkAddCircleAdmin(@RequestParam(value = "circleId", required = false) Long circleId) {
+        String result = joinCircleService.checkAddCircleAdmin(circleId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("管理员人数已满！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    /**
+     * 获取圈子中管理员
+     *
+     * @param circleId 圈子id
+     * @return
+     */
+    @GetMapping("/menu/admin/get/admin")
+    public Result<String> getCircleAdminInfo(@ParamCheck @RequestParam(value = "circleId", required = false) Long circleId) {
+        String result = joinCircleService.getCircleAdminInfo(circleId);
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
+     * 移除管理员
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    @GetMapping("/menu/admin/out")
+    public Result<String> outCircleAdminInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                                             @RequestParam(value = "userId", required = false) String userId) {
+        String result = joinCircleService.outCircleAdminInfo(circleId, userId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    /**
+     * 获取圈子中其它普通用户
+     *
+     * @param circleId 圈子id
+     * @return
+     */
+    @GetMapping("/menu/admin/get/general")
+    public Result<String> getCircleGeneralUserInfo(@ParamCheck @RequestParam(value = "circleId", required = false) Long circleId,
+                                                   @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
+        String result = joinCircleService.getCircleGeneralUserInfo(circleId, page);
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
      * 加入圈子
      *
      * @param circleId 圈子id

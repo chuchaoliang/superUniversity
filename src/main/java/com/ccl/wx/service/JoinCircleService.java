@@ -175,15 +175,6 @@ public interface JoinCircleService {
     String getUserSignStatisticsFailInfo(Long circleId, String userId, Date date, Integer page);
 
     /**
-     * 根据用户加入圈子状态和圈子id查找用户
-     *
-     * @param circleId       圈子id
-     * @param userPermission 用户加入圈子状态
-     * @return
-     */
-    List<JoinCircle> selectUserIdByUserPermission(Integer circleId, List<Integer> userPermission);
-
-    /**
      * 判断某位用户是否为圈子管理人员
      *
      * @param circleId       圈子id
@@ -382,6 +373,49 @@ public interface JoinCircleService {
      * @return
      */
     String updateUserCircleNickname(Long circleId, String userId, String nickname);
+
+    /**
+     * 获取圈子中管理员信息
+     *
+     * @param circleId 圈子id
+     * @return
+     */
+    String getCircleAdminInfo(Long circleId);
+
+    /**
+     * 获取圈子普通用户信息
+     *
+     * @param circleId 圈子id
+     * @param page     当前页数
+     * @return
+     */
+    String getCircleGeneralUserInfo(Long circleId, Integer page);
+
+    /**
+     * 检测是否可以添加管理员
+     *
+     * @param circleId 圈子id
+     * @return
+     */
+    String checkAddCircleAdmin(Long circleId);
+
+    /**
+     * 添加圈子管理员
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    String addCircleAdmin(Long circleId, String userId);
+
+    /**
+     * 移除管理员
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    String outCircleAdminInfo(Long circleId, String userId);
 }
 
 

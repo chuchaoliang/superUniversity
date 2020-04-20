@@ -36,4 +36,39 @@ public class UserPermissionList {
         permission.add(EnumUserPermission.ADMIN_USER.getValue());
         return permission;
     }
+
+    /**
+     * 圈子管理员（圈主）不包括圈主
+     *
+     * @return
+     */
+    public static List<Integer> circleAdminOutMaster() {
+        ArrayList<Integer> permission = new ArrayList<>();
+        permission.add(EnumUserPermission.ADMIN_USER.getValue());
+        return permission;
+    }
+
+    /**
+     * 圈子普通用户
+     *
+     * @return
+     */
+    public static List<Integer> circleGeneral() {
+        ArrayList<Integer> permission = new ArrayList<>();
+        permission.add(EnumUserPermission.ORDINARY_USER.getValue());
+        return permission;
+    }
+
+    /**
+     * 圈子全部用户
+     *
+     * @return
+     */
+    public static List<Integer> circleAll() {
+        ArrayList<Integer> permission = new ArrayList<>();
+        permission.add(EnumUserPermission.MASTER_USER.getValue());
+        permission.add(EnumUserPermission.ADMIN_USER.getValue());
+        permission.add(EnumUserPermission.ORDINARY_USER.getValue());
+        return permission;
+    }
 }
