@@ -103,7 +103,7 @@ public class JoinCircleController {
     public Result<String> getUserSignStatisticsSuccessInfo(@RequestParam(value = "circleId", required = false) Long circleId,
                                                            @RequestHeader(value = "token", required = false) String userId,
                                                            @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
-                                                           @RequestParam(value = "page", required = false) Integer page) {
+                                                           @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
         String result = joinCircleService.getUserSignStatisticsSuccessInfo(circleId, userId, date, page);
         return ResponseMsgUtil.success(result);
     }
@@ -123,7 +123,7 @@ public class JoinCircleController {
     public Result<String> getUserSignStatisticsFailInfo(@RequestParam(value = "circleId", required = false) Long circleId,
                                                         @RequestHeader(value = "token", required = false) String userId,
                                                         @RequestParam(value = "date", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
-                                                        @RequestParam(value = "page", required = false) Integer page) {
+                                                        @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
         String result = joinCircleService.getUserSignStatisticsFailInfo(circleId, userId, date, page);
         return ResponseMsgUtil.success(result);
     }

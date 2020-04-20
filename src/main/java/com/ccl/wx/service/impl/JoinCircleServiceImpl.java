@@ -52,6 +52,9 @@ public class JoinCircleServiceImpl implements JoinCircleService {
     @Resource
     private UserInfoService userInfoService;
 
+    @Resource
+    private JoinCircleService joinCircleService;
+
     @Override
     public int deleteByPrimaryKey(Long circleId, String userId) {
         return joinCircleMapper.deleteByPrimaryKey(circleId, userId);
@@ -177,8 +180,12 @@ public class JoinCircleServiceImpl implements JoinCircleService {
             } else {
                 Map userInfo = userVitalityInfo.get(0);
                 userInfo.put("rowNum", "9999");
+                userInfo.put("nickname", joinCircleService.getUserJoinCircleNickname(String.valueOf(userInfo.get("userId")), circleId));
                 return userVitalityInfo;
             }
+        }
+        for (Map map : userVitalityRankingInfo) {
+            map.put("nickname", joinCircleService.getUserJoinCircleNickname(String.valueOf(map.get("userId")), circleId));
         }
         return userVitalityRankingInfo;
     }
@@ -194,8 +201,12 @@ public class JoinCircleServiceImpl implements JoinCircleService {
             } else {
                 Map userInfo = userSignInInfo.get(0);
                 userInfo.put("rowNum", "9999");
+                userInfo.put("nickname", joinCircleService.getUserJoinCircleNickname(String.valueOf(userInfo.get("userId")), circleId));
                 return userSignInInfo;
             }
+        }
+        for (Map map : userSignInRankingInfo) {
+            map.put("nickname", joinCircleService.getUserJoinCircleNickname(String.valueOf(map.get("userId")), circleId));
         }
         return userSignInRankingInfo;
     }
@@ -208,6 +219,9 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         boolean judgeNextPage = CclUtil.judgeNextPage(userAmount, EnumPage.PAGE_NUMBER.getValue(), page);
         // 获取用户活跃度排行数据
         List<Map> userVitalityRanking = getUserVitalityRanking(circleId, page * EnumPage.PAGE_NUMBER.getValue(), EnumPage.PAGE_NUMBER.getValue());
+        for (Map map : userVitalityRanking) {
+            map.put("nickname", joinCircleService.getUserJoinCircleNickname(String.valueOf(map.get("userId")), circleId));
+        }
         // 定义返回数据列表
         ArrayList<Object> userVitalityData = new ArrayList<>();
         userVitalityData.add(userVitalityRanking);
@@ -222,6 +236,9 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         // 判断是否存在下一页
         boolean judgeNextPage = CclUtil.judgeNextPage(userAmount, EnumPage.PAGE_NUMBER.getValue(), page);
         List<Map> userSignInRanking = getUserSignInRanking(circleId, page * EnumPage.PAGE_NUMBER.getValue(), EnumPage.PAGE_NUMBER.getValue());
+        for (Map map : userSignInRanking) {
+            map.put("nickname", joinCircleService.getUserJoinCircleNickname(String.valueOf(map.get("userId")), circleId));
+        }
         // 定义返回数据列表
         ArrayList<Object> userSignInData = new ArrayList<>();
         userSignInData.add(userSignInRanking);
@@ -251,6 +268,7 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         List<Map> userSuccessSignInByDate = joinCircleMapper.getUserSuccessSignInByDate(circleId, formatDate, page * pageNumber, pageNumber);
         ArrayList<UserSignSuccessDTO> userSignSuccessDTOS = new ArrayList<>();
         for (Map userSuccessInfo : userSuccessSignInByDate) {
+            userSuccessInfo.put("nickname", joinCircleService.getUserJoinCircleNickname(userId, circleId));
             // 将Map中的数据复制到Bean中
             UserSignSuccessDTO userSignSuccessDTO = BeanUtil.fillBeanWithMap(userSuccessInfo, new UserSignSuccessDTO(), false);
             JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userSignSuccessDTO.getUserId());
@@ -290,6 +308,9 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         int pageNumber = EnumPage.PAGE_NUMBER.getValue();
         // 获取未打卡用户数据
         List<Map> userFailSignInByDate = joinCircleMapper.getUserFailSignInByDate(circleId, formatDate, pageNumber * page, pageNumber);
+        for (Map map : userFailSignInByDate) {
+            map.put("nickname", joinCircleService.getUserJoinCircleNickname(String.valueOf(map.get("userId")), circleId));
+        }
         // 获取今天的打卡人数
         int signInNumber = userDiaryService.countThemeUserNumberByDate(circleId, date);
         // 获取圈子总人数
@@ -569,6 +590,7 @@ public class JoinCircleServiceImpl implements JoinCircleService {
                 log.error("出现错误，存在用户未在用户列表中！！！！");
                 continue;
             } else {
+                userInfo.setNickname(joinCircleService.getUserJoinCircleNickname(userInfo.getId(), joinCircle.getCircleId()));
                 // 设置用户昵称
                 circleNormalUserInfoVO.setNickname(userInfo.getNickname());
                 // 设置用户头像
