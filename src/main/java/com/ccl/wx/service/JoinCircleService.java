@@ -416,6 +416,16 @@ public interface JoinCircleService {
      * @return
      */
     String outCircleAdminInfo(Long circleId, String userId);
+
+    /**
+     * 圈子转让
+     *
+     * @param circleId 圈子id
+     * @param tUserId  转让给目标用户的id
+     * @param userId   用户id
+     * @return
+     */
+    String transferCircle(Long circleId, String tUserId, String userId);
 }
 
 

@@ -379,6 +379,25 @@ public class JoinCircleController {
     }
 
     /**
+     * 圈子转让
+     *
+     * @param circleId 圈子id
+     * @param tUserId  转让给目标用户的id
+     * @param userId   用户id
+     * @return
+     */
+    @GetMapping("/menu/transfer")
+    public Result<String> transferCircle(@RequestParam(value = "circleId", required = false) Long circleId,
+                                         @RequestParam(value = "userId", required = false) String tUserId,
+                                         @RequestHeader(value = "token", required = false) String userId) {
+        String result = joinCircleService.transferCircle(circleId, tUserId, userId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    /**
      * 获取圈子中其它普通用户
      *
      * @param circleId 圈子id

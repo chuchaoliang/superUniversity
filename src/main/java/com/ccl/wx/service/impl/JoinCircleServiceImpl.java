@@ -862,6 +862,30 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         return fail;
     }
 
+    @Override
+    public String transferCircle(Long circleId, String tUserId, String userId) {
+        String fail = EnumResultStatus.FAIL.getValue();
+        if (judgeUserJoinCircleStatus(userId, circleId) && judgeUserJoinCircleStatus(tUserId, circleId)) {
+            JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+            if (joinCircle.getUserPermission().equals(EnumUserPermission.MASTER_USER.getValue())) {
+                // 是圈主
+                JoinCircle tJoinCircle = joinCircleMapper.selectByPrimaryKey(circleId, tUserId);
+                // 判断要转让的用户是否为管理员
+                if (tJoinCircle.getUserPermission().equals(EnumUserPermission.ADMIN_USER.getValue())) {
+                    // 转让
+                    tJoinCircle.setUserPermission(EnumUserPermission.MASTER_USER.getValue());
+                    joinCircle.setUserPermission(EnumUserPermission.ADMIN_USER.getValue());
+                    joinCircleMapper.updateByPrimaryKeySelective(tJoinCircle);
+                    joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
+                    return EnumResultStatus.SUCCESS.getValue();
+                }
+            } else {
+                return fail;
+            }
+        }
+        return fail;
+    }
+
     /**
      * 装饰用户信息
      *
