@@ -426,6 +426,16 @@ public interface JoinCircleService {
      * @return
      */
     String transferCircle(Long circleId, String tUserId, String userId);
+
+    /**
+     * 获取某个用户的所在圈子相关信息
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param tUserId  要查询的目标用户id
+     * @return
+     */
+    String getRecordUserInfo(Long circleId, String userId, String tUserId);
 }
 
 

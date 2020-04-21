@@ -21,6 +21,7 @@ import com.ccl.wx.util.CclDateUtil;
 import com.ccl.wx.util.CclUtil;
 import com.ccl.wx.vo.CircleNormalUserInfoVO;
 import com.ccl.wx.vo.CircleUserInfoVO;
+import com.ccl.wx.vo.UserCircleRecordVO;
 import com.ccl.wx.vo.UserVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -884,6 +885,20 @@ public class JoinCircleServiceImpl implements JoinCircleService {
             }
         }
         return fail;
+    }
+
+    @Override
+    public String getRecordUserInfo(Long circleId, String userId, String tUserId) {
+        String sUserId = StringUtils.isEmpty(tUserId) ? userId : tUserId;
+        if (judgeUserJoinCircleStatus(sUserId, circleId)) {
+            UserInfo userInfo = userInfoService.selectByPrimaryKey(sUserId);
+            UserCircleRecordVO userCircleRecordVO = new UserCircleRecordVO();
+            BeanUtils.copyProperties(userInfo, userCircleRecordVO);
+            JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, sUserId);
+            BeanUtils.copyProperties(joinCircle, userCircleRecordVO);
+            return JSON.toJSONStringWithDateFormat(userCircleRecordVO, DatePattern.NORM_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+        }
+        return EnumResultStatus.FAIL.getValue();
     }
 
     /**

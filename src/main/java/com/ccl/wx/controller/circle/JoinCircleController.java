@@ -7,6 +7,7 @@ import com.ccl.wx.enums.EnumPage;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.global.annotation.ParamCheck;
 import com.ccl.wx.service.JoinCircleService;
+import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,6 +29,9 @@ public class JoinCircleController {
 
     @Resource
     private JoinCircleService joinCircleService;
+
+    @Resource
+    private UserDiaryService userDiaryService;
 
     /**
      * 获取用户积分排行榜
@@ -411,6 +415,43 @@ public class JoinCircleController {
     }
 
     /**
+     * 获取某个用户的全部日志信息
+     * 打卡记录
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param page     页数
+     * @return
+     */
+    @ParamCheck
+    @GetMapping("/menu/record/diary")
+    public Result<String> getAssignDiaryInfo(@RequestParam(value = "circleId", required = false) Long circleId,
+                                             @RequestHeader(value = "token", required = false) String userId,
+                                             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
+        String result = userDiaryService.getAssignDiaryInfo(circleId, userId, page);
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
+     * 获取某个用户的所在圈子相关信息
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @param tUserId  目标用户id
+     * @return
+     */
+    @GetMapping("/menu/record/info")
+    public Result<String> getRecordUserInfo(@ParamCheck @RequestParam(value = "circleId", required = false) Long circleId,
+                                            @RequestHeader(value = "token", required = false) String userId,
+                                            @RequestParam(value = "userId", required = false) String tUserId) {
+        String result = joinCircleService.getRecordUserInfo(circleId, userId, tUserId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
      * 加入圈子
      *
      * @param circleId 圈子id
@@ -456,7 +497,7 @@ public class JoinCircleController {
      * @param userId   用户id
      * @return
      */
-    @GetMapping("/exit")
+    @GetMapping("/menu/exit")
     public Result<String> exitCircle(@RequestParam(value = "circleId", required = false) Long circleId,
                                      @RequestHeader(value = "token", required = false) String userId) {
         String result = joinCircleService.exitCircle(circleId, userId);
