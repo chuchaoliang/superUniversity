@@ -17,6 +17,7 @@ import com.ccl.wx.util.CclUtil;
 import com.ccl.wx.util.FtpUtil;
 import com.ccl.wx.vo.CircleIndexVO;
 import com.ccl.wx.vo.CircleInfoVO;
+import com.ccl.wx.vo.CircleNoticeVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -259,6 +261,68 @@ public class CircleInfoServiceImpl implements CircleInfoService {
     public String searchCircleByKeyWord(String keyword, String userId, Integer page) {
         List<CircleInfo> circleInfos = circleInfoMapper.selectSearchCircleInfo(keyword, null);
         return selectAdornCircle(circleInfos, userId, circleInfos.size(), page);
+    }
+
+    @Override
+    public String saveCircleNotice(CircleNoticeVO circleNoticeVO, String userId) {
+        Integer circleId = circleNoticeVO.getCircleId();
+        if (joinCircleService.judgeUserIsCircleManage(circleId, UserPermissionList.circleAdmin(), userId)) {
+            CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleId.longValue());
+            circleInfo.setCircleTask(circleNoticeVO.getNotice());
+            int i = circleInfoMapper.updateByPrimaryKeySelective(circleInfo);
+            if (i == 0) {
+                return EnumResultStatus.FAIL.getValue();
+            }
+            return EnumResultStatus.SUCCESS.getValue();
+        }
+        return EnumResultStatus.UNKNOWN.getValue();
+    }
+
+    @Override
+    public String deleteCircleNotice(Long circleId, String userId) {
+        if (joinCircleService.judgeUserIsCircleManage(circleId.intValue(), UserPermissionList.circleAdmin(), userId)) {
+            CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleId);
+            circleInfo.setCircleTask("");
+            int i = circleInfoMapper.updateByPrimaryKeySelective(circleInfo);
+            if (i == 0) {
+                return EnumResultStatus.FAIL.getValue();
+            }
+            return EnumResultStatus.SUCCESS.getValue();
+        }
+        // 无操作权限
+        return EnumResultStatus.UNKNOWN.getValue();
+    }
+
+    @Override
+    public String updateCircleNotice(CircleNoticeVO circleNoticeVO, String userId) {
+        Integer circleId = circleNoticeVO.getCircleId();
+        if (joinCircleService.judgeUserIsCircleManage(circleId, UserPermissionList.circleAdmin(), userId)) {
+            CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleId.longValue());
+            circleInfo.setCircleTask(circleNoticeVO.getNotice());
+            int i = circleInfoMapper.updateByPrimaryKeySelective(circleInfo);
+            if (i == 0) {
+                return EnumResultStatus.FAIL.getValue();
+            }
+            return EnumResultStatus.SUCCESS.getValue();
+        }
+        return EnumResultStatus.UNKNOWN.getValue();
+    }
+
+    @Override
+    public String checkCircleNotice(Long circleId) {
+        CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleId);
+        // 获取圈子通知
+        String circleTask = circleInfo.getCircleTask();
+        HashMap<String, Object> hashMap = new HashMap<>(2);
+        // 检测圈子通知是否为空
+        if (StringUtils.isEmpty(circleTask)) {
+            // 为空
+            hashMap.put("noticeIsNull", true);
+        } else {
+            hashMap.put("noticeIsNull", false);
+            hashMap.put("notice", circleTask);
+        }
+        return JSON.toJSONString(hashMap);
     }
 }
 

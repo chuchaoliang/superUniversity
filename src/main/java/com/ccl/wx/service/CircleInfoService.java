@@ -1,6 +1,7 @@
 package com.ccl.wx.service;
 
 import com.ccl.wx.entity.CircleInfo;
+import com.ccl.wx.vo.CircleNoticeVO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -138,6 +139,41 @@ public interface CircleInfoService {
      * @return
      */
     String searchCircleByKeyWord(String keyword, String userId, Integer page);
+
+    /**
+     * 保存圈子公告
+     *
+     * @param circleNoticeVO 圈子通知对象
+     * @param userId         用户id
+     * @return
+     */
+    String saveCircleNotice(CircleNoticeVO circleNoticeVO, String userId);
+
+    /**
+     * 删除圈子公告信息
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    String deleteCircleNotice(Long circleId, String userId);
+
+    /**
+     * 更新圈子公告信息
+     *
+     * @param circleNoticeVO 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    String updateCircleNotice(CircleNoticeVO circleNoticeVO, String userId);
+
+    /**
+     * 检测圈子公告是否为空，不为空返回公告信息
+     *
+     * @param circleId 圈子id
+     * @return
+     */
+    String checkCircleNotice(Long circleId);
 }
 
 

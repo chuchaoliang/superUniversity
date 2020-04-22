@@ -6,17 +6,21 @@ import com.ccl.wx.common.api.Result;
 import com.ccl.wx.enums.EnumPage;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.global.annotation.ParamCheck;
+import com.ccl.wx.service.CircleInfoService;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.util.ResponseMsgUtil;
+import com.ccl.wx.vo.CircleNoticeVO;
 import io.swagger.annotations.Api;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author 褚超亮
@@ -32,6 +36,9 @@ public class JoinCircleController {
 
     @Resource
     private UserDiaryService userDiaryService;
+
+    @Resource
+    private CircleInfoService circleInfoService;
 
     /**
      * 获取用户积分排行榜
@@ -452,6 +459,101 @@ public class JoinCircleController {
     }
 
     /**
+     * 退出圈子
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    @GetMapping("/menu/exit")
+    public Result<String> exitCircle(@RequestParam(value = "circleId", required = false) Long circleId,
+                                     @RequestHeader(value = "token", required = false) String userId) {
+        String result = joinCircleService.exitCircle(circleId, userId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    /**
+     * 保存圈子公告信息
+     *
+     * @param circleNoticeVO 圈子id和通知内容对象
+     * @param userId         用户id
+     * @return
+     */
+    @PostMapping("/menu/notice/add")
+    public Result<String> saveCircleNotice(@RequestBody(required = false) CircleNoticeVO circleNoticeVO,
+                                           @RequestHeader(value = "token", required = false) String userId,
+                                           BindingResult result) {
+        if (result.hasErrors()) {
+            return ResponseMsgUtil.fail(Objects.requireNonNull(result.getFieldError()).getDefaultMessage());
+        }
+        String resultResponse = circleInfoService.saveCircleNotice(circleNoticeVO, userId);
+        if (EnumResultStatus.FAIL.getValue().equals(resultResponse)) {
+            // 操作失败
+            return ResponseMsgUtil.fail("操作失败！");
+        } else if (EnumResultStatus.UNKNOWN.getValue().equals(resultResponse)) {
+            // 无权限操作
+            return ResponseMsgUtil.fail(EnumResultCode.UNAUTHORIZED);
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    /**
+     * 删除圈子公告信息
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    @GetMapping("/menu/notice/del")
+    public Result<String> deleteCircleNotice(@ParamCheck @RequestParam(value = "circleId", required = false) Long circleId,
+                                             @RequestHeader(value = "token", required = false) String userId) {
+        String result = circleInfoService.deleteCircleNotice(circleId, userId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        } else if (EnumResultStatus.UNKNOWN.getValue().equals(result)) {
+            return ResponseMsgUtil.fail(EnumResultCode.UNAUTHORIZED);
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    /**
+     * 更新圈子公告信息
+     *
+     * @param circleNoticeVO 圈子公告信息
+     * @param userId         用户id
+     * @return
+     */
+    @PostMapping("/menu/notice/update")
+    public Result<String> updateCircleNotice(@RequestBody(required = false) CircleNoticeVO circleNoticeVO,
+                                             @RequestHeader(value = "token", required = false) String userId) {
+        String result = circleInfoService.updateCircleNotice(circleNoticeVO, userId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        } else if (EnumResultStatus.UNKNOWN.getValue().equals(result)) {
+            return ResponseMsgUtil.fail(EnumResultCode.UNAUTHORIZED);
+        }
+        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    /**
+     * 检测圈子是否存在公告
+     *
+     * @param circleId 圈子id
+     * @return
+     */
+    @GetMapping("/menu/notice/check")
+    public Result<String> checkCircleNotice(@RequestParam(value = "circleId", required = false) Long circleId) {
+        String result = circleInfoService.checkCircleNotice(circleId);
+        if (EnumResultStatus.FAIL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail("操作失败！");
+        }
+        return ResponseMsgUtil.success(result);
+    }
+
+    /**
      * 加入圈子
      *
      * @param circleId 圈子id
@@ -488,23 +590,6 @@ public class JoinCircleController {
             return ResponseMsgUtil.fail("加入失败！密码错误！");
         }
         return ResponseMsgUtil.success(result);
-    }
-
-    /**
-     * 退出圈子
-     *
-     * @param circleId 圈子id
-     * @param userId   用户id
-     * @return
-     */
-    @GetMapping("/menu/exit")
-    public Result<String> exitCircle(@RequestParam(value = "circleId", required = false) Long circleId,
-                                     @RequestHeader(value = "token", required = false) String userId) {
-        String result = joinCircleService.exitCircle(circleId, userId);
-        if (EnumResultStatus.FAIL.getValue().equals(result)) {
-            return ResponseMsgUtil.fail("操作失败！");
-        }
-        return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
     }
 }
 

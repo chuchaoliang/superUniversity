@@ -19,10 +19,7 @@ import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.service.UserInfoService;
 import com.ccl.wx.util.CclDateUtil;
 import com.ccl.wx.util.CclUtil;
-import com.ccl.wx.vo.CircleNormalUserInfoVO;
-import com.ccl.wx.vo.CircleUserInfoVO;
-import com.ccl.wx.vo.UserCircleRecordVO;
-import com.ccl.wx.vo.UserVO;
+import com.ccl.wx.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -771,7 +768,7 @@ public class JoinCircleServiceImpl implements JoinCircleService {
     public String checkUserCircleNickname(Long circleId, String userId) {
         if (judgeUserJoinCircleStatus(userId, circleId)) {
             JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
-            HashMap<String, Object> hashMap = new HashMap<>();
+            HashMap<String, Object> hashMap = new HashMap<>(2);
             String userNickName = joinCircle.getUserNickName();
             if (StringUtils.isEmpty(userNickName)) {
                 // 昵称为空
