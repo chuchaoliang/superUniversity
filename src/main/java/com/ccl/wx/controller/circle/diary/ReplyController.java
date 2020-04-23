@@ -60,4 +60,17 @@ public class ReplyController {
         }
         return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
     }
+
+    /**
+     * 获取评论下的子评论信息
+     *
+     * @param commentId 评论id
+     * @return
+     */
+    @GetMapping("/diary/reply/get")
+    public Result<String> getDiaryReply(@RequestParam(value = "commentId", required = false) Integer commentId,
+                                        @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
+        String result = replyService.getReply(commentId, page);
+        return ResponseMsgUtil.success(result);
+    }
 }

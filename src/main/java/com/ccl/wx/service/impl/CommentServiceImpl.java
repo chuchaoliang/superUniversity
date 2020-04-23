@@ -16,8 +16,6 @@ import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.ReplyService;
 import com.ccl.wx.service.UserInfoService;
 import com.ccl.wx.util.CclDateUtil;
-import com.ccl.wx.vo.CircleHomeCommentVO;
-import com.ccl.wx.vo.CircleHomeReplyVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -110,7 +108,7 @@ public class CommentServiceImpl implements CommentService {
             CommentDTO commentDTO = new CommentDTO();
             List<Reply> replies = replyService.selectReply(comment.getId(), 0, EnumReply.REPLY_SHOW.getValue());
             // 获取全部子评论
-            List<ReplyDTO> replyDTOS = replyService.adornReply(replies);
+            List<ReplyDTO> replyDTOS = replyService.adornReply(replies, true);
             // 获取用户信息
             UserInfo userInfo = userInfoService.selectByPrimaryKey(comment.getUserId());
             userInfo.setNickname(joinCircleService.getUserJoinCircleNickname(userInfo.getId(), comment.getCircleId()));
@@ -197,56 +195,6 @@ public class CommentServiceImpl implements CommentService {
         } else {
             return true;
         }
-    }
-
-    @Override
-    public List<CircleHomeCommentVO> getAllComment(Long diaryId, Integer page) {
-        // 获取子评论
-        List<Comment> comments = commentMapper.selectComment(diaryId, 0, 0, 10);
-        List<CircleHomeCommentVO> circleHomeCommentVOS = new ArrayList<>();
-        for (Comment comment : comments) {
-            if (EnumComment.COMMENT_DELETE_STATUS.getValue().equals(comment.getCommentStatus())) {
-                // 点评为删除状态
-                continue;
-            }
-            CircleHomeCommentVO circleHomeCommentVO = new CircleHomeCommentVO();
-            // 查询此评论下的全部子评论
-            List<Reply> replies = replyService.selectReply(comment.getId(), 0, 3);
-            List<CircleHomeReplyVO> circleHomeReplyVOS = new ArrayList<>();
-            for (Reply reply : replies) {
-                CircleHomeReplyVO circleHomeReplyVO = new CircleHomeReplyVO();
-                // 回复人信息
-                UserInfo userInfo = userInfoService.selectByPrimaryKey(reply.getReplyUserid());
-                // 目标用户信息
-                UserInfo targetUserInfo = userInfoService.selectByPrimaryKey(reply.getTargetUserid());
-                BeanUtils.copyProperties(reply, circleHomeReplyVO);
-                // 设置回复人昵称
-                circleHomeReplyVO.setNickName(userInfo.getNickname());
-                // 设置回复人性别
-                circleHomeReplyVO.setGender(userInfo.getGender());
-                // 设置回复人头像
-                circleHomeReplyVO.setHeadImage(userInfo.getAvatarurl());
-                // 设置目标人昵称
-                circleHomeReplyVO.setTargetNickName(targetUserInfo.getNickname());
-                circleHomeReplyVOS.add(circleHomeReplyVO);
-                if (circleHomeCommentVOS.size() == 15) {
-                    break;
-                }
-            }
-            // 获取用户信息
-            UserInfo userInfo = userInfoService.selectByPrimaryKey(comment.getUserId());
-            BeanUtils.copyProperties(comment, circleHomeCommentVOS);
-            // 设置用户昵称
-            circleHomeCommentVO.setNickName(userInfo.getNickname());
-            // 设置用户头像
-            circleHomeCommentVO.setHeadImage(userInfo.getAvatarurl());
-            // 设置用户性别
-            circleHomeCommentVO.setGender(userInfo.getGender());
-            // 设置此评论的回复
-            circleHomeCommentVO.setReplies(circleHomeReplyVOS);
-            circleHomeCommentVOS.add(circleHomeCommentVO);
-        }
-        return circleHomeCommentVOS;
     }
 }
 

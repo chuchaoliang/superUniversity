@@ -550,9 +550,9 @@ public class CclUtil {
     /**
      * 判断是否存在下一页
      *
-     * @param allNumber 全部页数
-     * @param pageNumber    每页的数量
-     * @param page          当前是第几页
+     * @param allNumber  全部页数
+     * @param pageNumber 每页的数量
+     * @param page       当前是第几页
      * @return
      */
     public static boolean judgeNextPage(int allNumber, int pageNumber, int page) {

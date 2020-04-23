@@ -63,12 +63,14 @@ public interface ReplyService {
      * 装饰回复
      *
      * @param replies 回复列表
+     * @param index   是否展示回复中评论对应目标人信息（true展示false不展示）
      * @return
      */
-    List<ReplyDTO> adornReply(List<Reply> replies);
+    List<ReplyDTO> adornReply(List<Reply> replies, boolean index);
 
     /**
      * 根据日记id查询全部的回复
+     *
      * @param diaryId
      * @return
      */
@@ -81,4 +83,13 @@ public interface ReplyService {
      * @return
      */
     Long countByCommentId(Long commentId);
+
+    /**
+     * 获取评论下的子评论信息
+     *
+     * @param commentId 评论id
+     * @param page
+     * @return
+     */
+    String getReply(Integer commentId, Integer page);
 }

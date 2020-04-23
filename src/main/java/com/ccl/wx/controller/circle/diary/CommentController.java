@@ -1,14 +1,14 @@
 package com.ccl.wx.controller.circle.diary;
 
 import com.alibaba.fastjson.JSON;
-import com.ccl.wx.global.annotation.ParamCheck;
 import com.ccl.wx.common.api.EnumResultCode;
 import com.ccl.wx.common.api.Result;
+import com.ccl.wx.dto.CommentDTO;
 import com.ccl.wx.entity.Comment;
 import com.ccl.wx.enums.EnumResultStatus;
+import com.ccl.wx.global.annotation.ParamCheck;
 import com.ccl.wx.service.CommentService;
 import com.ccl.wx.util.ResponseMsgUtil;
-import com.ccl.wx.vo.CircleHomeCommentVO;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -74,8 +74,8 @@ public class CommentController {
     @GetMapping("/diary/comment/get")
     public Result<String> getAllCommentByDiaryId(@RequestParam(value = "diaryId", required = false) Integer diaryId,
                                                  @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
-        List<CircleHomeCommentVO> allComment = commentService.getAllComment(diaryId.longValue(), page);
-        return ResponseMsgUtil.success(JSON.toJSONString(allComment));
+        List<CommentDTO> diaryComment = commentService.getDiaryComment(diaryId.longValue(), page, false);
+        return ResponseMsgUtil.success(JSON.toJSONString(diaryComment));
     }
 
     /**
