@@ -1,7 +1,9 @@
 package com.ccl.wx.mapper;
 
 import com.ccl.wx.entity.UserInfo;
-import org.apache.ibatis.annotations.Mapper;import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * @author 褚超亮
@@ -23,6 +25,13 @@ public interface UserInfoMapper {
     int updateByPrimaryKey(UserInfo record);
 
     List<UserInfo> findByAll(UserInfo userInfo);
+
+    /**
+     * 查询全部用户信息
+     *
+     * @return
+     */
+    List<UserInfo> selectAllInfo();
 
     /**
      * 获取用户自增键最大值
