@@ -5,10 +5,7 @@ import com.ccl.wx.config.properties.ElasticSearchProperties;
 import com.ccl.wx.config.properties.FileUploadProperties;
 import com.ccl.wx.config.properties.FtpProperties;
 import com.ccl.wx.mapper.*;
-import com.ccl.wx.service.CircleScheduleService;
-import com.ccl.wx.service.JoinCircleService;
-import com.ccl.wx.service.TodayContentService;
-import com.ccl.wx.service.UserDiaryService;
+import com.ccl.wx.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.junit.Test;
@@ -20,6 +17,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 
 @Slf4j
 @RunWith(SpringRunner.class)
@@ -76,6 +75,9 @@ public class CclWxApplicationTests {
 
     @Autowired
     private RestHighLevelClient restHighLevelClient;
+
+    @Resource
+    private CircleInfoService circleInfoService;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Test

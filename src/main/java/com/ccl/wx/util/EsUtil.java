@@ -1,6 +1,7 @@
 package com.ccl.wx.util;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.ccl.wx.enums.EnumResultStatus;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -8,6 +9,8 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
@@ -132,13 +135,22 @@ public class EsUtil {
      * @param client   高级客户端
      * @param index    索引
      * @param dataList 数据列表
-     * @param id       文档id
+     * @param id       文档id （数据列表中所在代表的字段名称）
      * @return 是否操作成功 (true是 false否)
      */
-    public static boolean addDocuments(RestHighLevelClient client, String index, List<Object> dataList, String id) throws IOException {
+    public static boolean addDocuments(RestHighLevelClient client, String index, List dataList, String id) throws IOException {
+        if (!indexIsExists(client, index)) {
+            // 索引不存在 创建索引
+            if (!createIndex(client, index)) {
+                // 创建失败
+                return false;
+            }
+        }
         BulkRequest bulkRequest = new BulkRequest(index);
         for (Object data : dataList) {
-            bulkRequest.add(new IndexRequest().id(id).source(JSON.toJSONString(data), XContentType.JSON));
+            String text = JSON.toJSONString(data);
+            JSONObject jsonObject = JSON.parseObject(text);
+            bulkRequest.add(new IndexRequest().id(String.valueOf(jsonObject.get(id))).source(text, XContentType.JSON));
         }
         BulkResponse bulk = client.bulk(bulkRequest, RequestOptions.DEFAULT);
         return !bulk.hasFailures();
@@ -195,5 +207,17 @@ public class EsUtil {
             return updateResponse.getResult().getLowercase();
         }
         return EnumResultStatus.FAIL.getValue();
+    }
+
+    /**
+     * 普通搜索 根据searchRequest条件
+     *
+     * @param client
+     * @param searchRequest 条件
+     * @return
+     * @throws IOException
+     */
+    public static SearchResponse search(RestHighLevelClient client, SearchRequest searchRequest) throws IOException {
+        return client.search(searchRequest, RequestOptions.DEFAULT);
     }
 }

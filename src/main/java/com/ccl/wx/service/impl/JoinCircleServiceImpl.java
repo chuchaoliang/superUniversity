@@ -549,7 +549,7 @@ public class JoinCircleServiceImpl implements JoinCircleService {
             CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
             circleInfos.add(circleInfo);
         }
-        return circleInfoService.selectAdornCircle(circleInfos, userId, circleInfos.size(), page);
+        return circleInfoService.circleInfoComparator(circleInfos, userId, circleInfos.size(), page);
     }
 
     @Override
@@ -557,7 +557,7 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         CircleInfo circleInfo = new CircleInfo();
         circleInfo.setCircleUserid(userId);
         List<CircleInfo> circleInfos = circleInfoService.selectByAll(circleInfo);
-        return circleInfoService.selectAdornCircle(circleInfos, userId, circleInfos.size(), page);
+        return circleInfoService.circleInfoComparator(circleInfos, userId, circleInfos.size(), page);
     }
 
     @Override

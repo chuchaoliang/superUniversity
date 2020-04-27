@@ -1,0 +1,167 @@
+# 圈子默认配置
+circle:
+  # 圈子首页图片路径
+  head:
+    image: https://www.ccllove.club/wx/default/images/baibo.png
+  # 圈子主题默认配置
+  theme:
+    # 默认id
+    id: 0
+    # 默认头像地址
+    image: https://www.ccllove.club/wx/default/images/baibo.png
+    # 默认主题名称
+    title: 默认主题
+# 文件上传项目访问路径前缀
+easy:
+  server:
+    path: https://www.ccllove.club
+# 文件上传映射路径
+file:
+  upload:
+    local:
+      # 文件上传映射本地磁盘目录位置
+      path: /home/ccl/user/
+    suffix:
+      # 文件上传映射路径
+      path: /user/
+    useless:
+      local:
+        # nginx映射的图片路径
+        path: /home/ccl
+# 配置日志路径，级别
+logging:
+  level:
+    com:
+      ccl:
+        wx:
+          mapper: debug
+  path: /logs/
+# mybatis配置
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  type-aliases-package: com.mbyte.easy.entity
+# tomcat反向代理配置
+server:
+  tomcat:
+    port-header: X-Forwarded-Port
+    protocol-header: X-Forwarded-Proto
+    remote-ip-header: X-FORWARDED-FOR
+  use-forward-headers: true
+spring:
+  application:
+    name: cclWx
+  # druid 数据库配置
+  datasource:
+    druid:
+      # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+      # 配置监控统计拦截的filters，去掉后监控界面sql无法统计
+      filters: stat,wall
+      # 初始化时建立物理连接的个数
+      initial-size: 5
+      # 最大连接池数量
+      max-active: 30
+      # 要启用PSCache，必须配置大于0，当大于0时，poolPreparedStatements自动触发修改为true。
+      max-pool-prepared-statement-per-connection-size: 50
+      # 获取连接时最大等待时间，单位毫秒
+      max-wait: 60000
+      # 连接保持空闲而不被驱逐的最小时间
+      min-evictable-idle-time-millis: 300000
+      # 最小连接池数量
+      min-idle: 5
+      # 是否缓存preparedStatement，也就是PSCache。PSCache对支持游标的数据库性能提升巨大，比如说oracle。在mysql下建议关闭。
+      pool-prepared-statements: true
+      # druid连接池监控
+      stat-view-servlet:
+        login-password: Ccl6605216..
+        login-username: ChuChaoliang
+      # 申请连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能。
+      test-on-borrow: false
+      # 归还连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能。
+      test-on-return: false
+      # 建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。
+      test-while-idle: true
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      time-between-eviction-runs-millis: 60000
+      # 合并多个DruidDataSource的监控数据
+      use-global-data-source-stat: true
+      # 用来检测连接是否有效的sql，要求是一个查询语句
+      validation-query: SELECT 1 FROM DUAL
+      # 排除一些静态资源，以提高效率
+      web-stat-filter:
+        exclusions: '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*'
+  # 配置elasticsearch
+  elasticsearch:
+    hostname: 49.235.63.16
+    port: 19200
+    scheme: http
+  # 配置ftp
+  ftp:
+    # ftp上传的根目录
+    basePath: /home/ccl/user/
+    # ftp服务器的地址
+    host: 49.235.63.16
+    # 回显地址前缀
+    httpPath: https://ccllove.club
+    # ftp的密码
+    password: 123456
+    # ftp服务器的端口号（连接端口号）
+    port: 21
+    # ftp的用户名
+    user: ccl
+  # 环境选择
+  profiles:
+    active: dev
+  # rabbitmq配置
+  rabbitmq:
+    host: 49.235.63.16
+    password: admin
+    port: 5672
+    username: admin
+  # redis配置
+  redis:
+    database: 0
+    # redis服务器地址
+    host: 49.235.63.16
+    lettuce:
+      pool:
+        # 连接池最大连接数（使用负值表示没有限制）
+        max-active: 8
+        # 连接池中最大空闲连接
+        max-idle: 8
+        # 连接池最大阻塞等待时间（负值表示没有限制）
+        max-wait: -1
+        # 连接池中的最小空闲连接
+        min-idle: 0
+    # redis服务器连接密码
+    password: 6605216
+    # redis服务器连接端口
+    port: 6379
+    # 连接超时时间
+    timeout: 60000
+  servlet:
+    multipart:
+      # 单个文件大小限制
+      max-file-size: 100MB
+      # 总文件大小限制
+      max-request-size: 200MB
+  # thymeleaf配置
+  thymeleaf:
+    cache: false
+    check-template-location: true
+    encoding: UTF-8
+    prefix: classpath:/templates/
+    servlet:
+      content-type: text/html
+    suffix: .html
+user:
+  head:
+    image: https://www.ccllove.club/wx/default/default/defaultHead.png
+    image.path: /home/ccl/user/
+# 微信配置
+wx:
+  appId: wx13c833e813896ad0
+  secret: d458dbc0970ddc248fc69c5e6bf28ee5
