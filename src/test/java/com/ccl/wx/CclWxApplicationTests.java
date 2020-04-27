@@ -79,6 +79,9 @@ public class CclWxApplicationTests {
     @Resource
     private CircleInfoService circleInfoService;
 
+    @Resource
+    private ElasticsearchService elasticsearchService;
+
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Test
     public void test() throws Exception {

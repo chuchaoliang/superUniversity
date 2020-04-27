@@ -166,6 +166,13 @@ public class CircleInfoServiceImpl implements CircleInfoService {
                 if (EnumResultStatus.FAIL.getValue().equals(result)) {
                     return EnumResultStatus.FAIL.getValue();
                 } else {
+                    circleInfo.setCircleCreatetime(new Date());
+                    // 将圈子数据保存到es中
+                    try {
+                        elasticsearchService.addDocument(EnumEsIndex.ES_CIRCLE_INFO.getValue(), circleInfo, String.valueOf(circleInfo.getCircleId()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     // 插入成功返回圈子信息
                     return JSON.toJSONString(circleInfo);
                 }
