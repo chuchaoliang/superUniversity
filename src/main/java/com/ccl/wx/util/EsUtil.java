@@ -121,7 +121,6 @@ public class EsUtil {
      * @param index  索引名称
      * @param data   数据
      * @param id     对应id
-     * @throws IOException
      */
     public static void addDocument(RestHighLevelClient client, String index, Object data, String id) throws IOException {
         IndexRequest indexRequest = new IndexRequest(index).id(id).timeout(TimeValue.timeValueMinutes(1L))
@@ -176,8 +175,7 @@ public class EsUtil {
      * @param client
      * @param index  索引名称
      * @param id     对应id
-     * @return 存在返回文档内容json字符串 不存在 返回""
-     * @throws IOException
+     * @return 存在返回文档内容json字符串 不存在 返回null
      */
     public static String getDocument(RestHighLevelClient client, String index, String id) throws IOException {
         if (documentIsExists(client, index, id)) {
@@ -185,7 +183,7 @@ public class EsUtil {
             GetResponse documentFields = client.get(getRequest, RequestOptions.DEFAULT);
             return documentFields.getSourceAsString();
         }
-        return "";
+        return null;
     }
 
     /**
@@ -196,7 +194,6 @@ public class EsUtil {
      * @param index  索引名称
      * @param id     文档id
      * @return
-     * @throws IOException
      */
     public static String updateDocument(RestHighLevelClient client, Object data, String index, String id) throws IOException {
         if (documentIsExists(client, index, id)) {
@@ -215,7 +212,6 @@ public class EsUtil {
      * @param client
      * @param searchRequest 条件
      * @return
-     * @throws IOException
      */
     public static SearchResponse search(RestHighLevelClient client, SearchRequest searchRequest) throws IOException {
         return client.search(searchRequest, RequestOptions.DEFAULT);

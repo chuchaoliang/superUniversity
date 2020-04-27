@@ -123,17 +123,6 @@ public interface CircleInfoService {
     int updateCircleData(CircleInfo circleInfo, Long circleId, Integer value);
 
     /**
-     * 根据圈子类型和关键词查询数据
-     *
-     * @param keyword 关键词
-     * @param type    圈子类型
-     * @param userId  用户id
-     * @param page    页数
-     * @return
-     */
-    String searchCircleByTypeKeyWord(String keyword, Integer type, String userId, Integer page);
-
-    /**
      * 查询圈子
      *
      * @param keyword 关键词
@@ -141,16 +130,6 @@ public interface CircleInfoService {
      * @return
      */
     List<CircleInfo> selectSearchCircleInfo(String keyword, Integer type);
-
-    /**
-     * 根据关键词搜索圈子数据
-     *
-     * @param keyword 圈子关键词
-     * @param userId  用户id
-     * @param page    页数
-     * @return
-     */
-    String searchCircleByKeyWord(String keyword, String userId, Integer page);
 
     /**
      * 保存圈子公告
@@ -193,17 +172,19 @@ public interface CircleInfoService {
      * @return
      * @throws IOException
      */
-    boolean addUserInfoDocuments() throws IOException;
+    boolean addCircleInfoDocuments() throws IOException;
 
     /**
      * 根据圈子关键字查询圈子内容
      *
      * @param keyword 关键字
-     * @param page
-     * @param userId
+     * @param page    第几页
+     * @param userId  用户id
+     * @param type    圈子位置
      * @return
+     * @throws IOException
      */
-    String searchCircleInfoByKeyword(String keyword, Integer page, String userId) throws IOException;
+    String searchCircleInfo(String keyword, Integer page, String userId, Integer type) throws IOException;
 }
 
 

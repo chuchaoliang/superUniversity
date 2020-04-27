@@ -263,20 +263,8 @@ public class CircleInfoServiceImpl implements CircleInfoService {
     }
 
     @Override
-    public String searchCircleByTypeKeyWord(String keyword, Integer type, String userId, Integer page) {
-        List<CircleInfo> circleInfos = circleInfoMapper.selectSearchCircleInfo(keyword, type);
-        return circleInfoComparator(circleInfos, userId, circleInfos.size(), page);
-    }
-
-    @Override
     public List<CircleInfo> selectSearchCircleInfo(String keyword, Integer type) {
         return circleInfoMapper.selectSearchCircleInfo(keyword, type);
-    }
-
-    @Override
-    public String searchCircleByKeyWord(String keyword, String userId, Integer page) {
-        List<CircleInfo> circleInfos = circleInfoMapper.selectSearchCircleInfo(keyword, null);
-        return circleInfoComparator(circleInfos, userId, circleInfos.size(), page);
     }
 
     @Override
@@ -342,16 +330,22 @@ public class CircleInfoServiceImpl implements CircleInfoService {
     }
 
     @Override
-    public boolean addUserInfoDocuments() throws IOException {
+    public boolean addCircleInfoDocuments() throws IOException {
         List circleInfos = circleInfoMapper.selectAllInfo();
         return elasticsearchService.addDocuments(EnumEsIndex.ES_CIRCLE_INFO.getValue(), circleInfos, "circleId");
     }
 
     @Override
-    public String searchCircleInfoByKeyword(String keyword, Integer page, String userId) throws IOException {
+    public String searchCircleInfo(String keyword, Integer page, String userId, Integer type) throws IOException {
         // 构造查询条件
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().should(QueryBuilders.matchQuery("circleName", keyword))
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
+                .should(QueryBuilders.matchQuery("circleName", keyword))
                 .should(QueryBuilders.matchQuery("circleLabel", keyword));
+        if (type != null) {
+            boolQueryBuilder = QueryBuilders.boolQuery()
+                    .must(QueryBuilders.boolQuery().should(boolQueryBuilder))
+                    .must(QueryBuilders.matchQuery("circleLocation", type));
+        }
         // 构造高亮字段
         HighlightBuilder highlightBuilder = new HighlightBuilder().requireFieldMatch(false)
                 .field("circleName").field("circleLabel")
@@ -360,7 +354,8 @@ public class CircleInfoServiceImpl implements CircleInfoService {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(boolQueryBuilder)
                 .highlighter(highlightBuilder)
-                .from(page * EnumPage.PAGE_NUMBER.getValue()).size(EnumPage.PAGE_NUMBER.getValue()).timeout(TimeValue.timeValueSeconds(30L));
+                .from(page * EnumPage.PAGE_NUMBER.getValue()).size(EnumPage.PAGE_NUMBER.getValue())
+                .timeout(TimeValue.timeValueSeconds(30L));
         SearchResponse searchResponse = elasticsearchService.search(new SearchRequest().source(searchSourceBuilder));
         Long number = searchResponse.getHits().getTotalHits().value;
         List<CircleInfo> circleInfos = new ArrayList<>();
