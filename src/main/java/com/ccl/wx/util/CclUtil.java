@@ -5,6 +5,9 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpUtil;
 import com.ccl.wx.enums.EnumResultStatus;
 import org.apache.commons.io.FilenameUtils;
+import org.elasticsearch.common.text.Text;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -550,9 +553,9 @@ public class CclUtil {
     /**
      * 判断是否存在下一页
      *
-     * @param allNumber 全部页数
-     * @param pageNumber    每页的数量
-     * @param page          当前是第几页
+     * @param allNumber  全部页数
+     * @param pageNumber 每页的数量
+     * @param page       当前是第几页
      * @return
      */
     public static boolean judgeNextPage(int allNumber, int pageNumber, int page) {

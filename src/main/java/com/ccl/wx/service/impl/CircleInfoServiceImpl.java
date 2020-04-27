@@ -7,24 +7,33 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.common.comparator.CircleInfoComparator;
 import com.ccl.wx.common.list.UserPermissionList;
+import com.ccl.wx.config.properties.DefaultProperties;
 import com.ccl.wx.dto.CircleInfoDTO;
 import com.ccl.wx.entity.CircleInfo;
 import com.ccl.wx.enums.*;
 import com.ccl.wx.mapper.CircleInfoMapper;
-import com.ccl.wx.config.properties.DefaultProperties;
 import com.ccl.wx.service.*;
 import com.ccl.wx.util.CclUtil;
 import com.ccl.wx.util.FtpUtil;
 import com.ccl.wx.vo.CircleIndexVO;
 import com.ccl.wx.vo.CircleInfoVO;
+import com.ccl.wx.vo.CircleNoticeVO;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -51,7 +60,7 @@ public class CircleInfoServiceImpl implements CircleInfoService {
     private DefaultProperties defaultProperties;
 
     @Resource
-    private CircleIntroService circleIntroService;
+    private ElasticsearchService elasticsearchService;
 
     @Override
     public int deleteByPrimaryKey(Long circleId) {
@@ -181,12 +190,21 @@ public class CircleInfoServiceImpl implements CircleInfoService {
     }
 
     @Override
-    public String selectAdornCircle(List<CircleInfo> circles, String userId, Integer number, Integer page) {
+    public String circleInfoComparator(List<CircleInfo> circles, String userId, Integer number, Integer page) {
         Integer pageNumber = EnumPage.PAGE_NUMBER.getValue();
         List<CircleInfo> disposeCircles = circles.stream().sorted(new CircleInfoComparator())
                 .skip(page * pageNumber.longValue()).limit(pageNumber).collect(Collectors.toList());
+        return selectAdornCircle(disposeCircles, userId, number, page);
+    }
+
+    @Override
+    public String circleInfoEsSearch(List<CircleInfo> circles, String userId, Integer number, Integer page) {
+        return selectAdornCircle(circles, userId, number, page);
+    }
+
+    public String selectAdornCircle(List<CircleInfo> circles, String userId, Integer number, Integer page) {
         List<CircleInfoVO> circleInfoVOS = new ArrayList<>();
-        for (CircleInfo circle : disposeCircles) {
+        for (CircleInfo circle : circles) {
             CircleInfoVO circleInfoVO = new CircleInfoVO();
             BeanUtils.copyProperties(circle, circleInfoVO);
             // 设置圈子成员
@@ -209,7 +227,7 @@ public class CircleInfoServiceImpl implements CircleInfoService {
     @Override
     public String selectCircleByType(Integer type, String userId, Integer page) {
         List<CircleInfo> circles = circleInfoMapper.selectSearchCircleInfo(null, type);
-        return selectAdornCircle(circles, userId, circles.size(), page);
+        return circleInfoComparator(circles, userId, circles.size(), page);
     }
 
     @Override
@@ -247,7 +265,7 @@ public class CircleInfoServiceImpl implements CircleInfoService {
     @Override
     public String searchCircleByTypeKeyWord(String keyword, Integer type, String userId, Integer page) {
         List<CircleInfo> circleInfos = circleInfoMapper.selectSearchCircleInfo(keyword, type);
-        return selectAdornCircle(circleInfos, userId, circleInfos.size(), page);
+        return circleInfoComparator(circleInfos, userId, circleInfos.size(), page);
     }
 
     @Override
@@ -258,7 +276,109 @@ public class CircleInfoServiceImpl implements CircleInfoService {
     @Override
     public String searchCircleByKeyWord(String keyword, String userId, Integer page) {
         List<CircleInfo> circleInfos = circleInfoMapper.selectSearchCircleInfo(keyword, null);
-        return selectAdornCircle(circleInfos, userId, circleInfos.size(), page);
+        return circleInfoComparator(circleInfos, userId, circleInfos.size(), page);
+    }
+
+    @Override
+    public String saveCircleNotice(CircleNoticeVO circleNoticeVO, String userId) {
+        Integer circleId = circleNoticeVO.getCircleId();
+        if (joinCircleService.judgeUserIsCircleManage(circleId, UserPermissionList.circleAdmin(), userId)) {
+            CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleId.longValue());
+            circleInfo.setCircleTask(circleNoticeVO.getNotice());
+            int i = circleInfoMapper.updateByPrimaryKeySelective(circleInfo);
+            if (i == 0) {
+                return EnumResultStatus.FAIL.getValue();
+            }
+            return EnumResultStatus.SUCCESS.getValue();
+        }
+        return EnumResultStatus.UNKNOWN.getValue();
+    }
+
+    @Override
+    public String deleteCircleNotice(Long circleId, String userId) {
+        if (joinCircleService.judgeUserIsCircleManage(circleId.intValue(), UserPermissionList.circleAdmin(), userId)) {
+            CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleId);
+            circleInfo.setCircleTask("");
+            int i = circleInfoMapper.updateByPrimaryKeySelective(circleInfo);
+            if (i == 0) {
+                return EnumResultStatus.FAIL.getValue();
+            }
+            return EnumResultStatus.SUCCESS.getValue();
+        }
+        // 无操作权限
+        return EnumResultStatus.UNKNOWN.getValue();
+    }
+
+    @Override
+    public String updateCircleNotice(CircleNoticeVO circleNoticeVO, String userId) {
+        Integer circleId = circleNoticeVO.getCircleId();
+        if (joinCircleService.judgeUserIsCircleManage(circleId, UserPermissionList.circleAdmin(), userId)) {
+            CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleId.longValue());
+            circleInfo.setCircleTask(circleNoticeVO.getNotice());
+            int i = circleInfoMapper.updateByPrimaryKeySelective(circleInfo);
+            if (i == 0) {
+                return EnumResultStatus.FAIL.getValue();
+            }
+            return EnumResultStatus.SUCCESS.getValue();
+        }
+        return EnumResultStatus.UNKNOWN.getValue();
+    }
+
+    @Override
+    public String checkCircleNotice(Long circleId) {
+        CircleInfo circleInfo = circleInfoMapper.selectByPrimaryKey(circleId);
+        // 获取圈子通知
+        String circleTask = circleInfo.getCircleTask();
+        HashMap<String, Object> hashMap = new HashMap<>(2);
+        // 检测圈子通知是否为空
+        if (StringUtils.isEmpty(circleTask)) {
+            // 为空
+            hashMap.put("noticeIsNull", true);
+        } else {
+            hashMap.put("noticeIsNull", false);
+            hashMap.put("notice", circleTask);
+        }
+        return JSON.toJSONString(hashMap);
+    }
+
+    @Override
+    public boolean addUserInfoDocuments() throws IOException {
+        List circleInfos = circleInfoMapper.selectAllInfo();
+        return elasticsearchService.addDocuments(EnumEsIndex.ES_CIRCLE_INFO.getValue(), circleInfos, "circleId");
+    }
+
+    @Override
+    public String searchCircleInfoByKeyword(String keyword, Integer page, String userId) throws IOException {
+        // 构造查询条件
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery().should(QueryBuilders.matchQuery("circleName", keyword))
+                .should(QueryBuilders.matchQuery("circleLabel", keyword));
+        // 构造高亮字段
+        HighlightBuilder highlightBuilder = new HighlightBuilder().requireFieldMatch(false)
+                .field("circleName").field("circleLabel")
+                .preTags(EnumEsCommon.ES_HIGHLIGHT_PRE_TAGS_COLOR.getValue())
+                .postTags(EnumEsCommon.ES_HIGHLIGHT_POST_TAGS_COLOR.getValue());
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(boolQueryBuilder)
+                .highlighter(highlightBuilder)
+                .from(page * EnumPage.PAGE_NUMBER.getValue()).size(EnumPage.PAGE_NUMBER.getValue()).timeout(TimeValue.timeValueSeconds(30L));
+        SearchResponse searchResponse = elasticsearchService.search(new SearchRequest().source(searchSourceBuilder));
+        Long number = searchResponse.getHits().getTotalHits().value;
+        List<CircleInfo> circleInfos = new ArrayList<>();
+        for (SearchHit hit : searchResponse.getHits()) {
+            CircleInfo circleInfo = JSON.parseObject(hit.getSourceAsString(), CircleInfo.class);
+            List<String> highParam = Arrays.asList("circleName", "circleLabel");
+            Map<String, String> highlightParamMap = elasticsearchService.esListHighlightSearch(hit, highParam);
+            String circleName = highlightParamMap.get("circleName");
+            String circleLabel = highlightParamMap.get("circleLabel");
+            if (!StringUtils.isEmpty(circleName)) {
+                circleInfo.setCircleName(circleName);
+            }
+            if (!StringUtils.isEmpty(circleLabel)) {
+                circleInfo.setCircleLabel(circleLabel);
+            }
+            circleInfos.add(circleInfo);
+        }
+        return circleInfoEsSearch(circleInfos, userId, number.intValue(), page);
     }
 }
 

@@ -196,6 +196,7 @@
         <include refid="Base_Column_List"/>
         from reply
         where comment_id=#{commentId,jdbcType=BIGINT}
+        order by reply_createtime desc
         limit #{start,jdbcType=INTEGER},#{number,jdbcType=INTEGER}
     </select>
 

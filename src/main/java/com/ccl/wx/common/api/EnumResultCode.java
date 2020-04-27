@@ -10,7 +10,7 @@ public enum EnumResultCode implements IResultCode {
 
     FAIL(400, "部分请求参数为空"),
 
-    UNAUTHORIZED(401, "无操作权限"),
+    UNAUTHORIZED(401, "无操作权限！"),
 
     NOT_FOUND(404, "请求资源不存在啊！！"),
 

@@ -374,4 +374,8 @@
             </if>
         </where>
     </select>
+    <select id="selectAllInfo" resultMap="BaseResultMap">
+        select *
+        from circle_info
+    </select>
 </mapper>

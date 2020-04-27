@@ -17,9 +17,15 @@
     <properties>
         <java.version>1.8</java.version>
         <skipTests>true</skipTests>
+        <elasticsearch.version>7.6.1</elasticsearch.version>
     </properties>
 
     <dependencies>
+        <!--引入elasticsearch高级客户端-->
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+        </dependency>
         <!--mybatis相关配置类-->
         <dependency>
             <groupId>com.google.guava</groupId>

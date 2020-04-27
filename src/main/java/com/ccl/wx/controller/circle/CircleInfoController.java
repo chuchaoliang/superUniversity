@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -129,9 +130,10 @@ public class CircleInfoController {
     @GetMapping("/search/keyword")
     public Result<String> searchCircleByKeyWord(@RequestParam(value = "keyword", required = false) String keyword,
                                                 @RequestHeader(value = "token", required = false) String userId,
-                                                @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
-        String result = circleInfoService.searchCircleByKeyWord(keyword, userId, page);
-        return ResponseMsgUtil.success(result);
+                                                @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) throws IOException {
+        //String result = circleInfoService.searchCircleByKeyWord(keyword, userId, page);
+        String result1 = circleInfoService.searchCircleInfoByKeyword(keyword, page, userId);
+        return ResponseMsgUtil.success(result1);
     }
 
 

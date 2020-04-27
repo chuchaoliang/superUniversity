@@ -26,6 +26,13 @@ public interface CircleInfoMapper {
     int updateByPrimaryKey(CircleInfo record);
 
     /**
+     * 查询全部圈子信息
+     *
+     * @return
+     */
+    List<CircleInfo> selectAllInfo();
+
+    /**
      * 根据条件查询圈子
      *
      * @param circleInfo 条件

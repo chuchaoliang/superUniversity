@@ -1,8 +1,10 @@
 package com.ccl.wx.service;
 
 import com.ccl.wx.entity.CircleInfo;
+import com.ccl.wx.vo.CircleNoticeVO;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -53,7 +55,7 @@ public interface CircleInfoService {
     boolean checkCircleName(String circleName);
 
     /**
-     * 圈子装饰方法
+     * 排序器过滤圈子数据
      *
      * @param circles 需要装饰的圈子信息
      * @param userId  用户id
@@ -61,7 +63,18 @@ public interface CircleInfoService {
      * @param page    当前是第几页
      * @return
      */
-    String selectAdornCircle(List<CircleInfo> circles, String userId, Integer number, Integer page);
+    String circleInfoComparator(List<CircleInfo> circles, String userId, Integer number, Integer page);
+
+    /**
+     * es搜索圈子数据
+     *
+     * @param circles 需要装饰的圈子信息
+     * @param userId  用户id
+     * @param number  数据总数
+     * @param page    当前是第几页
+     * @return
+     */
+    String circleInfoEsSearch(List<CircleInfo> circles, String userId, Integer number, Integer page);
 
     /**
      * 根据圈子类型查找圈子
@@ -138,6 +151,59 @@ public interface CircleInfoService {
      * @return
      */
     String searchCircleByKeyWord(String keyword, String userId, Integer page);
+
+    /**
+     * 保存圈子公告
+     *
+     * @param circleNoticeVO 圈子通知对象
+     * @param userId         用户id
+     * @return
+     */
+    String saveCircleNotice(CircleNoticeVO circleNoticeVO, String userId);
+
+    /**
+     * 删除圈子公告信息
+     *
+     * @param circleId 圈子id
+     * @param userId   用户id
+     * @return
+     */
+    String deleteCircleNotice(Long circleId, String userId);
+
+    /**
+     * 更新圈子公告信息
+     *
+     * @param circleNoticeVO 圈子id
+     * @param userId         用户id
+     * @return
+     */
+    String updateCircleNotice(CircleNoticeVO circleNoticeVO, String userId);
+
+    /**
+     * 检测圈子公告是否为空，不为空返回公告信息
+     *
+     * @param circleId 圈子id
+     * @return
+     */
+    String checkCircleNotice(Long circleId);
+
+    /**
+     * 添加用户信息到es文档中
+     *
+     * @return
+     * @throws IOException
+     */
+    boolean addUserInfoDocuments() throws IOException;
+
+    /**
+     * 根据圈子关键字查询圈子内容
+     *
+     * @param keyword 关键字
+     * @param page
+     * @param userId
+     * @return
+     */
+    String searchCircleInfoByKeyword(String keyword, Integer page, String userId) throws IOException;
 }
 
 

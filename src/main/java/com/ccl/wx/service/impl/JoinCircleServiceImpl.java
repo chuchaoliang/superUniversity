@@ -19,9 +19,7 @@ import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.service.UserInfoService;
 import com.ccl.wx.util.CclDateUtil;
 import com.ccl.wx.util.CclUtil;
-import com.ccl.wx.vo.CircleNormalUserInfoVO;
-import com.ccl.wx.vo.CircleUserInfoVO;
-import com.ccl.wx.vo.UserVO;
+import com.ccl.wx.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -551,7 +549,7 @@ public class JoinCircleServiceImpl implements JoinCircleService {
             CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId);
             circleInfos.add(circleInfo);
         }
-        return circleInfoService.selectAdornCircle(circleInfos, userId, circleInfos.size(), page);
+        return circleInfoService.circleInfoComparator(circleInfos, userId, circleInfos.size(), page);
     }
 
     @Override
@@ -559,7 +557,7 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         CircleInfo circleInfo = new CircleInfo();
         circleInfo.setCircleUserid(userId);
         List<CircleInfo> circleInfos = circleInfoService.selectByAll(circleInfo);
-        return circleInfoService.selectAdornCircle(circleInfos, userId, circleInfos.size(), page);
+        return circleInfoService.circleInfoComparator(circleInfos, userId, circleInfos.size(), page);
     }
 
     @Override
@@ -770,7 +768,7 @@ public class JoinCircleServiceImpl implements JoinCircleService {
     public String checkUserCircleNickname(Long circleId, String userId) {
         if (judgeUserJoinCircleStatus(userId, circleId)) {
             JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
-            HashMap<String, Object> hashMap = new HashMap<>();
+            HashMap<String, Object> hashMap = new HashMap<>(2);
             String userNickName = joinCircle.getUserNickName();
             if (StringUtils.isEmpty(userNickName)) {
                 // 昵称为空
@@ -860,6 +858,44 @@ public class JoinCircleServiceImpl implements JoinCircleService {
             }
         }
         return fail;
+    }
+
+    @Override
+    public String transferCircle(Long circleId, String tUserId, String userId) {
+        String fail = EnumResultStatus.FAIL.getValue();
+        if (judgeUserJoinCircleStatus(userId, circleId) && judgeUserJoinCircleStatus(tUserId, circleId)) {
+            JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, userId);
+            if (joinCircle.getUserPermission().equals(EnumUserPermission.MASTER_USER.getValue())) {
+                // 是圈主
+                JoinCircle tJoinCircle = joinCircleMapper.selectByPrimaryKey(circleId, tUserId);
+                // 判断要转让的用户是否为管理员
+                if (tJoinCircle.getUserPermission().equals(EnumUserPermission.ADMIN_USER.getValue())) {
+                    // 转让
+                    tJoinCircle.setUserPermission(EnumUserPermission.MASTER_USER.getValue());
+                    joinCircle.setUserPermission(EnumUserPermission.ADMIN_USER.getValue());
+                    joinCircleMapper.updateByPrimaryKeySelective(tJoinCircle);
+                    joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
+                    return EnumResultStatus.SUCCESS.getValue();
+                }
+            } else {
+                return fail;
+            }
+        }
+        return fail;
+    }
+
+    @Override
+    public String getRecordUserInfo(Long circleId, String userId, String tUserId) {
+        String sUserId = StringUtils.isEmpty(tUserId) ? userId : tUserId;
+        if (judgeUserJoinCircleStatus(sUserId, circleId)) {
+            UserInfo userInfo = userInfoService.selectByPrimaryKey(sUserId);
+            UserCircleRecordVO userCircleRecordVO = new UserCircleRecordVO();
+            BeanUtils.copyProperties(userInfo, userCircleRecordVO);
+            JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, sUserId);
+            BeanUtils.copyProperties(joinCircle, userCircleRecordVO);
+            return JSON.toJSONStringWithDateFormat(userCircleRecordVO, DatePattern.NORM_DATE_PATTERN, SerializerFeature.WriteDateUseDateFormat);
+        }
+        return EnumResultStatus.FAIL.getValue();
     }
 
     /**

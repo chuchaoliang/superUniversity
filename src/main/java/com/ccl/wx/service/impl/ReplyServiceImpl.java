@@ -5,12 +5,14 @@ import com.ccl.wx.dto.ReplyDTO;
 import com.ccl.wx.entity.Comment;
 import com.ccl.wx.entity.Reply;
 import com.ccl.wx.entity.UserInfo;
+import com.ccl.wx.enums.EnumPage;
 import com.ccl.wx.enums.EnumResultStatus;
 import com.ccl.wx.mapper.ReplyMapper;
 import com.ccl.wx.service.CommentService;
 import com.ccl.wx.service.ReplyService;
 import com.ccl.wx.service.UserInfoService;
 import com.ccl.wx.util.CclDateUtil;
+import com.ccl.wx.util.CclUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -105,26 +107,37 @@ public class ReplyServiceImpl implements ReplyService {
     }
 
     @Override
-    public List<ReplyDTO> adornReply(List<Reply> replies) {
+    public List<ReplyDTO> adornReply(List<Reply> replies, boolean index) {
         ArrayList<ReplyDTO> replyDTOS = new ArrayList<>();
+        if (replies.isEmpty()) {
+            return replyDTOS;
+        }
+        // 获取评论人的用户id
+        Long commentId = replies.get(0).getCommentId();
+        Comment comment = commentService.selectByPrimaryKey(commentId);
+        String userId = comment.getUserId();
+        // 如果目标人id是评论人的id则省略目标人信息展示
         for (Reply reply : replies) {
             ReplyDTO replyDTO = new ReplyDTO();
             // 回复人信息
             UserInfo replyUserInfo = userInfoService.selectByPrimaryKey(reply.getReplyUserid());
-            // 目标人信息
-            UserInfo targetUserInfo = userInfoService.selectByPrimaryKey(reply.getTargetUserid());
-            // 设置回复人、目标人昵称
+            // 设置回复人昵称
             replyUserInfo.setNickname(joinCircleService.getUserJoinCircleNickname(replyUserInfo.getId(), reply.getCircleId()));
-            targetUserInfo.setNickname(joinCircleService.getUserJoinCircleNickname(targetUserInfo.getId(), reply.getCircleId()));
             BeanUtils.copyProperties(reply, replyDTO);
             // 设置回复人信息
             replyDTO.setRNickName(replyUserInfo.getNickname());
             replyDTO.setRGender(replyUserInfo.getGender());
             replyDTO.setRHeadImage(replyUserInfo.getAvatarurl());
-            // 设置目标人信息
-            replyDTO.setTNickName(targetUserInfo.getNickname());
-            replyDTO.setTGender(targetUserInfo.getGender());
-            replyDTO.setTHeadImage(targetUserInfo.getAvatarurl());
+            // 目标人信息
+            UserInfo targetUserInfo = userInfoService.selectByPrimaryKey(reply.getTargetUserid());
+            if (index || !userId.equals(targetUserInfo.getId())) {
+                // 设置目标人昵称
+                targetUserInfo.setNickname(joinCircleService.getUserJoinCircleNickname(targetUserInfo.getId(), reply.getCircleId()));
+                // 是日记详细信息，设置目标人信息
+                replyDTO.setTNickName(targetUserInfo.getNickname());
+                replyDTO.setTGender(targetUserInfo.getGender());
+                replyDTO.setTHeadImage(targetUserInfo.getAvatarurl());
+            }
             // 设置回复创建时间
             replyDTO.setCreateTime(CclDateUtil.todayDate(reply.getReplyCreatetime()));
             replyDTOS.add(replyDTO);
@@ -140,5 +153,18 @@ public class ReplyServiceImpl implements ReplyService {
     @Override
     public Long countByCommentId(Long commentId) {
         return replyMapper.countByCommentId(commentId);
+    }
+
+    @Override
+    public String getReply(Integer commentId, Integer page) {
+        int pageNumber = EnumPage.PAGE_NUMBER.getValue();
+        List<Reply> replies = replyMapper.selectReply(commentId.longValue(), page * pageNumber, pageNumber);
+        List<ReplyDTO> replyDTOS = adornReply(replies, false);
+        // 获取此评论下的回复总数
+        Long replyNumber = replyMapper.countByCommentId(commentId.longValue());
+        List<Object> result = new ArrayList<>();
+        result.add(replyDTOS);
+        result.add(CclUtil.judgeNextPage(replyNumber.intValue(), EnumPage.PAGE_NUMBER.getValue(), page));
+        return JSON.toJSONString(result);
     }
 }

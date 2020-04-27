@@ -222,24 +222,6 @@ public class UserDiaryController {
     }
 
     /**
-     * 获取某个用户的全部日志信息
-     * 打卡记录
-     *
-     * @param circleId 圈子id
-     * @param userId   用户id
-     * @param page     页数
-     * @return
-     */
-    @ParamCheck
-    @GetMapping("/menu/diary/get/user")
-    public Result<String> getAssignDiaryInfo(@RequestParam(value = "circleId", required = false) Long circleId,
-                                             @RequestHeader(value = "token", required = false) String userId,
-                                             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
-        String result = userDiaryService.getAssignDiaryInfo(circleId, userId, page);
-        return ResponseMsgUtil.success(result);
-    }
-
-    /**
      * 增加日志浏览量，并不仅仅日志信息的
      *
      * @return
