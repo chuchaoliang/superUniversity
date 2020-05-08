@@ -6,4 +6,5 @@ spring:
             password: Ccl6605216..
             url: jdbc:mysql://49.235.63.16:33060/wx?useUnicode=true&characterEncoding=utf-8&serverTimezone=CTT
             username: ChuChaoliang
-
+server:
+    port: 8888

@@ -46,16 +46,6 @@ public class CommentServiceImpl implements CommentService {
     @Resource
     private JoinCircleService joinCircleService;
 
-    /**
-     * 评论数量
-     */
-    public static final Integer COMMENT_NUMBER = 5;
-
-    /**
-     * 评论的回复数量
-     */
-    public static final Integer COMMENT_REPLY_NUMBER = 3;
-
     @Override
     public int deleteByPrimaryKey(Long id) {
         return commentMapper.deleteByPrimaryKey(id);

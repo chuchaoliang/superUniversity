@@ -44,7 +44,8 @@ public class TokenCheckAop {
     void pointcut() {
     }
 
-    @Pointcut("execution(public * com.ccl.wx.controller..*.*(..)) && !execution(* com.ccl.wx.controller.user.UserInfoController.user*(..))")
+    @Pointcut("execution(public * com.ccl.wx.controller..*.*(..)) && !execution(* com.ccl.wx.controller.user.UserInfoController.user*(..)) " +
+            "&& !execution(* com.ccl.wx.controller.circle.CircleScheduleController.*(..))")
     void allPointcut() {
     }
 
