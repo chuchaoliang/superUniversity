@@ -34,7 +34,17 @@ public enum EnumRedis {
     /**
      * 点赞状态
      */
-    LIKE_STATUS_PREFIX("likeStatus::");
+    LIKE_STATUS_PREFIX("likeStatus::"),
+
+    /**
+     * 在线人数总数
+     */
+    ONLINE_SUM("online"),
+
+    /**
+     * 在线用户信息
+     */
+    ONLINE_USER_INFO("online::system");
 
     private String value;
 

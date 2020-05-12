@@ -11,7 +11,6 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -90,6 +89,5 @@ public class CclWxApplicationTests {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Test
     public void test() throws Exception {
-        amqpAdmin.declareExchange(new DirectExchange("ccl.direct.exchange"));
     }
 }
