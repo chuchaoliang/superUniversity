@@ -2,11 +2,12 @@ package com.ccl.wx.service.impl;
 
 import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.entity.UserLike;
-import com.ccl.wx.enums.diary.EnumLike;
 import com.ccl.wx.enums.EnumRedis;
 import com.ccl.wx.enums.common.EnumResultStatus;
+import com.ccl.wx.enums.diary.EnumLike;
 import com.ccl.wx.mapper.UserLikeMapper;
 import com.ccl.wx.service.JoinCircleService;
+import com.ccl.wx.service.RedisService;
 import com.ccl.wx.service.UserInfoService;
 import com.ccl.wx.service.UserLikeService;
 import com.ccl.wx.vo.DiaryLikeVO;
@@ -21,7 +22,6 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +45,9 @@ public class UserLikeServiceImpl implements UserLikeService {
 
     @Resource
     private JoinCircleService joinCircleService;
+
+    @Resource
+    private RedisService redisService;
 
     @Override
     public int deleteByPrimaryKey(Long id) {
@@ -174,7 +177,7 @@ public class UserLikeServiceImpl implements UserLikeService {
 
     @Override
     public String saveLikeRedis(String userId, String circleId, String diaryId) {
-        boolean likeStatus = judgeLikeStatus(userId);
+        boolean likeStatus = redisService.judgeButtonClick(userId, true);
         if (likeStatus) {
             // 用户点赞状态存储到redis中 like::用户id 键 圈子id::日志id 值 1 点赞 0 取消点赞
             String key = circleId + EnumRedis.REDIS_JOINT.getValue() + diaryId;
@@ -223,22 +226,6 @@ public class UserLikeServiceImpl implements UserLikeService {
             redisTemplate.opsForValue().increment(EnumRedis.LIKE_SUM_PREFIX.getValue() + diaryId, -1);
         }
         return EnumResultStatus.SUCCESS.getValue();
-    }
-
-    @Override
-    public Boolean judgeLikeStatus(String userId) {
-        // 值+1
-        String userKey = EnumRedis.LIKE_STATUS_PREFIX.getValue() + userId;
-        redisTemplate.opsForValue().increment(userKey);
-        int likeStatus = Integer.parseInt(String.valueOf(redisTemplate.opsForValue().get(userKey)));
-        if (likeStatus <= EnumLike.SUM_LIKE.getValue()) {
-            // 可以进行点赞,并且设置过期时间为60s
-            redisTemplate.expire(userKey, EnumLike.OUT_TIME.getValue(), TimeUnit.SECONDS);
-            return true;
-        } else {
-            // 不能设置
-            return false;
-        }
     }
 
     @Override

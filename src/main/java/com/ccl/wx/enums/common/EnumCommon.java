@@ -5,20 +5,16 @@ package com.ccl.wx.enums.common;
  * @date 2020/3/8 14:44
  */
 public enum EnumCommon {
-    /**
-     * 字符串连接拼接符号
-     */
+    // 字符串连接拼接符号
     STRING_JOINT(","),
-
-    /**
-     * 更新时的加值
-     */
+    // 更新时的加值
     UPDATE_ADD(1),
-
-    /**
-     * 更新时候的减值
-     */
-    UPDATE_SUB(-1);
+    // 更新时候的减值
+    UPDATE_SUB(-1),
+    // 高频点击限制
+    HIGH_CLICK(15),
+    // 低频点击限制
+    LOW_CLICK(5);
 
     private String value;
 

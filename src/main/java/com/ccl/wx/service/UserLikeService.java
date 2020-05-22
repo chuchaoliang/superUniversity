@@ -99,14 +99,6 @@ public interface UserLikeService {
     String decrementLikeCount(String diaryId);
 
     /**
-     * 判断用户的点赞状态60s内只能进行15次点赞
-     *
-     * @param userId 用户id
-     * @return
-     */
-    Boolean judgeLikeStatus(String userId);
-
-    /**
      * 判断该点赞状态是否存在，存在返回其点赞状态
      *
      * @param userId   用户id

@@ -32,9 +32,14 @@ public enum EnumRedis {
     REDIS_JOINT("::"),
 
     /**
-     * 点赞状态
+     * 高频按钮
      */
-    LIKE_STATUS_PREFIX("likeStatus::"),
+    HIGH_FREQUENCY_BUTTON("high::button"),
+
+    /**
+     * 低频按钮
+     */
+    LOW_FREQUENCY_BUTTON("low::button"),
 
     /**
      * 在线人数总数
