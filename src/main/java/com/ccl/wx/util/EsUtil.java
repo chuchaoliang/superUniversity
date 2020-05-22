@@ -2,7 +2,7 @@ package com.ccl.wx.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.ccl.wx.enums.EnumResultStatus;
+import com.ccl.wx.enums.common.EnumResultStatus;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;

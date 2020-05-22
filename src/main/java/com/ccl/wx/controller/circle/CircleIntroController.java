@@ -5,7 +5,7 @@ import com.ccl.wx.common.api.EnumResultCode;
 import com.ccl.wx.common.api.Result;
 import com.ccl.wx.dto.CircleIntroDTO;
 import com.ccl.wx.entity.CircleIntro;
-import com.ccl.wx.enums.EnumResultStatus;
+import com.ccl.wx.enums.common.EnumResultStatus;
 import com.ccl.wx.service.CircleIntroService;
 import com.ccl.wx.util.ResponseMsgUtil;
 import io.swagger.annotations.Api;

@@ -8,7 +8,7 @@ import com.ccl.wx.common.api.EnumResultCode;
 import com.ccl.wx.common.api.Result;
 import com.ccl.wx.dto.CircleTodayContentDTO;
 import com.ccl.wx.entity.TodayContent;
-import com.ccl.wx.enums.EnumResultStatus;
+import com.ccl.wx.enums.common.EnumResultStatus;
 import com.ccl.wx.service.TodayContentService;
 import com.ccl.wx.service.UserDiaryService;
 import com.ccl.wx.util.ResponseMsgUtil;

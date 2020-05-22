@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.common.api.EnumResultCode;
 import com.ccl.wx.common.api.Result;
+import com.ccl.wx.config.websocket.WsSession;
 import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.util.EsUtil;
 import com.ccl.wx.util.ResponseMsgUtil;
@@ -107,5 +108,11 @@ public class adminController {
             }
         }
         return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
+    }
+
+    @GetMapping("/test2")
+    public Result<String> test2() {
+        Integer onlineSum = WsSession.getOnlineSum();
+        return ResponseMsgUtil.success(String.valueOf(onlineSum));
     }
 }

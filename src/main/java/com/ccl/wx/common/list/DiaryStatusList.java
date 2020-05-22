@@ -1,6 +1,6 @@
 package com.ccl.wx.common.list;
 
-import com.ccl.wx.enums.EnumUserDiary;
+import com.ccl.wx.enums.diary.EnumUserDiary;
 
 import java.util.ArrayList;
 import java.util.List;

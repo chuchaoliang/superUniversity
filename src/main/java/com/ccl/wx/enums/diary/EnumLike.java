@@ -1,4 +1,4 @@
-package com.ccl.wx.enums;
+package com.ccl.wx.enums.diary;
 
 /**
  * @author 褚超亮

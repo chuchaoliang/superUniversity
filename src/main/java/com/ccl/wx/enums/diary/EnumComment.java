@@ -1,4 +1,4 @@
-package com.ccl.wx.enums;
+package com.ccl.wx.enums.diary;
 
 /**
  * 用户评论类型

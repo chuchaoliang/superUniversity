@@ -1,7 +1,7 @@
 package com.ccl.wx.controller.circle;
 
 import cn.hutool.core.date.DatePattern;
-import com.ccl.wx.enums.EnumEnvironmentProfile;
+import com.ccl.wx.enums.common.EnumEnvironmentProfile;
 import com.ccl.wx.service.CircleScheduleService;
 import com.ccl.wx.service.TodayContentService;
 import com.ccl.wx.service.UserDiaryService;

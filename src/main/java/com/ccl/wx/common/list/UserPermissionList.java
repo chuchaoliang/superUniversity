@@ -1,6 +1,6 @@
 package com.ccl.wx.common.list;
 
-import com.ccl.wx.enums.EnumUserPermission;
+import com.ccl.wx.enums.circle.EnumUserPermission;
 
 import java.util.ArrayList;
 import java.util.List;

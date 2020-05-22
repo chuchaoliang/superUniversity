@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ccl.wx.dto.CircleIntroDTO;
 import com.ccl.wx.entity.CircleIntro;
-import com.ccl.wx.enums.EnumResultStatus;
+import com.ccl.wx.enums.common.EnumResultStatus;
 import com.ccl.wx.mapper.CircleIntroMapper;
 import com.ccl.wx.service.CircleIntroService;
 import com.ccl.wx.util.CclUtil;

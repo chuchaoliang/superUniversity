@@ -13,7 +13,7 @@ import com.ccl.wx.config.properties.FileUploadProperties;
 import com.ccl.wx.config.properties.FtpProperties;
 import com.ccl.wx.config.properties.LoginData;
 import com.ccl.wx.entity.UserInfo;
-import com.ccl.wx.enums.EnumResultStatus;
+import com.ccl.wx.enums.common.EnumResultStatus;
 import com.ccl.wx.mapper.UserInfoMapper;
 import com.ccl.wx.pojo.UserSession;
 import com.ccl.wx.service.UserInfoService;

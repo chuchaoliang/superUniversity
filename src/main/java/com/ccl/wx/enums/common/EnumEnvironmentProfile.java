@@ -1,4 +1,4 @@
-package com.ccl.wx.enums;
+package com.ccl.wx.enums.common;
 
 /**
  * 代码所在环境

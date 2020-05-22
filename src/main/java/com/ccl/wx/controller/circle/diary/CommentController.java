@@ -5,7 +5,7 @@ import com.ccl.wx.common.api.EnumResultCode;
 import com.ccl.wx.common.api.Result;
 import com.ccl.wx.dto.CommentDTO;
 import com.ccl.wx.entity.Comment;
-import com.ccl.wx.enums.EnumResultStatus;
+import com.ccl.wx.enums.common.EnumResultStatus;
 import com.ccl.wx.global.annotation.ParamCheck;
 import com.ccl.wx.service.CommentService;
 import com.ccl.wx.util.ResponseMsgUtil;

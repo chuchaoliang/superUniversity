@@ -1,19 +1,13 @@
 package com.ccl.wx.config.websocket;
 
-import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateUtil;
-import com.ccl.wx.enums.EnumRedis;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * websocket session管理工具类
@@ -27,15 +21,10 @@ public class WsSession {
     private WsSession() {
     }
 
-    @Resource
-    private RedisTemplate redisTemplate;
-
-    private static RedisTemplate redisTemplateCopy;
-
-    @PostConstruct
-    public void init() {
-        redisTemplateCopy = redisTemplate;
-    }
+    /**
+     * 连接总人数
+     */
+    private final static AtomicInteger ONLINE_SUM = new AtomicInteger();
 
     /**
      * 保存连接 session 的地方
@@ -55,17 +44,23 @@ public class WsSession {
      * 在线人数 +1
      */
     public static void addOnlineCount() {
-        redisTemplateCopy.opsForValue().increment(EnumRedis.ONLINE_SUM.getValue());
+        ONLINE_SUM.getAndIncrement();
     }
 
     /**
      * 在线人数 -1
      */
     public static void subOnlineCount() {
-        Long sum = redisTemplateCopy.opsForValue().decrement(EnumRedis.ONLINE_SUM.getValue());
-        if (sum <= 0L) {
-            redisTemplateCopy.opsForValue().set(EnumRedis.ONLINE_SUM.getValue(), 0);
-        }
+        ONLINE_SUM.getAndDecrement();
+    }
+
+    /**
+     * 获取连接总人数
+     *
+     * @return
+     */
+    public static Integer getOnlineSum() {
+        return ONLINE_SUM.get();
     }
 
     /**
@@ -74,10 +69,7 @@ public class WsSession {
      * @param key
      */
     public static void add(String key, WebSocketSession session) {
-        // 在线人数+1 添加 session
         addOnlineCount();
-        // redis中添加
-        redisTemplateCopy.opsForHash().put(EnumRedis.ONLINE_USER_INFO.getValue(), key, DateUtil.format(new Date(), DatePattern.NORM_DATETIME_MINUTE_PATTERN));
         SESSION_POOL.put(key, session);
     }
 
@@ -89,10 +81,7 @@ public class WsSession {
      */
     public static WebSocketSession remove(String key) {
         // 在线人数-1 删除 session
-        subOnlineCount();
-        // redis中删除
-        redisTemplateCopy.opsForHash().delete(EnumRedis.ONLINE_USER_INFO.getValue(), key);
-        return SESSION_POOL.remove(key);
+        return removeAndClose(key);
     }
 
     /**
@@ -100,17 +89,19 @@ public class WsSession {
      *
      * @param key
      */
-    public static void removeAndClose(String key) {
-        WebSocketSession session = remove(key);
+    public static WebSocketSession removeAndClose(String key) {
+        WebSocketSession session = SESSION_POOL.remove(key);
         if (session != null) {
             try {
                 // 关闭连接
                 subOnlineCount();
                 session.close();
+                return session;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        return null;
     }
 
     /**
