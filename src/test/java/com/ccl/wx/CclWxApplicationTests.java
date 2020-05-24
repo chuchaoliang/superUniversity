@@ -1,9 +1,6 @@
 package com.ccl.wx;
 
-import com.ccl.wx.config.properties.DefaultProperties;
-import com.ccl.wx.config.properties.ElasticSearchProperties;
-import com.ccl.wx.config.properties.FileUploadProperties;
-import com.ccl.wx.config.properties.FtpProperties;
+import com.ccl.wx.config.properties.*;
 import com.ccl.wx.mapper.*;
 import com.ccl.wx.service.*;
 import lombok.extern.slf4j.Slf4j;

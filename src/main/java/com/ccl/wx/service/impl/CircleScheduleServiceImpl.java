@@ -2,14 +2,18 @@ package com.ccl.wx.service.impl;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSON;
 import com.ccl.wx.entity.UserDiary;
 import com.ccl.wx.entity.UserLike;
-import com.ccl.wx.enums.diary.EnumLike;
+import com.ccl.wx.entity.UserNotify;
 import com.ccl.wx.enums.EnumRedis;
+import com.ccl.wx.enums.diary.EnumLike;
 import com.ccl.wx.enums.diary.EnumUserDiary;
+import com.ccl.wx.enums.notify.EnumNotifyResourceType;
 import com.ccl.wx.service.*;
 import com.ccl.wx.util.FtpUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -40,21 +44,27 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
     @Resource
     private ReplyService replyService;
 
+    @Resource
+    private RabbitTemplate rabbitTemplate;
+
     @Override
     public void saveUserLikeDataPersistence() {
         // 获取所有的键
         Set<String> likeUsers = redisTemplate.keys(EnumRedis.LIKE_PREFIX.getValue() + "*");
         log.info(DateUtil.format(new Date(), DatePattern.NORM_DATETIME_MINUTE_PATTERN) + "持久化点赞数据：" + likeUsers.size() + "条数据");
-        if (likeUsers.size() != 0) {
+        if (!likeUsers.isEmpty()) {
             // 遍历
             for (String likeUser : likeUsers) {
                 // 得到圈子id 和 日志id 数组
                 redisTemplate.opsForHash().entries(likeUser).forEach((key, value) -> {
                     // 为有效点赞
+                    // 用户id数据
                     String[] userIdArray = String.valueOf(likeUser).split(EnumRedis.REDIS_JOINT.getValue());
+                    // 圈子id日记id
                     String[] circleIdAndDiaryId = String.valueOf(key).split(EnumRedis.REDIS_JOINT.getValue());
                     String circleId = circleIdAndDiaryId[0];
                     String diaryId = circleIdAndDiaryId[1];
+                    // 用户id
                     String userId = userIdArray[1];
                     UserLike userLikeInfo = userLikeService.selectByTypeId(Long.valueOf(diaryId));
                     if (value.equals(EnumLike.LIKE_SUCCESS.getValue())) {
@@ -68,11 +78,23 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
                             userLike.setCircleId(Long.valueOf(circleId));
                             userLike.setTypeId(Long.valueOf(diaryId));
                             userLike.setType(EnumLike.LIKE_DIARY.getValue());
-                            userLike.setLikeCreatetime(new Date());
-                            userLike.setLikeUpdatetime(new Date());
                             userLike.setLikeStatus(EnumLike.LIKE_SUCCESS.getValue());
                             userLikeService.insertSelective(userLike);
                         }
+                        // 保存数据到mysql通知表中
+                        UserNotify userNotify = new UserNotify();
+                        // 设置目标用户id
+                        userNotify.setTargetId(userDiaryService.selectByPrimaryKey(Long.valueOf(diaryId)).getUserId());
+                        // 设置发送者用户id
+                        userNotify.setSenderId(userId);
+                        // 设置资源类型
+                        userNotify.setResourceType((byte) EnumNotifyResourceType.DIARY.getValue());
+                        // 设置资源id
+                        userNotify.setResourceId(Integer.parseInt(diaryId));
+                        // TODO 设置通知所在位置 获取用户配置，查看是否进行通知
+                        userNotify.setLocation((byte) 1);
+                        // 将数据发送到rabbitmq中
+                        rabbitTemplate.convertAndSend("", "", JSON.toJSONString(userLike));
                     } else {
                         // 若点赞对象不为空，且点赞用户不为空
                         if (userLikeInfo != null && !StringUtils.isEmpty(userLikeInfo.getLikeUserid())) {

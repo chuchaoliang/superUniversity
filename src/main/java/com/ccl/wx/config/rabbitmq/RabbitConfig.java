@@ -1,8 +1,9 @@
 package com.ccl.wx.config.rabbitmq;
 
+import com.ccl.wx.config.properties.RabbitMQData;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,67 +24,33 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class RabbitConfig {
-
-    //队列 起名：TestDirectQueue
-    @Bean
-    public Queue TestDirectQueue() {
-        return new Queue("TestDirectQueue", true);  //true 是否持久
-    }
-
-    @Bean
-    public Queue foundA() {
-        return new Queue("fanout.a");
-    }
-
-    @Bean
-    public Queue foundB() {
-        return new Queue("fanout.b");
-    }
-
-    @Bean
-    public Queue foundC() {
-        return new Queue("fanout.c");
-    }
-
     /**
-     * 定义一个fanout交换器
+     * 添加点赞队列
      *
      * @return
      */
     @Bean
-    public FanoutExchange FanoutExchange() {
-        return new FanoutExchange("fanoutExchange");
+    public Queue diaryLikeQueue() {
+        return new Queue(RabbitMQData.LIKE, true);
     }
 
     /**
-     * 将定义的fanoutA队列与fanoutExchange交换机绑定
+     * 消息通知Direct交换机
      *
      * @return
      */
     @Bean
-    public Binding bindingExchangeWithA() {
-        return BindingBuilder.bind(foundA()).to(FanoutExchange());
+    public DirectExchange commonNotifyDirectExchange() {
+        return new DirectExchange(RabbitMQData.COMMON_NOTIFY_EXCHANGE, true, false);
     }
 
+    /**
+     * 将点赞交换机绑定
+     *
+     * @return
+     */
     @Bean
-    public Binding bindingExchangeWithB() {
-        return BindingBuilder.bind(foundB()).to(FanoutExchange());
+    public Binding bindingDirect() {
+        return BindingBuilder.bind(diaryLikeQueue()).to(commonNotifyDirectExchange()).with(RabbitMQData.LIKE);
     }
-
-    @Bean
-    public Binding bindingExchangeWithC() {
-        return BindingBuilder.bind(foundC()).to(FanoutExchange());
-    }
-
-    ////Direct交换机 起名：TestDirectExchange
-    //@Bean
-    //DirectExchange TestDirectExchange() {
-    //    return new DirectExchange("TestDirectExchange");
-    //}
-    //
-    ////绑定  将队列和交换机绑定, 并设置用于匹配键：TestDirectRouting
-    //@Bean
-    //Binding bindingDirect() {
-    //    return BindingBuilder.bind(TestDirectQueue()).to(TestDirectExchange()).with("TestDirectRouting");
-    //}
 }

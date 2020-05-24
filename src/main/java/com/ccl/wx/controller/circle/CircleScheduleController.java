@@ -62,10 +62,10 @@ public class CircleScheduleController implements ApplicationContextAware {
     }
 
     /**
-     * 每整点执行一次
+     * 每隔十五分钟执行一次
      * 将redis中的数据持久化到mysql中
      */
-    @Scheduled(cron = "0 0 0/1 * * ?")
+    @Scheduled(cron = "0 0/15 * * * ?")
     public void saveUserLikeDataPersistence() {
         String activeProfile = getActiveProfile();
         if (EnumEnvironmentProfile.PROD_PROFILE.getValue().equals(activeProfile)) {
@@ -77,11 +77,11 @@ public class CircleScheduleController implements ApplicationContextAware {
     }
 
     /**
-     * 每小时执行一次
+     * 每隔十五分钟执行一次
      * 保存用户的点赞数据信息
      * 持redis中的数据持久化到mysql中
      */
-    @Scheduled(cron = "0 0 0/1 * * ?")
+    @Scheduled(cron = "0 0/15 * * * ?")
     public void saveUserAccountLikeDataPersistence() {
         String activeProfile = getActiveProfile();
         if (EnumEnvironmentProfile.PROD_PROFILE.getValue().equals(activeProfile)) {

@@ -121,6 +121,12 @@ spring:
     password: admin
     port: 5672
     username: admin
+    # 支持发布返回
+    #publisher-returns: true
+    # 支持发布确认
+    #publisher-confirms: true
+    # 虚拟主机名称
+    #virtual-host: /
   # redis配置
   redis:
     database: 0
@@ -165,3 +171,8 @@ user:
 wx:
   appId: wx13c833e813896ad0
   secret: d458dbc0970ddc248fc69c5e6bf28ee5
+
+
+
+
+
