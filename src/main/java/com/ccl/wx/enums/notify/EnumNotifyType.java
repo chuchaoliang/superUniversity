@@ -7,34 +7,36 @@ package com.ccl.wx.enums.notify;
  * @date 2020/5/22 18:37
  */
 public enum EnumNotifyType {
+    // 系统通知
+    SYSTEM_NOTICE(0),
     // 点赞
-    DIARY_LIKE(0),
+    DIARY_LIKE(1),
     // 评论
-    DIARY_COMMON_COMMENT(1),
+    DIARY_COMMON_COMMENT(2),
     // 点评
-    DIARY_COMMENT(2),
+    DIARY_COMMENT(3),
     // 回复
-    DIARY_REPLY(3),
+    DIARY_REPLY(4),
     //申请加入圈子
-    CIRCLE_APPLY(4),
+    CIRCLE_APPLY(5),
     // 拒绝加入圈子
-    CIRCLE_REFUSE(5),
+    CIRCLE_REFUSE(6),
     // 同意加入圈子
-    CIRCLE_AGREE(6),
+    CIRCLE_AGREE(7),
     // 淘汰
-    CIRCLE_OUT(7),
+    CIRCLE_OUT(8),
     // 加入圈子
-    CIRCLE_JOIN(8),
+    CIRCLE_JOIN(9),
     // 退出圈子
-    CIRCLE_EXIT(9),
+    CIRCLE_EXIT(10),
     // 关注
-    USER_ATTENTION(10),
+    USER_ATTENTION(11),
     // 取消关注
-    USER_CALL_ATTENTION(11),
+    USER_CALL_ATTENTION(12),
     // 私信
-    USER_CHAT(12),
+    USER_CHAT(13),
     // 公告
-    SYSTEM_NOTICE(13);
+    COMMON_NOTICE(14);
 
     private int value;
 

@@ -28,7 +28,7 @@ import java.util.Objects;
 @Api(tags = {"UserBasicController【用户的基本信息】"})
 @Slf4j
 @RestController
-@RequestMapping("/wx/person")
+@RequestMapping("/person")
 public class UserInfoController {
     @Resource
     private UserInfoService userInfoService;

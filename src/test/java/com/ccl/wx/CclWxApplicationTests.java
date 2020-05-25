@@ -23,66 +23,6 @@ import javax.annotation.Resource;
 @SpringBootTest
 public class CclWxApplicationTests {
 
-    @Autowired
-    private CircleInfoMapper circleInfoMapper;
-
-    @Autowired
-    private RedisTemplate redisTemplate;
-
-    @Autowired
-    private CircleScheduleService circleScheduleService;
-
-    @Autowired
-    private UserDiaryService userDiaryService;
-
-    @Autowired
-    private TodayContentMapper todayContentMapper;
-
-    @Autowired
-    private UserInfoMapper userInfoMapper;
-
-    @Autowired
-    private CommentMapper commentMapper;
-
-    @Autowired
-    private TodayContentService todayContentService;
-
-    @Autowired
-    private JoinCircleMapper joinCircleMapper;
-
-    @Autowired
-    private DefaultProperties defaultProperties;
-
-    @Autowired
-    private JoinCircleService joinCircleService;
-
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
-
-    @Autowired
-    private UserDiaryMapper userDiaryMapper;
-
-    @Autowired
-    private FtpProperties ftpProperties;
-
-    @Autowired
-    private FileUploadProperties fileUploadProperties;
-
-    @Autowired
-    private ElasticSearchProperties elasticSearchProperties;
-
-    @Autowired
-    private RestHighLevelClient restHighLevelClient;
-
-    @Resource
-    private CircleInfoService circleInfoService;
-
-    @Resource
-    private ElasticsearchService elasticsearchService;
-
-    @Resource
-    private AmqpAdmin amqpAdmin;
-
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Test
     public void test() throws Exception {

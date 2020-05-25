@@ -8,7 +8,6 @@ import com.ccl.wx.entity.UserNotify;
 
 public interface UserNotifyService{
 
-
     int deleteByPrimaryKey(Long id);
 
     int insert(UserNotify record);

@@ -25,7 +25,7 @@ import java.util.Objects;
 @Api(tags = {"CircleIntroController【圈子简介相关的数据信息】"})
 @Slf4j
 @RestController
-@RequestMapping("/wx/circle")
+@RequestMapping("/circle")
 public class CircleIntroController {
 
     @Resource

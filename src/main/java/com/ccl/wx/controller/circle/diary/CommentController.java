@@ -23,7 +23,7 @@ import java.util.Objects;
  * 圈子评论、点赞、回复功能
  */
 @RestController
-@RequestMapping("/wx/circle")
+@RequestMapping("/circle")
 public class CommentController {
 
     @Resource

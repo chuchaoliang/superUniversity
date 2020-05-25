@@ -32,7 +32,7 @@ import java.util.Objects;
 @Api(tags = {"CircleInfoController【圈子信息相关的数据信息】"})
 @Slf4j
 @RestController
-@RequestMapping("/wx/circle")
+@RequestMapping("/circle")
 public class CircleInfoController {
 
     @Resource

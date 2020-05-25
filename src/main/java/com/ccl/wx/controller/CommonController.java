@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 @Api(tags = {"CommonController【公共接口】"})
 @Slf4j
 @RestController
-@RequestMapping("/wx/common")
+@RequestMapping("/common")
 public class CommonController {
 
     @Resource

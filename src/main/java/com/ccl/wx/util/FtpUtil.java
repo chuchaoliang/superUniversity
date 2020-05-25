@@ -46,6 +46,11 @@ public class FtpUtil {
      */
     private static Ftp ftp;
 
+    /**
+     * Constructor(构造方法) -> @Autowired(依赖注入) -> @PostConstruct(注释的方法)
+     * PostConstruct在构造函数之后执行，init（）方法之前执行。
+     * 项目启动的时候执行这个方法
+     */
     @PostConstruct
     public void init() {
         ftpProperties = initFtpProperties;

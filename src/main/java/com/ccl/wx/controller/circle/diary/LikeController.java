@@ -18,7 +18,7 @@ import javax.annotation.Resource;
  * @date 2020/4/7 21:59
  */
 @RestController
-@RequestMapping("/wx/circle")
+@RequestMapping("/circle")
 public class LikeController {
 
     @Resource

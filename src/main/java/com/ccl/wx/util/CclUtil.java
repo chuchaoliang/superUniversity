@@ -644,4 +644,18 @@ public class CclUtil {
     public static String getUid(int id) {
         return String.valueOf(1000 + id);
     }
+
+    /**
+     * 判断更新或者插入操作是否成功
+     *
+     * @param i
+     * @return
+     */
+    public static String judgeOperationIsSuccess(int i) {
+        if (i != 0) {
+            return EnumResultStatus.SUCCESS.getValue();
+        } else {
+            return EnumResultStatus.FAIL.getValue();
+        }
+    }
 }

@@ -28,7 +28,7 @@ import java.util.Objects;
  */
 @Api(tags = {"JoinCircleController【用户加入圈子相关】"})
 @RestController
-@RequestMapping("/wx/circle")
+@RequestMapping("/circle")
 public class JoinCircleController {
 
     @Resource

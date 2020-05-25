@@ -34,7 +34,7 @@ import java.util.List;
  */
 @Api(tags = {"CircleThemeController【圈子主题相关操作信息】"})
 @RestController
-@RequestMapping("/wx/circle")
+@RequestMapping("/circle")
 public class CircleThemeController {
 
     @Resource

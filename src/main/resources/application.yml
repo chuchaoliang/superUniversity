@@ -50,6 +50,9 @@ server:
     protocol-header: X-Forwarded-Proto
     remote-ip-header: X-FORWARDED-FOR
   use-forward-headers: true
+  servlet:
+    # 设置访问路径
+    context-path: /wx
 spring:
   application:
     name: cclWx

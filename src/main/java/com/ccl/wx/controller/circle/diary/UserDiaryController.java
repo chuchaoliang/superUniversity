@@ -31,7 +31,7 @@ import java.util.Objects;
 @Slf4j
 @Api(tags = {"CircleDiaryController【圈子用户日志信息】"})
 @RestController
-@RequestMapping("/wx/circle")
+@RequestMapping("/circle")
 public class UserDiaryController {
 
     @Resource

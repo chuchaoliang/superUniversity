@@ -19,7 +19,7 @@ import java.util.Objects;
  * @date 2020/4/7 20:20
  */
 @RestController
-@RequestMapping("/wx/circle")
+@RequestMapping("/circle")
 public class ReplyController {
 
     @Resource
