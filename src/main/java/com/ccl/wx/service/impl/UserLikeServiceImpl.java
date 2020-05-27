@@ -2,7 +2,7 @@ package com.ccl.wx.service.impl;
 
 import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.entity.UserLike;
-import com.ccl.wx.enums.EnumRedis;
+import com.ccl.wx.enums.redis.EnumRedis;
 import com.ccl.wx.enums.common.EnumResultStatus;
 import com.ccl.wx.enums.diary.EnumLike;
 import com.ccl.wx.mapper.UserLikeMapper;

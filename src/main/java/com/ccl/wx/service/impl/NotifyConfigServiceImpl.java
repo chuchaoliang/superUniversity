@@ -64,9 +64,13 @@ public class NotifyConfigServiceImpl implements NotifyConfigService {
         // 用户设置对象为空
         if (!judgeUserNotifyIsNull(userId)) {
             NotifyConfig userNotifyConfig = selectByPrimaryKey(userId);
-            List<String> configs = Arrays.asList(userNotifyConfig.getNotifyConfig().split(","));
-            if (configs.contains(String.valueOf(type)) || configs.contains(String.valueOf(-type))) {
-                return false;
+            if (StringUtils.isEmpty(userNotifyConfig.getNotifyConfig())) {
+                return true;
+            } else {
+                List<String> configs = Arrays.asList(userNotifyConfig.getNotifyConfig().split(","));
+                if (configs.contains(String.valueOf(type)) || configs.contains(String.valueOf(-type))) {
+                    return false;
+                }
             }
         }
         return true;
@@ -77,9 +81,13 @@ public class NotifyConfigServiceImpl implements NotifyConfigService {
         // 用户设置对象为空
         if (!judgeUserNotifyIsNull(userId)) {
             NotifyConfig userNotifyConfig = selectByPrimaryKey(userId);
-            List<String> configs = Arrays.asList(userNotifyConfig.getNotifyConfig().split(","));
-            if (configs.contains(String.valueOf(-type))) {
-                return false;
+            if (StringUtils.isEmpty(userNotifyConfig.getNotifyConfig())) {
+                return true;
+            } else {
+                List<String> configs = Arrays.asList(userNotifyConfig.getNotifyConfig().split(","));
+                if (configs.contains(String.valueOf(-type))) {
+                    return false;
+                }
             }
         }
         return true;

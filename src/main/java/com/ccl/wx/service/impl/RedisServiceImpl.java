@@ -1,6 +1,6 @@
 package com.ccl.wx.service.impl;
 
-import com.ccl.wx.enums.EnumRedis;
+import com.ccl.wx.enums.redis.EnumRedis;
 import com.ccl.wx.enums.common.EnumCommon;
 import com.ccl.wx.enums.diary.EnumLike;
 import com.ccl.wx.service.RedisService;

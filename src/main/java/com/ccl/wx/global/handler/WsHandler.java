@@ -26,6 +26,7 @@ public class WsHandler implements WebSocketHandler {
      */
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> webSocketMessage) throws Exception {
+        // TODO 这里进行用户私信处理
         //Object payload = webSocketMessage.getPayload();
         //Object token = session.getAttributes().get("token");
         //System.out.println("接收到：" + token + "发送的消息" + payload);

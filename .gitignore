@@ -55,3 +55,4 @@ hs_err_pid*
 # IntelliJ project files
 out
 gen
+!/src/test/java/com/ccl/wx/CclWxApplicationTests.java

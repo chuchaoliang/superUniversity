@@ -14,7 +14,15 @@ public enum EnumCommon {
     // 高频点击限制
     HIGH_CLICK(15),
     // 低频点击限制
-    LOW_CLICK(5);
+    LOW_CLICK(5),
+    // 未读
+    NOT_READ(0),
+    // 已读
+    HAVE_READ(1),
+    // 未删除
+    NOT_DELETE(0),
+    // 已删除
+    HAVE_DELETE(1);
 
     private String value;
 

@@ -2,7 +2,7 @@ package com.ccl.wx.enums.notify;
 
 /**
  * 通知所在的位置
- *
+ * 废弃！！！
  * @author 褚超亮
  * @date 2020/5/22 18:57
  */

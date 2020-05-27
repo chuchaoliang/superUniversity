@@ -117,7 +117,7 @@ spring:
     user: ccl
   # 环境选择
   profiles:
-    active: dev
+    active: prod
   # rabbitmq配置
   rabbitmq:
     host: 49.235.63.16

@@ -114,4 +114,17 @@ public class WsSession {
         // 获得 session
         return SESSION_POOL.get(key);
     }
+
+    /**
+     * 判断用户是否在线
+     *
+     * @param userId 用户id
+     * @return
+     */
+    public static boolean judgeUserOnline(String userId) {
+        if (SESSION_POOL.containsKey(userId)) {
+            return true;
+        }
+        return false;
+    }
 }
