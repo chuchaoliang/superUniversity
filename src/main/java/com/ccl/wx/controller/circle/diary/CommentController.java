@@ -30,19 +30,23 @@ public class CommentController {
     private CommentService commentService;
 
     /**
-     * 保存评论
+     * 保存日志评论
      *
-     * @param comment 评论内容状态
+     * @param comment      评论具体内容
+     * @param userId       用户id
+     * @param targetUserId 日志所属人id
+     * @param result       参数校检结果
      * @return
      */
     @PostMapping("/diary/comment/add")
     public Result<String> saveCircleComment(@Validated @RequestBody(required = false) Comment comment,
-                                            @RequestHeader(value = "token", required = false) String userId, BindingResult result) {
+                                            @RequestHeader(value = "token", required = false) String userId,
+                                            @ParamCheck @RequestParam(value = "userId", required = false) String targetUserId, BindingResult result) {
         if (result.hasErrors()) {
             return ResponseMsgUtil.fail(Objects.requireNonNull(result.getFieldError()).getDefaultMessage());
         }
         comment.setUserId(userId);
-        String responseResult = commentService.saveDiaryComment(comment);
+        String responseResult = commentService.saveDiaryComment(comment, targetUserId);
         if (EnumResultStatus.FAIL.getValue().equals(responseResult)) {
             return ResponseMsgUtil.fail("评论失败！");
         }

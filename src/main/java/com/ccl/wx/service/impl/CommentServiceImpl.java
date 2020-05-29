@@ -6,15 +6,13 @@ import com.ccl.wx.dto.ReplyDTO;
 import com.ccl.wx.entity.Comment;
 import com.ccl.wx.entity.Reply;
 import com.ccl.wx.entity.UserInfo;
-import com.ccl.wx.enums.diary.EnumComment;
 import com.ccl.wx.enums.common.EnumPage;
-import com.ccl.wx.enums.diary.EnumReply;
 import com.ccl.wx.enums.common.EnumResultStatus;
+import com.ccl.wx.enums.diary.EnumComment;
+import com.ccl.wx.enums.diary.EnumReply;
+import com.ccl.wx.enums.notify.EnumNotifyType;
 import com.ccl.wx.mapper.CommentMapper;
-import com.ccl.wx.service.CommentService;
-import com.ccl.wx.service.JoinCircleService;
-import com.ccl.wx.service.ReplyService;
-import com.ccl.wx.service.UserInfoService;
+import com.ccl.wx.service.*;
 import com.ccl.wx.util.CclDateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -45,6 +43,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Resource
     private JoinCircleService joinCircleService;
+
+    @Resource
+    private NotifyConfigService notifyConfigService;
+
+    @Resource
+    private UserNotifyService userNotifyService;
 
     @Override
     public int deleteByPrimaryKey(Long id) {
@@ -153,10 +157,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public String saveDiaryComment(Comment comment) {
+    public String saveDiaryComment(Comment comment, String targetUserId) {
         // 插入数据
         int i = commentMapper.insertSelective(comment);
         if (i == 1) {
+            userNotifyService.userMessageNotify(EnumNotifyType.DIARY_COMMON_COMMENT, comment.getUserId(), targetUserId, comment.getDiaryId().intValue());
             return JSON.toJSONString(comment);
         }
         return EnumResultStatus.FAIL.getValue();

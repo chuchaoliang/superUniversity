@@ -52,10 +52,11 @@ public interface CommentService {
     /**
      * 保存日志评论
      *
-     * @param comment 评论内容
+     * @param comment      评论内容
+     * @param targetUserId 日志所属人的id
      * @return
      */
-    String saveDiaryComment(Comment comment);
+    String saveDiaryComment(Comment comment, String targetUserId);
 
     /**
      * 删除圈子评论

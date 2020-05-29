@@ -121,9 +121,9 @@ spring:
   # rabbitmq配置
   rabbitmq:
     host: 49.235.63.16
-    password: admin
+    password: Ccl6605216.
     port: 5672
-    username: admin
+    username: ccl
     # 支持发布返回
     #publisher-returns: true
     # 支持发布确认

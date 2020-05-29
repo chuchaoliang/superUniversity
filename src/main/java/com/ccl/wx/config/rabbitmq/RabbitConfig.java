@@ -24,6 +24,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class RabbitConfig {
+    // ==============================声明队列======================================
+
     /**
      * 添加点赞队列
      *
@@ -31,8 +33,20 @@ public class RabbitConfig {
      */
     @Bean
     public Queue diaryLikeQueue() {
-        return new Queue(RabbitMQData.LIKE, true);
+        return new Queue(RabbitMQData.DIARY_LIKE, true);
     }
+
+    /**
+     * 添加评论队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue diaryCommonComment() {
+        return new Queue(RabbitMQData.DIARY_COMMON_COMMENT, true);
+    }
+
+    // ==============================声明交换机======================================
 
     /**
      * 消息通知Direct交换机
@@ -41,8 +55,10 @@ public class RabbitConfig {
      */
     @Bean
     public DirectExchange commonNotifyDirectExchange() {
-        return new DirectExchange(RabbitMQData.COMMON_NOTIFY_EXCHANGE, true, false);
+        return new DirectExchange(RabbitMQData.NOTIFY_EXCHANGE_NAME, true, false);
     }
+
+    // ==============================绑定======================================
 
     /**
      * 将点赞交换机绑定
@@ -50,7 +66,17 @@ public class RabbitConfig {
      * @return
      */
     @Bean
-    public Binding bindingDirect() {
-        return BindingBuilder.bind(diaryLikeQueue()).to(commonNotifyDirectExchange()).with(RabbitMQData.LIKE);
+    public Binding bindingDirectOfLike() {
+        return BindingBuilder.bind(diaryLikeQueue()).to(commonNotifyDirectExchange()).with(RabbitMQData.DIARY_LIKE);
+    }
+
+    /**
+     * 绑定评论交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingDirectOfCommonComment() {
+        return BindingBuilder.bind(diaryCommonComment()).to(commonNotifyDirectExchange()).with(RabbitMQData.DIARY_COMMON_COMMENT);
     }
 }

@@ -65,7 +65,7 @@ public class CircleScheduleController implements ApplicationContextAware {
      * 每隔十五分钟执行一次
      * 将redis中的数据持久化到mysql中
      */
-    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0/5 * * * ?")
     public void saveUserLikeDataPersistence() {
         String activeProfile = getActiveProfile();
         if (EnumEnvironmentProfile.PROD_PROFILE.getValue().equals(activeProfile)) {

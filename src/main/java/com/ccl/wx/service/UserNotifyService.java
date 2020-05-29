@@ -1,12 +1,16 @@
 package com.ccl.wx.service;
 
+import com.ccl.wx.common.notify.IUserNotify;
 import com.ccl.wx.entity.UserNotify;
-    /**
- * @author  褚超亮
- * @date  2020/5/23 22:23
+
+import java.io.IOException;
+
+/**
+ * @author 褚超亮
+ * @date 2020/5/23 22:23
  */
 
-public interface UserNotifyService{
+public interface UserNotifyService {
 
     int deleteByPrimaryKey(Long id);
 
@@ -20,4 +24,23 @@ public interface UserNotifyService{
 
     int updateByPrimaryKey(UserNotify record);
 
+    /**
+     * 处理用户的消息初步处理
+     *
+     * @param userNotifyType 消息类型
+     * @param sendUserId     发送人用户id
+     * @param targetUserId   目标人用户id
+     * @param resourceId     资源id
+     * @return "success":发送信息 "fail":未发送信息
+     */
+    String userMessageNotify(IUserNotify userNotifyType, String sendUserId, String targetUserId, Integer resourceId);
+
+    /**
+     * 用户的消息推送处理
+     *
+     * @param message 消息内容json字符串
+     * @return "success":发送提醒 "fail":不发送提醒
+     * @throws IOException
+     */
+    String userMessageDispose(String message) throws IOException;
 }

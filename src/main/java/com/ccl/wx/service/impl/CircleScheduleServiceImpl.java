@@ -2,20 +2,15 @@ package com.ccl.wx.service.impl;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSON;
-import com.ccl.wx.config.properties.RabbitMQData;
 import com.ccl.wx.entity.UserDiary;
 import com.ccl.wx.entity.UserLike;
-import com.ccl.wx.entity.UserNotify;
-import com.ccl.wx.enums.redis.EnumRedis;
 import com.ccl.wx.enums.diary.EnumLike;
 import com.ccl.wx.enums.diary.EnumUserDiary;
-import com.ccl.wx.enums.notify.EnumNotifyResourceType;
 import com.ccl.wx.enums.notify.EnumNotifyType;
+import com.ccl.wx.enums.redis.EnumRedis;
 import com.ccl.wx.service.*;
 import com.ccl.wx.util.FtpUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -47,10 +42,7 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
     private ReplyService replyService;
 
     @Resource
-    private RabbitTemplate rabbitTemplate;
-
-    @Resource
-    private NotifyConfigService notifyConfigService;
+    private UserNotifyService userNotifyService;
 
     @Override
     public void saveUserLikeDataPersistence() {
@@ -87,23 +79,8 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
                             userLikeService.insertSelective(userLike);
                         }
                         String targetUserId = userDiaryService.selectByPrimaryKey(Long.valueOf(diaryId)).getUserId();
-                        // 判断是否通知，触发用户不能等于目标用户
-                        if (notifyConfigService.judgeMessagePersistence(EnumNotifyType.DIARY_LIKE.getValue(), targetUserId) && !userId.equals(targetUserId)) {
-                            // 保存数据到mysql通知表中
-                            UserNotify userNotify = new UserNotify();
-                            // 设置目标用户id
-                            userNotify.setTargetId(targetUserId);
-                            // 设置发送者用户id
-                            userNotify.setSenderId(userId);
-                            // 设置资源类型
-                            userNotify.setResourceType((byte) EnumNotifyResourceType.DIARY.getValue());
-                            // 设置资源id
-                            userNotify.setResourceId(Integer.parseInt(diaryId));
-                            // 设置消息所在位置
-                            userNotify.setLocation((byte) EnumNotifyType.DIARY_LIKE.getLocation());
-                            // 将数据发送到rabbitmq中
-                            rabbitTemplate.convertAndSend(RabbitMQData.COMMON_NOTIFY_EXCHANGE, RabbitMQData.LIKE, JSON.toJSONString(userNotify));
-                        }
+                        // 发送消息
+                        userNotifyService.userMessageNotify(EnumNotifyType.DIARY_LIKE, userId, targetUserId, Integer.parseInt(diaryId));
                     } else {
                         // 若点赞对象不为空，且点赞用户不为空
                         if (userLikeInfo != null && !StringUtils.isEmpty(userLikeInfo.getLikeUserid())) {
