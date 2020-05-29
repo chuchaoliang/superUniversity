@@ -1,6 +1,7 @@
 package com.ccl.wx.config.rabbitmq;
 
 import com.ccl.wx.config.properties.RabbitMQData;
+import com.ccl.wx.enums.notify.EnumNotifyType;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -33,7 +34,7 @@ public class RabbitConfig {
      */
     @Bean
     public Queue diaryLikeQueue() {
-        return new Queue(RabbitMQData.DIARY_LIKE, true);
+        return new Queue(EnumNotifyType.DIARY_LIKE.getQueue(), true);
     }
 
     /**
@@ -43,7 +44,7 @@ public class RabbitConfig {
      */
     @Bean
     public Queue diaryCommonComment() {
-        return new Queue(RabbitMQData.DIARY_COMMON_COMMENT, true);
+        return new Queue(EnumNotifyType.DIARY_COMMON_COMMENT.getQueue(), true);
     }
 
     /**
@@ -53,7 +54,17 @@ public class RabbitConfig {
      */
     @Bean
     public Queue diaryReply() {
-        return new Queue(RabbitMQData.DIARY_REPLY, true);
+        return new Queue(EnumNotifyType.DIARY_REPLY.getQueue(), true);
+    }
+
+    /**
+     * 添加点评队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue diaryComment() {
+        return new Queue(EnumNotifyType.DIARY_COMMENT.getQueue(), true);
     }
 
     // ==============================声明交换机======================================
@@ -77,7 +88,7 @@ public class RabbitConfig {
      */
     @Bean
     public Binding bindingDirectOfLike() {
-        return BindingBuilder.bind(diaryLikeQueue()).to(commonNotifyDirectExchange()).with(RabbitMQData.DIARY_LIKE);
+        return BindingBuilder.bind(diaryLikeQueue()).to(commonNotifyDirectExchange()).with(EnumNotifyType.DIARY_LIKE.getQueue());
     }
 
     /**
@@ -87,7 +98,7 @@ public class RabbitConfig {
      */
     @Bean
     public Binding bindingDirectOfCommonComment() {
-        return BindingBuilder.bind(diaryCommonComment()).to(commonNotifyDirectExchange()).with(RabbitMQData.DIARY_COMMON_COMMENT);
+        return BindingBuilder.bind(diaryCommonComment()).to(commonNotifyDirectExchange()).with(EnumNotifyType.DIARY_COMMON_COMMENT.getQueue());
     }
 
     /**
@@ -97,6 +108,16 @@ public class RabbitConfig {
      */
     @Bean
     public Binding bindingDirectOfReply() {
-        return BindingBuilder.bind(diaryReply()).to(commonNotifyDirectExchange()).with(RabbitMQData.DIARY_REPLY);
+        return BindingBuilder.bind(diaryReply()).to(commonNotifyDirectExchange()).with(EnumNotifyType.DIARY_REPLY.getQueue());
+    }
+
+    /**
+     * 绑定点评交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingDirectOfComment() {
+        return BindingBuilder.bind(diaryComment()).to(commonNotifyDirectExchange()).with(EnumNotifyType.DIARY_COMMENT.getQueue());
     }
 }

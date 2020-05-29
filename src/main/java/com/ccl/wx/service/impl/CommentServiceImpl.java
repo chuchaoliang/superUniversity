@@ -160,8 +160,15 @@ public class CommentServiceImpl implements CommentService {
     public String saveDiaryComment(Comment comment, String targetUserId) {
         // 插入数据
         int i = commentMapper.insertSelective(comment);
-        if (i == 1) {
-            userNotifyService.userMessageNotify(EnumNotifyType.DIARY_COMMON_COMMENT, comment.getUserId(), targetUserId, comment.getDiaryId().intValue());
+        if (i != 0) {
+            // 是否为普通用户评论
+            if (comment.getCommentType().equals(EnumComment.COMMENT_USER.getValue())) {
+                // 普通用户评论
+                userNotifyService.userMessageNotify(EnumNotifyType.DIARY_COMMON_COMMENT, comment.getUserId(), targetUserId, comment.getDiaryId().intValue());
+            } else {
+                // 圈主点评
+                userNotifyService.userMessageNotify(EnumNotifyType.DIARY_COMMENT, comment.getUserId(), targetUserId, comment.getDiaryId().intValue());
+            }
             return JSON.toJSONString(comment);
         }
         return EnumResultStatus.FAIL.getValue();

@@ -51,4 +51,14 @@ public class NotifyConsumer {
     public void reply(String msg) throws IOException {
         userNotifyService.userMessageDispose(msg);
     }
+
+    /**
+     * 监听点评消息
+     * @param msg
+     * @throws IOException
+     */
+    @RabbitListener(queues = RabbitMQData.DIARY_COMMENT)
+    public void comment(String msg) throws IOException {
+        userNotifyService.userMessageDispose(msg);
+    }
 }

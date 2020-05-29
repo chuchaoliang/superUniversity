@@ -30,7 +30,7 @@ public class CommentController {
     private CommentService commentService;
 
     /**
-     * 保存日志评论
+     * 保存日志评论、点评
      *
      * @param comment      评论具体内容
      * @param userId       用户id
