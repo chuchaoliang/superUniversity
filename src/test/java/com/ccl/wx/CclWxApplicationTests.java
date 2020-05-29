@@ -22,5 +22,8 @@ public class CclWxApplicationTests {
     @Test
     public void test() throws Exception {
         System.out.println(EnumNotifyType.DIARY_LIKE.getQueue());
+        System.out.println(EnumNotifyType.DIARY_LIKE.getNotifyLocation());
+        System.out.println(EnumNotifyType.DIARY_LIKE.getNotifyType());
+        System.out.println(EnumNotifyType.DIARY_LIKE.getResourceType());
     }
 }

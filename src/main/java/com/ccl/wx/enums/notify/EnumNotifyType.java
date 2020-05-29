@@ -19,7 +19,7 @@ public enum EnumNotifyType implements IUserNotify {
     // 点评
     DIARY_COMMENT(3, 2, 0, RabbitMQData.DIARY_COMMENT),
     // 回复
-    DIARY_REPLY(4, 2, 0, RabbitMQData.DIARY_REPLY),
+    DIARY_REPLY(4, 2, 5, RabbitMQData.DIARY_REPLY),
     //申请加入圈子
     CIRCLE_APPLY(5, 0, 4, RabbitMQData.CIRCLE_APPLY),
     // 拒绝加入圈子
@@ -77,6 +77,7 @@ public enum EnumNotifyType implements IUserNotify {
      * 2通知
      * 3私信
      * 4圈子
+     * 5评论
      */
     private final int resourceType;
 

@@ -46,6 +46,16 @@ public class RabbitConfig {
         return new Queue(RabbitMQData.DIARY_COMMON_COMMENT, true);
     }
 
+    /**
+     * 添加回复队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue diaryReply() {
+        return new Queue(RabbitMQData.DIARY_REPLY, true);
+    }
+
     // ==============================声明交换机======================================
 
     /**
@@ -78,5 +88,15 @@ public class RabbitConfig {
     @Bean
     public Binding bindingDirectOfCommonComment() {
         return BindingBuilder.bind(diaryCommonComment()).to(commonNotifyDirectExchange()).with(RabbitMQData.DIARY_COMMON_COMMENT);
+    }
+
+    /**
+     * 绑定回复交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingDirectOfReply() {
+        return BindingBuilder.bind(diaryReply()).to(commonNotifyDirectExchange()).with(RabbitMQData.DIARY_REPLY);
     }
 }

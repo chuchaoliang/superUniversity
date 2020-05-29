@@ -2,11 +2,11 @@ package com.ccl.wx.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.ccl.wx.common.notify.IUserNotify;
-import com.ccl.wx.config.properties.RabbitMQData;
 import com.ccl.wx.config.websocket.WsSession;
 import com.ccl.wx.entity.UserNotify;
 import com.ccl.wx.enums.common.EnumCommon;
 import com.ccl.wx.enums.common.EnumResultStatus;
+import com.ccl.wx.enums.notify.EnumNotifyType;
 import com.ccl.wx.mapper.UserNotifyMapper;
 import com.ccl.wx.pojo.NotifyTemplate;
 import com.ccl.wx.service.NotifyConfigService;
@@ -86,7 +86,7 @@ public class UserNotifyServiceImpl implements UserNotifyService {
             // 设置消息所在位置
             userNotify.setLocation(userNotifyType.getNotifyLocation().byteValue());
             // 将数据发送到rabbitmq中
-            rabbitTemplate.convertAndSend(RabbitMQData.NOTIFY_EXCHANGE_NAME, RabbitMQData.DIARY_LIKE, JSON.toJSONString(userNotify));
+            rabbitTemplate.convertAndSend(EnumNotifyType.EXCHANGE_NAME, userNotifyType.getQueue(), JSON.toJSONString(userNotify));
             return EnumResultStatus.SUCCESS.getValue();
         }
         return EnumResultStatus.FAIL.getValue();

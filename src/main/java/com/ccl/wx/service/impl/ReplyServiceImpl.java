@@ -7,10 +7,12 @@ import com.ccl.wx.entity.Reply;
 import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.enums.common.EnumPage;
 import com.ccl.wx.enums.common.EnumResultStatus;
+import com.ccl.wx.enums.notify.EnumNotifyType;
 import com.ccl.wx.mapper.ReplyMapper;
 import com.ccl.wx.service.CommentService;
 import com.ccl.wx.service.ReplyService;
 import com.ccl.wx.service.UserInfoService;
+import com.ccl.wx.service.UserNotifyService;
 import com.ccl.wx.util.CclDateUtil;
 import com.ccl.wx.util.CclUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +45,9 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Resource
     private JoinCircleServiceImpl joinCircleService;
+
+    @Resource
+    private UserNotifyService userNotifyService;
 
     @Override
     public int deleteByPrimaryKey(Long id) {
@@ -82,6 +87,7 @@ public class ReplyServiceImpl implements ReplyService {
         }
         int i = replyMapper.insertSelective(reply);
         if (i == 1) {
+            userNotifyService.userMessageNotify(EnumNotifyType.DIARY_REPLY, reply.getReplyUserid(), reply.getTargetUserid(), reply.getCommentId().intValue());
             return JSON.toJSONString(reply);
         }
         return EnumResultStatus.FAIL.getValue();
