@@ -38,4 +38,9 @@ public class RedisServiceImpl implements RedisService {
             return false;
         }
     }
+
+    @Override
+    public void stringSetValue(Object key, Object value) {
+        redisTemplate.opsForValue().set(key, value);
+    }
 }

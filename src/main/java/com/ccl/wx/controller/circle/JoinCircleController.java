@@ -560,9 +560,8 @@ public class JoinCircleController {
      * @param userId   用户id
      * @return
      */
-    @ParamCheck
     @GetMapping("/join")
-    public Result<String> joinCircle(@RequestParam(value = "circleId", required = false) Long circleId,
+    public Result<String> joinCircle(@ParamCheck @RequestParam(value = "circleId", required = false) Long circleId,
                                      @RequestParam(value = "reason", required = false) String applyReason,
                                      @RequestHeader(value = "token", required = false) String userId) {
         String result = joinCircleService.joinCircle(circleId, userId, applyReason);

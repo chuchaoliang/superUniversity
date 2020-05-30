@@ -2,8 +2,12 @@ package com.ccl.wx.service.impl;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import com.ccl.wx.common.list.UserPermissionList;
+import com.ccl.wx.entity.JoinCircle;
 import com.ccl.wx.entity.UserDiary;
 import com.ccl.wx.entity.UserLike;
+import com.ccl.wx.enums.circle.EnumCircle;
+import com.ccl.wx.enums.circle.EnumUserCircle;
 import com.ccl.wx.enums.diary.EnumLike;
 import com.ccl.wx.enums.diary.EnumUserDiary;
 import com.ccl.wx.enums.notify.EnumNotifyType;
@@ -17,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author 褚超亮
@@ -44,6 +49,9 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
     @Resource
     private UserNotifyService userNotifyService;
 
+    @Resource
+    private JoinCircleService joinCircleService;
+
     @Override
     public void saveUserLikeDataPersistence() {
         // 获取所有的键
@@ -56,7 +64,7 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
                 redisTemplate.opsForHash().entries(likeUser).forEach((key, value) -> {
                     // 为有效点赞
                     // 用户id数据
-                    String[] userIdArray = String.valueOf(likeUser).split(EnumRedis.REDIS_JOINT.getValue());
+                    String[] userIdArray = likeUser.split(EnumRedis.REDIS_JOINT.getValue());
                     // 圈子id日记id
                     String[] circleIdAndDiaryId = String.valueOf(key).split(EnumRedis.REDIS_JOINT.getValue());
                     String circleId = circleIdAndDiaryId[0];
@@ -80,7 +88,7 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
                         }
                         String targetUserId = userDiaryService.selectByPrimaryKey(Long.valueOf(diaryId)).getUserId();
                         // 发送消息
-                        userNotifyService.userMessageNotify(EnumNotifyType.DIARY_LIKE, userId, targetUserId, Integer.parseInt(diaryId));
+                        userNotifyService.userMessageNotify(EnumNotifyType.DIARY_LIKE, userId, Collections.singletonList(targetUserId), Integer.parseInt(diaryId));
                     } else {
                         // 若点赞对象不为空，且点赞用户不为空
                         if (userLikeInfo != null && !StringUtils.isEmpty(userLikeInfo.getLikeUserid())) {
@@ -187,5 +195,31 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
         log.info(dateInfo + "删除评论数:" + commentSum);
         log.info(dateInfo + "删除回复数:" + replySum);
         log.info(dateInfo + "删除点赞数:" + likeSum);
+    }
+
+    @Override
+    public void disposeUserJoinCircleMessage() {
+        Set<String> keys = redisTemplate.keys(EnumRedis.CIRCLE_JOIN_PREFIX.getValue() + "*");
+        assert keys != null;
+        if (!keys.isEmpty()) {
+            int size = keys.size();
+            log.info(DateUtil.format(new Date(), DatePattern.NORM_DATETIME_MINUTE_PATTERN) + "redis中处理加入圈子消息总数量：" + size + "条数据");
+            for (String key : keys) {
+                String[] split = key.split(EnumRedis.REDIS_JOINT.getValue());
+                String circleId = split[2];
+                String userId = split[3];
+                if (EnumUserCircle.USER_NORMAL_STATUS.getValue() == Integer.parseInt(String.valueOf(redisTemplate.opsForValue().get(key)))) {
+                    // 正常处理，通知
+                    // 获取管理员用户id列表
+                    List<String> adminUserIdList = joinCircleService.selectUserIdByUserPermission(Integer.parseInt(circleId), UserPermissionList.circleAdmin(), 0, EnumCircle.ADMIN_MAX_NUMBER.getValue()).stream().map(JoinCircle::getUserId).collect(Collectors.toList());
+                    userNotifyService.userMessageNotify(EnumNotifyType.CIRCLE_JOIN, userId, adminUserIdList, Integer.parseInt(circleId));
+                } else {
+                    // 用户中途退出了圈子
+                    size--;
+                }
+                // 缓存中删除
+                redisTemplate.delete(key);
+            }
+        }
     }
 }

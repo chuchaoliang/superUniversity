@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -87,7 +88,8 @@ public class ReplyServiceImpl implements ReplyService {
         }
         int i = replyMapper.insertSelective(reply);
         if (i == 1) {
-            userNotifyService.userMessageNotify(EnumNotifyType.DIARY_REPLY, reply.getReplyUserid(), reply.getTargetUserid(), reply.getCommentId().intValue());
+            userNotifyService.userMessageNotify(EnumNotifyType.DIARY_REPLY, reply.getReplyUserid(),
+                    Collections.singletonList(reply.getTargetUserid()), reply.getCommentId().intValue());
             return JSON.toJSONString(reply);
         }
         return EnumResultStatus.FAIL.getValue();

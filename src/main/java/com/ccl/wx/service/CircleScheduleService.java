@@ -22,4 +22,9 @@ public interface CircleScheduleService {
      * 删除用户的日志并且评论、点赞、回复等信息
      */
     void deleteUserDiaryInfoAndComment();
+
+    /**
+     * 处理用户加入圈子的消息
+     */
+    void disposeUserJoinCircleMessage();
 }

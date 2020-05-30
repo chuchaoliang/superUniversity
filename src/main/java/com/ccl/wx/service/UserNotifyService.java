@@ -4,6 +4,7 @@ import com.ccl.wx.common.notify.IUserNotify;
 import com.ccl.wx.entity.UserNotify;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author 褚超亮
@@ -29,11 +30,11 @@ public interface UserNotifyService {
      *
      * @param userNotifyType 消息类型
      * @param sendUserId     发送人用户id
-     * @param targetUserId   目标人用户id
+     * @param targetUserIdList   目标人用户id
      * @param resourceId     资源id
      * @return "success":发送信息 "fail":未发送信息
      */
-    String userMessageNotify(IUserNotify userNotifyType, String sendUserId, String targetUserId, Integer resourceId);
+    String userMessageNotify(IUserNotify userNotifyType, String sendUserId, List<String> targetUserIdList, Integer resourceId);
 
     /**
      * 用户的消息推送处理
@@ -43,4 +44,6 @@ public interface UserNotifyService {
      * @throws IOException
      */
     String userMessageDispose(String message) throws IOException;
+
+
 }

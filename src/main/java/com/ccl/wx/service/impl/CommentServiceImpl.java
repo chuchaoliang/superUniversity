@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -164,10 +165,10 @@ public class CommentServiceImpl implements CommentService {
             // 是否为普通用户评论
             if (comment.getCommentType().equals(EnumComment.COMMENT_USER.getValue())) {
                 // 普通用户评论
-                userNotifyService.userMessageNotify(EnumNotifyType.DIARY_COMMON_COMMENT, comment.getUserId(), targetUserId, comment.getDiaryId().intValue());
+                userNotifyService.userMessageNotify(EnumNotifyType.DIARY_COMMON_COMMENT, comment.getUserId(), Collections.singletonList(targetUserId), comment.getDiaryId().intValue());
             } else {
                 // 圈主点评
-                userNotifyService.userMessageNotify(EnumNotifyType.DIARY_COMMENT, comment.getUserId(), targetUserId, comment.getDiaryId().intValue());
+                userNotifyService.userMessageNotify(EnumNotifyType.DIARY_COMMENT, comment.getUserId(), Collections.singletonList(targetUserId), comment.getDiaryId().intValue());
             }
             return JSON.toJSONString(comment);
         }

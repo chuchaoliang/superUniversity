@@ -13,4 +13,12 @@ public interface RedisService {
      * @return true 可以操作 false 不可以操作
      */
     boolean judgeButtonClick(String userId, boolean isHigh);
+
+    /**
+     * redis中添加值
+     *
+     * @param key   要添加的key
+     * @param value 对应的值
+     */
+    void stringSetValue(Object key, Object value);
 }

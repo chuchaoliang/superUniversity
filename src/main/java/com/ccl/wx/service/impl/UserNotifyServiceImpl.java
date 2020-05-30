@@ -18,6 +18,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author 褚超亮
@@ -67,27 +68,29 @@ public class UserNotifyServiceImpl implements UserNotifyService {
     }
 
     @Override
-    public String userMessageNotify(IUserNotify userNotifyType, String sendUserId, String targetUserId,
+    public String userMessageNotify(IUserNotify userNotifyType, String sendUserId, List<String> targetUserIdList,
                                     Integer resourceId) {
         Integer notifyType = userNotifyType.getNotifyType();
-        if (notifyConfigService.judgeMessagePersistence(notifyType, targetUserId) && !sendUserId.equals(targetUserId)) {
-            // 保存数据到mysql通知表中
-            UserNotify userNotify = new UserNotify();
-            // 设置目标用户id
-            userNotify.setTargetId(targetUserId);
-            // 设置发送者用户id
-            userNotify.setSenderId(sendUserId);
-            // 设置资源类型
-            userNotify.setResourceType(userNotifyType.getResourceType().byteValue());
-            // 设置动作类型
-            userNotify.setAction(notifyType.byteValue());
-            // 设置资源id
-            userNotify.setResourceId(resourceId);
-            // 设置消息所在位置
-            userNotify.setLocation(userNotifyType.getNotifyLocation().byteValue());
-            // 将数据发送到rabbitmq中
-            rabbitTemplate.convertAndSend(EnumNotifyType.EXCHANGE_NAME, userNotifyType.getQueue(), JSON.toJSONString(userNotify));
-            return EnumResultStatus.SUCCESS.getValue();
+        for (String targetUserId : targetUserIdList) {
+            if (notifyConfigService.judgeMessagePersistence(notifyType, targetUserId) && !sendUserId.equals(targetUserId)) {
+                // 保存数据到mysql通知表中
+                UserNotify userNotify = new UserNotify();
+                // 设置目标用户id
+                userNotify.setTargetId(targetUserId);
+                // 设置发送者用户id
+                userNotify.setSenderId(sendUserId);
+                // 设置资源类型
+                userNotify.setResourceType(userNotifyType.getResourceType().byteValue());
+                // 设置动作类型
+                userNotify.setAction(notifyType.byteValue());
+                // 设置资源id
+                userNotify.setResourceId(resourceId);
+                // 设置消息所在位置
+                userNotify.setLocation(userNotifyType.getNotifyLocation().byteValue());
+                // 将数据发送到rabbitmq中
+                rabbitTemplate.convertAndSend(EnumNotifyType.EXCHANGE_NAME, userNotifyType.getQueue(), JSON.toJSONString(userNotify));
+                return EnumResultStatus.SUCCESS.getValue();
+            }
         }
         return EnumResultStatus.FAIL.getValue();
     }

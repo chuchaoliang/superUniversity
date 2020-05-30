@@ -13,7 +13,6 @@ import java.util.Map;
 
 public interface JoinCircleService {
 
-
     int deleteByPrimaryKey(Long circleId, String userId);
 
     int insert(JoinCircle record);
@@ -436,6 +435,17 @@ public interface JoinCircleService {
      * @return
      */
     String getRecordUserInfo(Long circleId, String userId, String tUserId);
+
+    /**
+     * 获取圈子中所有的管理人员信息
+     *
+     * @param circleId       圈子id
+     * @param userPermission 用户权限列表
+     * @param start          起始位置
+     * @param page           数据数量
+     * @return
+     */
+    List<JoinCircle> selectUserIdByUserPermission(Integer circleId, List<Integer> userPermission, Integer start, Integer page);
 }
 
 

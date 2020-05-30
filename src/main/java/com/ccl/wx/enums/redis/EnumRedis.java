@@ -32,24 +32,19 @@ public enum EnumRedis {
     REDIS_JOINT("::"),
 
     /**
-     * 高频按钮
+     * 高频按钮 high::button::(userId)
      */
     HIGH_FREQUENCY_BUTTON("high::button"),
 
     /**
-     * 低频按钮
+     * 低频按钮 low::button::(userId)
      */
     LOW_FREQUENCY_BUTTON("low::button"),
 
     /**
-     * 在线人数总数
+     * 加入圈子前缀 circle::join::(circleId)::(userId)
      */
-    ONLINE_SUM("online"),
-
-    /**
-     * 在线用户信息
-     */
-    ONLINE_USER_INFO("online::system");
+    CIRCLE_JOIN_PREFIX("circle::join::");
 
     private String value;
 

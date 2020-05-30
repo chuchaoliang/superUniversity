@@ -67,6 +67,26 @@ public class RabbitConfig {
         return new Queue(EnumNotifyType.DIARY_COMMENT.getQueue(), true);
     }
 
+    /**
+     * 添加加入圈子队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue circleJoin() {
+        return new Queue(EnumNotifyType.CIRCLE_JOIN.getQueue(), true);
+    }
+
+    /**
+     * 添加申请加入队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue circleApply() {
+        return new Queue(EnumNotifyType.CIRCLE_APPLY.getQueue(), true);
+    }
+
     // ==============================声明交换机======================================
 
     /**
@@ -119,5 +139,25 @@ public class RabbitConfig {
     @Bean
     public Binding bindingDirectOfComment() {
         return BindingBuilder.bind(diaryComment()).to(commonNotifyDirectExchange()).with(EnumNotifyType.DIARY_COMMENT.getQueue());
+    }
+
+    /**
+     * 绑定加入圈子交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingDirectOfJoin() {
+        return BindingBuilder.bind(circleJoin()).to(commonNotifyDirectExchange()).with(EnumNotifyType.CIRCLE_JOIN.getQueue());
+    }
+
+    /**
+     * 绑定申请加入圈子交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingDirectOfApply() {
+        return BindingBuilder.bind(circleApply()).to(commonNotifyDirectExchange()).with(EnumNotifyType.CIRCLE_APPLY.getQueue());
     }
 }

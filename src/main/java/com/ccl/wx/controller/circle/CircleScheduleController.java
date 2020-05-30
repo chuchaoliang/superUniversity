@@ -62,7 +62,7 @@ public class CircleScheduleController implements ApplicationContextAware {
     }
 
     /**
-     * 每隔十五分钟执行一次
+     * 每隔五分钟执行一次
      * 将redis中的数据持久化到mysql中
      */
     @Scheduled(cron = "0 0/5 * * * ?")
@@ -77,7 +77,7 @@ public class CircleScheduleController implements ApplicationContextAware {
     }
 
     /**
-     * 每隔十五分钟执行一次
+     * 每隔五分钟执行一次
      * 保存用户的点赞数据信息
      * 持redis中的数据持久化到mysql中
      */
@@ -89,6 +89,21 @@ public class CircleScheduleController implements ApplicationContextAware {
             log.info(dateFormat.format(new Date()) + "：将点赞数目总数持久化到mysql");
             log.info(LOG_STR);
             circleScheduleService.saveUserAccountLikeDataPersistence();
+        }
+    }
+
+    /**
+     * ，诶隔五分钟执行一次
+     * 处理用户加入圈子的消息
+     */
+    @Scheduled(cron = "0 0/5 * * * ?")
+    public void disposeUserJoinCircleMessage() {
+        String activeProfile = getActiveProfile();
+        if (EnumEnvironmentProfile.PROD_PROFILE.getValue().equals(activeProfile)) {
+            log.info(LOG_STR);
+            log.info(dateFormat.format(new Date()) + "：处理用户加入圈子消息");
+            log.info(LOG_STR);
+            circleScheduleService.disposeUserJoinCircleMessage();
         }
     }
 
