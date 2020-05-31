@@ -445,20 +445,33 @@ public class JoinCircleServiceImpl implements JoinCircleService {
      *
      * @param applyUserId 申请人用户id
      * @param circleId    圈子id
+     * @param userId
      * @return
      */
     @Override
-    public String agreeJoinApply(String applyUserId, Long circleId) {
+    public String agreeJoinApply(String applyUserId, Long circleId, String userId) {
         JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, applyUserId);
+        boolean admin = judgeUserIsCircleManage(circleId.intValue(), UserPermissionList.circleAdmin(), userId);
+        if (!admin) {
+            // 不是圈子管理员，无操作权限
+            return EnumResultStatus.PARAMS_NULL.getValue();
+        }
         if (joinCircle == null || !joinCircle.getUserStatus().equals(EnumUserCircle.USER_AWAIT_STATUS.getValue())) {
-            log.error("(同意加入)操作异常异常用户-->" + applyUserId + "异常圈子id-->" + circleId);
+            log.error("【JoinCircleServiceImpl(agreeJoinApply(String applyUserId, Long circleId, String userId))】(同意加入)操作异常异常用户-->"
+                    + applyUserId + "异常圈子id-->" + circleId);
             return EnumResultStatus.FAIL.getValue();
+        } else if (joinCircle.getUserStatus().equals(EnumUserCircle.USER_NORMAL_STATUS.getValue())) {
+            // 用户已正常加入，操作已被处理
+            return EnumResultStatus.UNKNOWN.getValue();
         } else {
             String result = normalJoinCircle(circleId, applyUserId);
             if (EnumResultStatus.FAIL.getValue().equals(result)) {
                 return EnumResultStatus.FAIL.getValue();
+            } else {
+                // 加入成功
+                userNotifyService.userMessageNotify(EnumNotifyType.CIRCLE_AGREE, userId, Collections.singletonList(applyUserId), circleId.intValue());
+                return EnumResultStatus.SUCCESS.getValue();
             }
-            return EnumResultStatus.SUCCESS.getValue();
         }
     }
 
@@ -570,19 +583,22 @@ public class JoinCircleServiceImpl implements JoinCircleService {
         JoinCircle circleInfo = joinCircleMapper.selectByPrimaryKey(circleId, userId);
         if (circleInfo == null || circleInfoService.judgeUserIsCircleMaster(userId, circleId)) {
             // 是圈主人失败
-            return EnumResultStatus.FAIL.getValue();
+            return EnumResultStatus.UNKNOWN.getValue();
         }
-        // 退出圈子，圈子人数-1
-        if (circleInfo.getUserStatus().equals(EnumUserCircle.USER_NORMAL_STATUS.getValue())) {
-            CircleInfo circleInfoData = new CircleInfo();
-            circleInfoData.setCircleMember(0);
-            circleInfoService.updateCircleData(circleInfoData, circleId, EnumCommon.UPDATE_SUB.getData());
-        }
-        circleInfo.setExitTime(new Date());
-        circleInfo.setUserStatus(EnumUserCircle.USER_EXIT_STATUS.getValue());
-        int i = joinCircleMapper.updateByPrimaryKeySelective(circleInfo);
-        if (i == 1) {
-            return EnumResultStatus.SUCCESS.getValue();
+        if (circleInfo.getUserStatus().equals(EnumUserCircle.USER_EXIT_STATUS.getValue())) {
+            circleInfo.setExitTime(new Date());
+            circleInfo.setUserStatus(EnumUserCircle.USER_EXIT_STATUS.getValue());
+            int i = joinCircleMapper.updateByPrimaryKeySelective(circleInfo);
+            if (i != 0) {
+                // redis中保存数据
+                redisService.stringSetValue(EnumRedis.CIRCLE_EXIT_PREFIX.getValue() + circleId + EnumRedis.REDIS_JOINT.getValue()
+                        + userId, EnumUserCircle.USER_EXIT_STATUS.getValue());
+                // 退出圈子，圈子人数-1
+                CircleInfo circleInfoData = new CircleInfo();
+                circleInfoData.setCircleMember(0);
+                circleInfoService.updateCircleData(circleInfoData, circleId, EnumCommon.UPDATE_SUB.getData());
+                return EnumResultStatus.SUCCESS.getValue();
+            }
         }
         return EnumResultStatus.FAIL.getValue();
     }
@@ -700,7 +716,7 @@ public class JoinCircleServiceImpl implements JoinCircleService {
     }
 
     @Override
-    public String refuseJoinCircle(Long circleId, String applyUserId, String refuseReason) {
+    public String refuseJoinCircle(Long circleId, String applyUserId, String refuseReason, String userId) {
         JoinCircle joinCircle = joinCircleMapper.selectByPrimaryKey(circleId, applyUserId);
         if (joinCircle == null) {
             return EnumResultStatus.FAIL.getValue();
@@ -716,10 +732,12 @@ public class JoinCircleServiceImpl implements JoinCircleService {
             // 设置拒绝时间
             joinCircle.setExitTime(new Date());
             int i = joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
-            if (i != 1) {
-                return EnumResultStatus.FAIL.getValue();
-            } else {
+            if (i != 0) {
+                // 发送拒绝消息
+                userNotifyService.userMessageNotify(EnumNotifyType.CIRCLE_REFUSE, userId, Collections.singletonList(applyUserId), circleId.intValue());
                 return EnumResultStatus.SUCCESS.getValue();
+            } else {
+                return EnumResultStatus.FAIL.getValue();
             }
         }
     }
@@ -747,15 +765,17 @@ public class JoinCircleServiceImpl implements JoinCircleService {
                             joinCircle.setUserStatus(EnumUserCircle.USER_OUT_STATUS.getValue());
                             joinCircle.setExitTime(new Date());
                             int i = joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
-                            if (i == 0) {
-                                return fail;
-                            } else {
+                            if (i != 0) {
+                                // 发送提醒信息
+                                userNotifyService.userMessageNotify(EnumNotifyType.CIRCLE_OUT, userId, Collections.singletonList(outUserId), circleId.intValue());
+                                // 更新圈子成员信息
                                 CircleInfo circleInfo = new CircleInfo();
                                 circleInfo.setCircleMember(0);
                                 circleInfoService.updateCircleData(circleInfo, circleId, EnumCommon.UPDATE_SUB.getData());
                                 return success;
+                            } else {
+                                return fail;
                             }
-
                         } else {
                             return EnumResultStatus.UNKNOWN.getValue();
                         }
@@ -764,17 +784,21 @@ public class JoinCircleServiceImpl implements JoinCircleService {
                         joinCircle.setUserStatus(EnumUserCircle.USER_OUT_STATUS.getValue());
                         joinCircle.setExitTime(new Date());
                         int i = joinCircleMapper.updateByPrimaryKeySelective(joinCircle);
-                        if (i == 0) {
-                            return fail;
-                        } else {
+                        if (i != 0) {
+                            // 发送提醒信息
+                            userNotifyService.userMessageNotify(EnumNotifyType.CIRCLE_OUT, userId, Collections.singletonList(outUserId), circleId.intValue());
+                            // 更新圈子成员信息
                             CircleInfo circleInfo = new CircleInfo();
                             circleInfo.setCircleMember(0);
                             circleInfoService.updateCircleData(circleInfo, circleId, EnumCommon.UPDATE_SUB.getData());
                             return success;
+                        } else {
+                            return fail;
                         }
                     }
                 } else {
-                    log.error("未知异常userId-->" + userId + "========" + "circleId-->" + circleId);
+                    log.error("【JoinCircleServiceImpl(outCircleUser(Long circleId, String outUserId, String userId))】未知异常userId-->"
+                            + userId + "无操作权限！！！===>" + "circleId-->" + circleId);
                     return EnumResultStatus.UNKNOWN.getValue();
                 }
             }

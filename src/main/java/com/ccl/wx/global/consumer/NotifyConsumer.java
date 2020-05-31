@@ -84,4 +84,48 @@ public class NotifyConsumer {
     public void apply(String msg) throws IOException {
         userNotifyService.userMessageDispose(msg);
     }
+
+    /**
+     * 监听拒绝用户加入圈子
+     *
+     * @param msg
+     * @throws IOException
+     */
+    @RabbitListener(queues = RabbitMQData.CIRCLE_REFUSE)
+    public void refuse(String msg) throws IOException {
+        userNotifyService.userMessageDispose(msg);
+    }
+
+    /**
+     * 监听同意用户加入圈子
+     *
+     * @param msg
+     * @throws IOException
+     */
+    @RabbitListener(queues = RabbitMQData.CIRCLE_AGREE)
+    public void agree(String msg) throws IOException {
+        userNotifyService.userMessageDispose(msg);
+    }
+
+    /**
+     * 监听淘汰圈子用户
+     *
+     * @param msg
+     * @throws IOException
+     */
+    @RabbitListener(queues = RabbitMQData.CIRCLE_OUT)
+    public void out(String msg) throws IOException {
+        userNotifyService.userMessageDispose(msg);
+    }
+
+    /**
+     * 监听退出圈子用户
+     *
+     * @param msg
+     * @throws IOException
+     */
+    @RabbitListener(queues = RabbitMQData.CIRCLE_EXIT)
+    public void exit(String msg) throws IOException {
+        userNotifyService.userMessageDispose(msg);
+    }
 }

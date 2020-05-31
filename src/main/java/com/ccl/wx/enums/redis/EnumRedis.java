@@ -44,9 +44,14 @@ public enum EnumRedis {
     /**
      * 加入圈子前缀 circle::join::(circleId)::(userId)
      */
-    CIRCLE_JOIN_PREFIX("circle::join::");
+    CIRCLE_JOIN_PREFIX("circle::join::"),
 
-    private String value;
+    /**
+     * 退出圈子前缀 circle::exit::(circleId)::(userId)
+     */
+    CIRCLE_EXIT_PREFIX("circle::exit::");
+
+    private final String value;
 
     EnumRedis(String value) {
         this.value = value;

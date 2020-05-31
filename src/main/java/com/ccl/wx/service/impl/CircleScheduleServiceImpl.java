@@ -220,6 +220,34 @@ public class CircleScheduleServiceImpl implements CircleScheduleService {
                 // 缓存中删除
                 redisTemplate.delete(key);
             }
+            log.info(DateUtil.format(new Date(), DatePattern.NORM_DATETIME_MINUTE_PATTERN) + "redis中实际处理加入圈子消息：" + size + "条数据");
+        }
+    }
+
+    @Override
+    public void disposeUserExitCircleMessage() {
+        Set<String> keys = redisTemplate.keys(EnumRedis.CIRCLE_EXIT_PREFIX.getValue() + "*");
+        assert keys != null;
+        if (!keys.isEmpty()) {
+            int size = keys.size();
+            log.info(DateUtil.format(new Date(), DatePattern.NORM_DATETIME_MINUTE_PATTERN) + "redis中处理退出圈子消息总数量：" + size + "条数据");
+            for (String key : keys) {
+                String[] split = key.split(EnumRedis.REDIS_JOINT.getValue());
+                String circleId = split[2];
+                String userId = split[3];
+                if (EnumUserCircle.USER_EXIT_STATUS.getValue() == Integer.parseInt(String.valueOf(redisTemplate.opsForValue().get(key)))) {
+                    // 正常处理，通知
+                    // 获取管理员用户id列表
+                    List<String> adminUserIdList = joinCircleService.selectUserIdByUserPermission(Integer.parseInt(circleId), UserPermissionList.circleAdmin(), 0, EnumCircle.ADMIN_MAX_NUMBER.getValue()).stream().map(JoinCircle::getUserId).collect(Collectors.toList());
+                    userNotifyService.userMessageNotify(EnumNotifyType.CIRCLE_EXIT, userId, adminUserIdList, Integer.parseInt(circleId));
+                } else {
+                    // 用户中途加入了圈子
+                    size--;
+                }
+                // 缓存中删除
+                redisTemplate.delete(key);
+            }
+            log.info(DateUtil.format(new Date(), DatePattern.NORM_DATETIME_MINUTE_PATTERN) + "redis中实际处理退出圈子消息：" + size + "条数据");
         }
     }
 }

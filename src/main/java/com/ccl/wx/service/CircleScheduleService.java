@@ -27,4 +27,9 @@ public interface CircleScheduleService {
      * 处理用户加入圈子的消息
      */
     void disposeUserJoinCircleMessage();
+
+    /**
+     * 处理用户退出圈子的消息
+     */
+    void disposeUserExitCircleMessage();
 }

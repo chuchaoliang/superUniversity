@@ -311,9 +311,10 @@ public interface JoinCircleService {
      *
      * @param applyUserId 申请人用户id
      * @param circleId    圈子id
+     * @param userId      操作人用户id
      * @return
      */
-    String agreeJoinApply(String applyUserId, Long circleId);
+    String agreeJoinApply(String applyUserId, Long circleId, String userId);
 
     /**
      * 拒绝用户加入圈子申请
@@ -321,9 +322,10 @@ public interface JoinCircleService {
      * @param circleId     圈子id
      * @param applyUserId  申请人用户id
      * @param refuseReason 拒绝理由
+     * @param userId       处理人id
      * @return
      */
-    String refuseJoinCircle(Long circleId, String applyUserId, String refuseReason);
+    String refuseJoinCircle(Long circleId, String applyUserId, String refuseReason, String userId);
 
     /**
      * 淘汰圈子中用户

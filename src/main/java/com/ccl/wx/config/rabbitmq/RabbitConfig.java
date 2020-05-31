@@ -87,6 +87,46 @@ public class RabbitConfig {
         return new Queue(EnumNotifyType.CIRCLE_APPLY.getQueue(), true);
     }
 
+    /**
+     * 添加拒绝加入圈子队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue circleRefuse() {
+        return new Queue(EnumNotifyType.CIRCLE_REFUSE.getQueue(), true);
+    }
+
+    /**
+     * 添加同意加入圈子队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue circleAgree() {
+        return new Queue(EnumNotifyType.CIRCLE_AGREE.getQueue(), true);
+    }
+
+    /**
+     * 添加淘汰加入圈子队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue circleOut() {
+        return new Queue(EnumNotifyType.CIRCLE_OUT.getQueue(), true);
+    }
+
+    /**
+     * 添加退出圈子队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue circleExit() {
+        return new Queue(EnumNotifyType.CIRCLE_EXIT.getQueue(), true);
+    }
+
     // ==============================声明交换机======================================
 
     /**
@@ -159,5 +199,45 @@ public class RabbitConfig {
     @Bean
     public Binding bindingDirectOfApply() {
         return BindingBuilder.bind(circleApply()).to(commonNotifyDirectExchange()).with(EnumNotifyType.CIRCLE_APPLY.getQueue());
+    }
+
+    /**
+     * 绑定拒绝用户加入圈子交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingDirectOfRefuse() {
+        return BindingBuilder.bind(circleRefuse()).to(commonNotifyDirectExchange()).with(EnumNotifyType.CIRCLE_REFUSE.getQueue());
+    }
+
+    /**
+     * 绑定同意用户加入圈子交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingDirectOfAgree() {
+        return BindingBuilder.bind(circleAgree()).to(commonNotifyDirectExchange()).with(EnumNotifyType.CIRCLE_AGREE.getQueue());
+    }
+
+    /**
+     * 绑定淘汰圈子用户交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingDirectOfOut() {
+        return BindingBuilder.bind(circleOut()).to(commonNotifyDirectExchange()).with(EnumNotifyType.CIRCLE_OUT.getQueue());
+    }
+
+    /**
+     * 绑定退出圈子用户交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingDirectOfExit() {
+        return BindingBuilder.bind(circleExit()).to(commonNotifyDirectExchange()).with(EnumNotifyType.CIRCLE_EXIT.getQueue());
     }
 }

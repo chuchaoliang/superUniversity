@@ -174,6 +174,7 @@ public class JoinCircleController {
      *
      * @param circleId  圈子id
      * @param outUserId 被淘汰用户人id
+     * @param userId    操作人用户id
      * @return
      */
     @ParamCheck
@@ -227,11 +228,16 @@ public class JoinCircleController {
      * @return
      */
     @GetMapping("/menu/manager/audit/agree")
-    public Result<String> agreeJoinCircle(@RequestParam(value = "circleId", required = false) Long circleId,
-                                          @RequestParam(value = "userId", required = false) String applyUserId) {
-        String result = joinCircleService.agreeJoinApply(applyUserId, circleId);
+    public Result<String> agreeJoinCircle(@ParamCheck @RequestParam(value = "circleId", required = false) Long circleId,
+                                          @RequestParam(value = "userId", required = false) String applyUserId,
+                                          @RequestHeader(value = "token", required = false) String userId) {
+        String result = joinCircleService.agreeJoinApply(applyUserId, circleId, userId);
         if (EnumResultStatus.FAIL.getValue().equals(result)) {
             return ResponseMsgUtil.fail("操作失败！");
+        } else if (EnumResultStatus.UNKNOWN.getValue().equals(result)) {
+            return ResponseMsgUtil.fail(EnumResultCode.REFUSE_REQUEST.getStatus(), "用户已经加入此圈子，该操作可能已被其它管理员处理！！");
+        } else if (EnumResultStatus.PARAMS_NULL.getValue().equals(result)) {
+            return ResponseMsgUtil.fail(EnumResultCode.UNAUTHORIZED);
         }
         return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
     }
@@ -242,13 +248,15 @@ public class JoinCircleController {
      * @param circleId     圈子id
      * @param applyUserId  申请用户id
      * @param refuseReason 拒绝理由
+     * @param userId       处理人id
      * @return
      */
     @GetMapping("/menu/manager/audit/refuse")
     public Result<String> refuseJoinCircle(@ParamCheck @RequestParam(value = "circleId", required = false) Long circleId,
                                            @ParamCheck @RequestParam(value = "userId", required = false) String applyUserId,
+                                           @RequestHeader(value = "token", required = false) String userId,
                                            @RequestParam(value = "reason", required = false) String refuseReason) {
-        String result = joinCircleService.refuseJoinCircle(circleId, applyUserId, refuseReason);
+        String result = joinCircleService.refuseJoinCircle(circleId, applyUserId, refuseReason, userId);
         if (EnumResultStatus.FAIL.getValue().equals(result)) {
             return ResponseMsgUtil.fail("操作失败！");
         }
@@ -471,6 +479,8 @@ public class JoinCircleController {
         String result = joinCircleService.exitCircle(circleId, userId);
         if (EnumResultStatus.FAIL.getValue().equals(result)) {
             return ResponseMsgUtil.fail("操作失败！");
+        } else if (EnumResultStatus.UNKNOWN.getValue().equals(result)) {
+            return ResponseMsgUtil.fail(EnumResultCode.REFUSE_REQUEST.getStatus(), "圈主不能退出圈子啊！！！");
         }
         return ResponseMsgUtil.success(EnumResultCode.SUCCESS);
     }
