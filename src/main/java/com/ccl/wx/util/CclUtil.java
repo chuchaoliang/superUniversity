@@ -3,6 +3,7 @@ package com.ccl.wx.util;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.ccl.wx.enums.common.EnumResultStatus;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -656,6 +657,21 @@ public class CclUtil {
             return EnumResultStatus.SUCCESS.getValue();
         } else {
             return EnumResultStatus.FAIL.getValue();
+        }
+    }
+
+    /**
+     * 判断字符串是否为json对象
+     *
+     * @param str
+     * @return
+     */
+    public static boolean isJson(String str) {
+        try {
+            JSONObject.parseObject(str);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }

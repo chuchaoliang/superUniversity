@@ -20,7 +20,7 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, sender_id, target_id, `action`, resource_type, resource_id, is_delete, is_read, 
+    id, sender_id, target_id, `action`, resource_type, resource_id, is_delete, is_read,
     `location`, read_time, create_time, delete_time, update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -188,4 +188,14 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <select id="selectUserNotifyInfo" resultMap="BaseResultMap">
+    select * from user_notify
+    <where>
+    sender_id = #{sendUserId,jdbcType=VARCHAR} and target_id = #{targetUserId,jdbcType=VARCHAR}
+  and `action` = #{action,jdbcType=INTEGER}
+  <if test="delete != null">
+  and is_delete = #{delete,jdbcType=INTEGER}
+</if>
+</where>
+</select>
 </mapper>

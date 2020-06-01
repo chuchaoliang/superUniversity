@@ -3,6 +3,7 @@ package com.ccl.wx.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.ccl.wx.common.notify.IUserNotify;
 import com.ccl.wx.config.websocket.WsSession;
+import com.ccl.wx.entity.UserChat;
 import com.ccl.wx.entity.UserNotify;
 import com.ccl.wx.enums.common.EnumCommon;
 import com.ccl.wx.enums.common.EnumResultStatus;
@@ -10,9 +11,12 @@ import com.ccl.wx.enums.notify.EnumNotifyType;
 import com.ccl.wx.mapper.UserNotifyMapper;
 import com.ccl.wx.pojo.NotifyTemplate;
 import com.ccl.wx.service.NotifyConfigService;
+import com.ccl.wx.service.UserChatService;
 import com.ccl.wx.service.UserNotifyService;
+import com.ccl.wx.util.CclUtil;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -30,12 +34,12 @@ public class UserNotifyServiceImpl implements UserNotifyService {
 
     @Resource
     private UserNotifyMapper userNotifyMapper;
-
     @Resource
     private RabbitTemplate rabbitTemplate;
-
     @Resource
     private NotifyConfigService notifyConfigService;
+    @Resource
+    private UserChatService userChatService;
 
     @Override
     public int deleteByPrimaryKey(Long id) {
@@ -106,23 +110,110 @@ public class UserNotifyServiceImpl implements UserNotifyService {
         // 判断用户是否设置已读或者未读，如果用户设置不提醒则已读，否则未读
         userNotify.setRead(judgeMessageRemind ? (byte) EnumCommon.NOT_READ.getData() : (byte) EnumCommon.HAVE_READ.getData());
         // 插入用户消息数据
-        insertSelective(userNotify);
-        if (judgeMessageRemind) {
-            // 进行消息提醒，判断用户是否在线
-            if (WsSession.judgeUserOnline(targetId)) {
-                // 用户在线进行消息提醒
-                NotifyTemplate notifyTemplate = new NotifyTemplate();
-                // 设置消息类型
-                notifyTemplate.setMessageType(notifyType);
-                // 消息所在位置
-                notifyTemplate.setMessageLocation(userNotify.getLocation());
-                // 获取用户的session对象
-                WebSocketSession session = WsSession.get(targetId);
-                // 发送提醒
-                session.sendMessage(new TextMessage(JSON.toJSONString(notifyTemplate)));
+        int i = insertSelective(userNotify);
+        if (i != 0) {
+            // 插入消息成功
+            if (judgeMessageRemind) {
+                // 进行消息提醒，判断用户是否在线
+                if (WsSession.judgeUserOnline(targetId)) {
+                    // 用户在线进行消息提醒
+                    NotifyTemplate notifyTemplate = new NotifyTemplate();
+                    // 设置消息类型
+                    notifyTemplate.setMessageType(notifyType);
+                    // 消息所在位置
+                    notifyTemplate.setMessageLocation(userNotify.getLocation());
+                    // 获取用户的session对象
+                    WebSocketSession session = WsSession.get(targetId);
+                    // 发送提醒
+                    session.sendMessage(new TextMessage(JSON.toJSONString(notifyTemplate)));
+                }
+                return EnumResultStatus.SUCCESS.getValue();
+            }
+        }
+        return EnumResultStatus.FAIL.getValue();
+    }
+
+    @Override
+    public String userChatMessageDispose(String message) {
+        if (!CclUtil.isJson(message)) {
+            return EnumResultStatus.FAIL.getValue();
+        }
+        UserChat userChat = JSON.parseObject(message, UserChat.class);
+        // 发送者用户id
+        String sendId = userChat.getSendId();
+        // 目标人用户id
+        String targetId = userChat.getTargetId();
+        // 聊天内容
+        String content = userChat.getContent();
+        if (!StringUtils.isEmpty(sendId) && !StringUtils.isEmpty(targetId) && !StringUtils.isEmpty(content)) {
+            // 判断用户消息是否持久化
+            boolean judgeMessagePersistence = notifyConfigService.judgeMessagePersistence(EnumNotifyType.USER_CHAT.getResourceType(), targetId);
+            if (judgeMessagePersistence) {
+                int i = userChatService.insertSelective(userChat);
+                if (i != 0) {
+                    // 通知用户
+                    boolean judgeMessageRemind = notifyConfigService.judgeMessageRemind(EnumNotifyType.USER_CHAT.getResourceType(), targetId);
+                    UserNotify userNotify = userNotifyMapper.selectUserNotifyInfo(sendId, targetId, EnumNotifyType.USER_CHAT.getNotifyType(),
+                            EnumCommon.NOT_DELETE.getData());
+                    if (userNotify == null) {
+                        // 第一次聊天 插入消息
+                        UserNotify notify = new UserNotify();
+                        // 设置发送人用户id
+                        notify.setSenderId(sendId);
+                        // 设置目标人用户id
+                        notify.setTargetId(targetId);
+                        // 设置是否已读
+                        notify.setRead(judgeMessageRemind ? (byte) EnumCommon.NOT_READ.getData() : (byte) EnumCommon.HAVE_READ.getData());
+                        // 设置资源类型
+                        notify.setResourceType(EnumNotifyType.USER_CHAT.getResourceType().byteValue());
+                        // 设置资源id
+                        notify.setResourceId(userChat.getId().intValue());
+                        int i1 = userNotifyMapper.insertSelective(notify);
+                        sendUserChatMessage(targetId, userChat.getContent(), i1, judgeMessageRemind);
+                    } else {
+                        // 存在过聊天，更新数据
+                        userNotify.setRead(judgeMessageRemind ? (byte) EnumCommon.NOT_READ.getData() : (byte) EnumCommon.HAVE_READ.getData());
+                        userNotify.setResourceId(userChat.getId().intValue());
+                        int i1 = updateByPrimaryKeySelective(userNotify);
+                        sendUserChatMessage(targetId, userChat.getContent(), i1, judgeMessageRemind);
+                    }
+                }
             }
             return EnumResultStatus.SUCCESS.getValue();
         }
         return EnumResultStatus.FAIL.getValue();
+    }
+
+    /**
+     * 用户发送消息
+     *
+     * @param targetUserId 目标用户id
+     * @param content      消息内容
+     * @param i            插入或者更新返回值
+     * @param remind       是否在线
+     * @throws IOException
+     */
+    void sendUserChatMessage(String targetUserId, String content, int i, boolean remind) {
+        if (i != 0) {
+            if (WsSession.judgeUserOnline(targetUserId)) {
+                try {
+                    // 发送消息
+                    NotifyTemplate notifyTemplate = new NotifyTemplate();
+                    // 设置消息类型
+                    notifyTemplate.setMessageType(EnumNotifyType.USER_CHAT.getNotifyType());
+                    // 设置消息所在位置
+                    notifyTemplate.setMessageLocation(EnumNotifyType.USER_CHAT.getNotifyLocation());
+                    // 设置消息内容
+                    notifyTemplate.setMessageContent(content);
+                    // 设置是否提醒
+                    notifyTemplate.setRemind(remind);
+                    WebSocketSession session = WsSession.get(targetUserId);
+                    // 发送消息
+                    session.sendMessage(new TextMessage(JSON.toJSONString(notifyTemplate)));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

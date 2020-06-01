@@ -127,6 +127,21 @@ public class RabbitConfig {
         return new Queue(EnumNotifyType.CIRCLE_EXIT.getQueue(), true);
     }
 
+    /**
+     * 添加通知、公告队列（系统通知、普通用户通知）
+     *
+     * @return
+     */
+    @Bean
+    public Queue notice() {
+        return new Queue(EnumNotifyType.COMMON_NOTICE.getQueue(), true);
+    }
+
+    @Bean
+    public Queue userChat() {
+        return new Queue(EnumNotifyType.USER_CHAT.getQueue(), true);
+    }
+
     // ==============================声明交换机======================================
 
     /**
@@ -239,5 +254,25 @@ public class RabbitConfig {
     @Bean
     public Binding bindingDirectOfExit() {
         return BindingBuilder.bind(circleExit()).to(commonNotifyDirectExchange()).with(EnumNotifyType.CIRCLE_EXIT.getQueue());
+    }
+
+    /**
+     * 绑定用户通知交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingDirectOfNotice() {
+        return BindingBuilder.bind(notice()).to(commonNotifyDirectExchange()).with(EnumNotifyType.COMMON_NOTICE.getQueue());
+    }
+
+    /**
+     * 绑定用户聊天交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingDirectOfChat() {
+        return BindingBuilder.bind(userChat()).to(commonNotifyDirectExchange()).with(EnumNotifyType.USER_CHAT.getQueue());
     }
 }

@@ -69,7 +69,8 @@ public class CircleScheduleController implements ApplicationContextAware {
      */
     public boolean judgeEnvironment() {
         String activeProfile = getActiveProfile();
-        if (activeProfile.equals(EnumEnvironmentProfile.PROD_PROFILE.getValue())) {
+        if (activeProfile.equals(EnumEnvironmentProfile.PROD_PROFILE.getValue())
+                || activeProfile.equals(EnumEnvironmentProfile.LOCAL_PROFILE.getValue())) {
             return true;
         }
         return false;
@@ -141,8 +142,8 @@ public class CircleScheduleController implements ApplicationContextAware {
         if (judgeEnvironment()) {
             log.info(LOG_STR);
             log.info(dateFormat.format(new Date()) + "：开始删除用户日志信息");
-            circleScheduleService.deleteUserDiaryInfoAndComment();
             log.info(LOG_STR);
+            circleScheduleService.deleteUserDiaryInfoAndComment();
         }
     }
 
@@ -154,8 +155,8 @@ public class CircleScheduleController implements ApplicationContextAware {
         if (judgeEnvironment()) {
             log.info(LOG_STR);
             log.info(dateFormat.format(new Date()) + "：持久化日记浏览量到数据库中");
-            userDiaryService.saveDiaryBrowseNumber();
             log.info(LOG_STR);
+            userDiaryService.saveDiaryBrowseNumber();
         }
     }
 
@@ -168,8 +169,8 @@ public class CircleScheduleController implements ApplicationContextAware {
         if (judgeEnvironment()) {
             log.info(LOG_STR);
             log.info(dateFormat.format(new Date()) + "：删除圈子中删除状态的主题");
-            todayContentService.deleteCircleThemeFormDatabase();
             log.info(LOG_STR);
+            todayContentService.deleteCircleThemeFormDatabase();
         }
     }
 }

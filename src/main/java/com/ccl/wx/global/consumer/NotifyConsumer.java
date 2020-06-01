@@ -128,4 +128,47 @@ public class NotifyConsumer {
     public void exit(String msg) throws IOException {
         userNotifyService.userMessageDispose(msg);
     }
+
+    /**
+     * 监听系统、用户通知
+     *
+     * @param msg
+     */
+    @RabbitListener(queues = RabbitMQData.COMMON_NOTICE)
+    public void notice(String msg) throws IOException {
+        userNotifyService.userMessageDispose(msg);
+    }
+
+    /**
+     * 监听系统、用户通知
+     *
+     * @param msg
+     */
+    @RabbitListener(queues = RabbitMQData.USER_CHAT)
+    public void chat(String msg) {
+        log.info("chat壹号");
+        userNotifyService.userChatMessageDispose(msg);
+    }
+
+    /**
+     * 监听系统、用户通知
+     *
+     * @param msg
+     */
+    @RabbitListener(queues = RabbitMQData.USER_CHAT)
+    public void chat1(String msg) {
+        log.info("chat二号");
+        userNotifyService.userChatMessageDispose(msg);
+    }
+
+    /**
+     * 监听系统、用户通知
+     *
+     * @param msg
+     */
+    @RabbitListener(queues = RabbitMQData.USER_CHAT)
+    public void chat2(String msg) {
+        log.info("chat三号");
+        userNotifyService.userChatMessageDispose(msg);
+    }
 }

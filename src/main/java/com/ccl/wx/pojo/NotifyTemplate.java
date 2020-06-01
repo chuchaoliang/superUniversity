@@ -39,6 +39,11 @@ public class NotifyTemplate {
     private String targetUserId;
 
     /**
+     * 消息是否提醒（私信时才利用）
+     */
+    private boolean remind;
+
+    /**
      * 发送内容的日期
      */
     private final String sendDate = DateUtil.format(new Date(), DatePattern.NORM_DATETIME_MINUTE_PATTERN);

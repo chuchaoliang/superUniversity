@@ -28,10 +28,10 @@ public interface UserNotifyService {
     /**
      * 处理用户的消息初步处理
      *
-     * @param userNotifyType 消息类型
-     * @param sendUserId     发送人用户id
-     * @param targetUserIdList   目标人用户id
-     * @param resourceId     资源id
+     * @param userNotifyType   消息类型
+     * @param sendUserId       发送人用户id
+     * @param targetUserIdList 目标人用户id
+     * @param resourceId       资源id
      * @return "success":发送信息 "fail":未发送信息
      */
     String userMessageNotify(IUserNotify userNotifyType, String sendUserId, List<String> targetUserIdList, Integer resourceId);
@@ -45,5 +45,11 @@ public interface UserNotifyService {
      */
     String userMessageDispose(String message) throws IOException;
 
-
+    /**
+     * 用户聊天消息处理
+     *
+     * @param message
+     * @return
+     */
+    String userChatMessageDispose(String message);
 }

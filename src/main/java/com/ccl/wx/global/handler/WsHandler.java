@@ -1,12 +1,17 @@
 package com.ccl.wx.global.handler;
 
 import com.ccl.wx.config.websocket.WsSession;
+import com.ccl.wx.enums.notify.EnumNotifyType;
+import com.ccl.wx.util.CclUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
+
+import javax.annotation.Resource;
 
 /**
  * @author 褚超亮
@@ -15,6 +20,9 @@ import org.springframework.web.socket.WebSocketSession;
 @Slf4j
 @Component
 public class WsHandler implements WebSocketHandler {
+
+    @Resource
+    private RabbitTemplate rabbitTemplate;
 
     /**
      * 接收发送消息触发
@@ -26,11 +34,14 @@ public class WsHandler implements WebSocketHandler {
      */
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> webSocketMessage) throws Exception {
-        // TODO 这里进行用户私信处理
-        //Object payload = webSocketMessage.getPayload();
-        //Object token = session.getAttributes().get("token");
-        //System.out.println("接收到：" + token + "发送的消息" + payload);
-        //session.sendMessage(new TextMessage("server 发送给 " + token + " 消息 " + payload + " " + LocalDateTime.now().toString()));
+        // TODO 这里进行用户私信处理、或者其他消息，这里应该设置一个消息类型，明天设计一下 06-01
+        String message = (String) webSocketMessage.getPayload();
+        Object token = session.getAttributes().get("token");
+        if (CclUtil.isJson(message)) {
+            // rabbitmq
+            rabbitTemplate.convertAndSend(EnumNotifyType.USER_CHAT.getQueue(), message);
+        }
+        log.info("收到：" + token + "发送的消息" + message);
     }
 
     /**
