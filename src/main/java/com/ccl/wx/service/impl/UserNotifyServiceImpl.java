@@ -16,6 +16,7 @@ import com.ccl.wx.service.UserChatService;
 import com.ccl.wx.service.UserInfoService;
 import com.ccl.wx.service.UserNotifyService;
 import com.ccl.wx.util.CclUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -32,6 +33,7 @@ import java.util.List;
  */
 
 @Service
+@Slf4j
 public class UserNotifyServiceImpl implements UserNotifyService {
 
     @Resource
@@ -150,6 +152,10 @@ public class UserNotifyServiceImpl implements UserNotifyService {
         // 聊天内容
         String content = userChat.getContent();
         if (!StringUtils.isEmpty(sendId) && !StringUtils.isEmpty(targetId) && !StringUtils.isEmpty(content)) {
+            if (sendId.equals(targetId)) {
+                log.error("前端传输数据错误？？？接受者和发送者相同！！" + sendId + "::" + targetId);
+                return EnumResultStatus.FAIL.getValue();
+            }
             // 判断用户消息是否持久化
             boolean judgeMessagePersistence = notifyConfigService.judgeMessagePersistence(EnumNotifyType.USER_CHAT.getResourceType(), targetId);
             if (judgeMessagePersistence) {
@@ -157,9 +163,9 @@ public class UserNotifyServiceImpl implements UserNotifyService {
                 if (i != 0) {
                     // 通知用户
                     boolean judgeMessageRemind = notifyConfigService.judgeMessageRemind(EnumNotifyType.USER_CHAT.getResourceType(), targetId);
-                    UserNotify userNotify = userNotifyMapper.selectUserNotifyInfo(sendId, targetId, EnumNotifyType.USER_CHAT.getNotifyType(),
+                    List<UserNotify> userNotifies = userNotifyMapper.selectUserNotifyInfo(sendId, targetId, EnumNotifyType.USER_CHAT.getNotifyType(),
                             EnumCommon.NOT_DELETE.getData());
-                    if (userNotify == null) {
+                    if (userNotifies.isEmpty()) {
                         // 第一次聊天 插入消息
                         UserNotify notify = new UserNotify();
                         // 设置发送人用户id
@@ -172,14 +178,21 @@ public class UserNotifyServiceImpl implements UserNotifyService {
                         notify.setResourceType(EnumNotifyType.USER_CHAT.getResourceType().byteValue());
                         // 设置资源id
                         notify.setResourceId(userChat.getId().intValue());
+                        // 设置消息类型
+                        notify.setAction(EnumNotifyType.USER_CHAT.getNotifyType().byteValue());
                         int i1 = userNotifyMapper.insertSelective(notify);
-                        sendUserChatMessage(targetId, sendId, userChat.getContent(), i1, judgeMessageRemind);
+                        sendUserChatMessage(targetId, sendId, userChat.getContent(), i1, judgeMessageRemind, userChat.getId().intValue());
                     } else {
                         // 存在过聊天，更新数据
-                        userNotify.setRead(judgeMessageRemind ? (byte) EnumCommon.NOT_READ.getData() : (byte) EnumCommon.HAVE_READ.getData());
-                        userNotify.setResourceId(userChat.getId().intValue());
-                        int i1 = updateByPrimaryKeySelective(userNotify);
-                        sendUserChatMessage(targetId, sendId, userChat.getContent(), i1, judgeMessageRemind);
+                        if (userNotifies.size() == 1) {
+                            UserNotify userNotify = userNotifies.get(0);
+                            userNotify.setRead(judgeMessageRemind ? (byte) EnumCommon.NOT_READ.getData() : (byte) EnumCommon.HAVE_READ.getData());
+                            userNotify.setResourceId(userChat.getId().intValue());
+                            int i1 = updateByPrimaryKeySelective(userNotify);
+                            sendUserChatMessage(targetId, sendId, userChat.getContent(), i1, judgeMessageRemind, userChat.getId().intValue());
+                        } else {
+                            log.error("用户聊天出现错误！！！----》" + "sendId->" + sendId + "targetId->" + targetId);
+                        }
                     }
                 }
             }
@@ -196,9 +209,10 @@ public class UserNotifyServiceImpl implements UserNotifyService {
      * @param content      消息内容
      * @param i            插入或者更新返回值
      * @param remind       是否在线
+     * @param id
      * @throws IOException
      */
-    void sendUserChatMessage(String targetUserId, String senderUserId, String content, int i, boolean remind) {
+    void sendUserChatMessage(String targetUserId, String senderUserId, String content, int i, boolean remind, Integer id) {
         if (i != 0) {
             if (WsSession.judgeUserOnline(targetUserId)) {
                 try {
@@ -221,6 +235,8 @@ public class UserNotifyServiceImpl implements UserNotifyService {
                         notifyTemplate.setNickname(userInfo.getNickname());
                         // 设置发送人用户头像地址
                         notifyTemplate.setHeadPortrait(userInfo.getAvatarurl());
+                        // 设置消息id
+                        notifyTemplate.setId(id);
                         WebSocketSession session = WsSession.get(targetUserId);
                         // 发送消息
                         session.sendMessage(new TextMessage(JSON.toJSONString(notifyTemplate)));
@@ -232,3 +248,4 @@ public class UserNotifyServiceImpl implements UserNotifyService {
         }
     }
 }
+

@@ -7,6 +7,7 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="sender_id" jdbcType="VARCHAR" property="senderId" />
     <result column="target_id" jdbcType="VARCHAR" property="targetId" />
+    <result column="user_type" jdbcType="TINYINT" property="userType" />
     <result column="action" jdbcType="TINYINT" property="action" />
     <result column="resource_type" jdbcType="TINYINT" property="resourceType" />
     <result column="resource_id" jdbcType="INTEGER" property="resourceId" />
@@ -20,8 +21,8 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, sender_id, target_id, `action`, resource_type, resource_id, is_delete, is_read,
-    `location`, read_time, create_time, delete_time, update_time
+    id, sender_id, target_id, user_type, `action`, resource_type, resource_id, is_delete, 
+    is_read, `location`, read_time, create_time, delete_time, update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -37,16 +38,16 @@
   </delete>
   <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.UserNotify" useGeneratedKeys="true">
     <!--@mbg.generated-->
-    insert into user_notify (sender_id, target_id, `action`, 
-      resource_type, resource_id, is_delete, 
-      is_read, `location`, read_time, 
-      create_time, delete_time, update_time
-      )
-    values (#{senderId,jdbcType=VARCHAR}, #{targetId,jdbcType=VARCHAR}, #{action,jdbcType=TINYINT}, 
-      #{resourceType,jdbcType=TINYINT}, #{resourceId,jdbcType=INTEGER}, #{delete,jdbcType=TINYINT}, 
-      #{read,jdbcType=TINYINT}, #{location,jdbcType=TINYINT}, #{readTime,jdbcType=TIMESTAMP}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{deleteTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+    insert into user_notify (sender_id, target_id, user_type, 
+      `action`, resource_type, resource_id, 
+      is_delete, is_read, `location`, 
+      read_time, create_time, delete_time, 
+      update_time)
+    values (#{senderId,jdbcType=VARCHAR}, #{targetId,jdbcType=VARCHAR}, #{userType,jdbcType=TINYINT}, 
+      #{action,jdbcType=TINYINT}, #{resourceType,jdbcType=TINYINT}, #{resourceId,jdbcType=INTEGER}, 
+      #{delete,jdbcType=TINYINT}, #{read,jdbcType=TINYINT}, #{location,jdbcType=TINYINT}, 
+      #{readTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{deleteTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.UserNotify" useGeneratedKeys="true">
     <!--@mbg.generated-->
@@ -57,6 +58,9 @@
       </if>
       <if test="targetId != null">
         target_id,
+      </if>
+      <if test="userType != null">
+        user_type,
       </if>
       <if test="action != null">
         `action`,
@@ -95,6 +99,9 @@
       </if>
       <if test="targetId != null">
         #{targetId,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null">
+        #{userType,jdbcType=TINYINT},
       </if>
       <if test="action != null">
         #{action,jdbcType=TINYINT},
@@ -138,6 +145,9 @@
       <if test="targetId != null">
         target_id = #{targetId,jdbcType=VARCHAR},
       </if>
+      <if test="userType != null">
+        user_type = #{userType,jdbcType=TINYINT},
+      </if>
       <if test="action != null">
         `action` = #{action,jdbcType=TINYINT},
       </if>
@@ -176,6 +186,7 @@
     update user_notify
     set sender_id = #{senderId,jdbcType=VARCHAR},
       target_id = #{targetId,jdbcType=VARCHAR},
+      user_type = #{userType,jdbcType=TINYINT},
       `action` = #{action,jdbcType=TINYINT},
       resource_type = #{resourceType,jdbcType=TINYINT},
       resource_id = #{resourceId,jdbcType=INTEGER},

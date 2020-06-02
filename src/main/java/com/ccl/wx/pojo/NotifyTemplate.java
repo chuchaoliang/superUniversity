@@ -49,6 +49,11 @@ public class NotifyTemplate {
     private String headPortrait;
 
     /**
+     * 消息id
+     */
+    private Integer id;
+
+    /**
      * 消息是否提醒（私信时才利用）
      */
     private boolean remind;

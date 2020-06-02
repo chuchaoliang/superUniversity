@@ -53,3 +53,4 @@ public interface UserNotifyService {
      */
     String userChatMessageDispose(String message);
 }
+
