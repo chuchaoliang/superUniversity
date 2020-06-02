@@ -1,15 +1,17 @@
 package com.ccl.wx.global.handler;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.ccl.wx.common.api.EnumResultCode;
 import com.ccl.wx.config.websocket.WsSession;
 import com.ccl.wx.enums.notify.EnumNotifyType;
+import com.ccl.wx.enums.system.EnumMessageType;
 import com.ccl.wx.util.CclUtil;
+import com.ccl.wx.util.ResponseMsgUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.WebSocketHandler;
-import org.springframework.web.socket.WebSocketMessage;
-import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.*;
 
 import javax.annotation.Resource;
 
@@ -34,12 +36,21 @@ public class WsHandler implements WebSocketHandler {
      */
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> webSocketMessage) throws Exception {
-        // TODO 这里进行用户私信处理、或者其他消息，这里应该设置一个消息类型，明天设计一下 06-01
+        // TODO 这里进行用户私信处理、或者其他消息，这里应该设置一个消息类型，私信消息要添加一个id
         String message = (String) webSocketMessage.getPayload();
         Object token = session.getAttributes().get("token");
         if (CclUtil.isJson(message)) {
             // rabbitmq
-            rabbitTemplate.convertAndSend(EnumNotifyType.USER_CHAT.getQueue(), message);
+            JSONObject messageJson = JSON.parseObject(message);
+            String mtype = messageJson.get("mtype").toString();
+            if (EnumMessageType.USER_CHAT_TYPE.getValue().equals(mtype)) {
+                // 用户聊天信息
+                rabbitTemplate.convertAndSend(EnumNotifyType.USER_CHAT.getQueue(), message);
+            } else if (EnumMessageType.TEST_CONNECTION.getValue().equals(mtype)) {
+                // 测试用户连接是否成功
+                WebSocketSession userSession = WsSession.get((String) token);
+                userSession.sendMessage(new TextMessage(JSON.toJSONString(ResponseMsgUtil.success(EnumResultCode.SUCCESS))));
+            }
         }
         log.info("收到：" + token + "发送的消息" + message);
     }

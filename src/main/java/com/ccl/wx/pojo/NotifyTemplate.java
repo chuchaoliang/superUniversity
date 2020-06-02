@@ -34,9 +34,19 @@ public class NotifyTemplate {
     private String messageContent;
 
     /**
-     * 目标用户id，只有发送私信的时候（私信利用用户id来展示）
+     * 发送人用户id，只有发送私信的时候（私信利用用户id来展示）
      */
-    private String targetUserId;
+    private String senderUserId;
+
+    /**
+     * 发送人昵称
+     */
+    private String nickname;
+
+    /**
+     * 发送人头像地址
+     */
+    private String headPortrait;
 
     /**
      * 消息是否提醒（私信时才利用）

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.ccl.wx.common.notify.IUserNotify;
 import com.ccl.wx.config.websocket.WsSession;
 import com.ccl.wx.entity.UserChat;
+import com.ccl.wx.entity.UserInfo;
 import com.ccl.wx.entity.UserNotify;
 import com.ccl.wx.enums.common.EnumCommon;
 import com.ccl.wx.enums.common.EnumResultStatus;
@@ -12,6 +13,7 @@ import com.ccl.wx.mapper.UserNotifyMapper;
 import com.ccl.wx.pojo.NotifyTemplate;
 import com.ccl.wx.service.NotifyConfigService;
 import com.ccl.wx.service.UserChatService;
+import com.ccl.wx.service.UserInfoService;
 import com.ccl.wx.service.UserNotifyService;
 import com.ccl.wx.util.CclUtil;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -40,6 +42,8 @@ public class UserNotifyServiceImpl implements UserNotifyService {
     private NotifyConfigService notifyConfigService;
     @Resource
     private UserChatService userChatService;
+    @Resource
+    private UserInfoService userInfoService;
 
     @Override
     public int deleteByPrimaryKey(Long id) {
@@ -169,13 +173,13 @@ public class UserNotifyServiceImpl implements UserNotifyService {
                         // 设置资源id
                         notify.setResourceId(userChat.getId().intValue());
                         int i1 = userNotifyMapper.insertSelective(notify);
-                        sendUserChatMessage(targetId, userChat.getContent(), i1, judgeMessageRemind);
+                        sendUserChatMessage(targetId, sendId, userChat.getContent(), i1, judgeMessageRemind);
                     } else {
                         // 存在过聊天，更新数据
                         userNotify.setRead(judgeMessageRemind ? (byte) EnumCommon.NOT_READ.getData() : (byte) EnumCommon.HAVE_READ.getData());
                         userNotify.setResourceId(userChat.getId().intValue());
                         int i1 = updateByPrimaryKeySelective(userNotify);
-                        sendUserChatMessage(targetId, userChat.getContent(), i1, judgeMessageRemind);
+                        sendUserChatMessage(targetId, sendId, userChat.getContent(), i1, judgeMessageRemind);
                     }
                 }
             }
@@ -188,28 +192,39 @@ public class UserNotifyServiceImpl implements UserNotifyService {
      * 用户发送消息
      *
      * @param targetUserId 目标用户id
+     * @param senderUserId
      * @param content      消息内容
      * @param i            插入或者更新返回值
      * @param remind       是否在线
      * @throws IOException
      */
-    void sendUserChatMessage(String targetUserId, String content, int i, boolean remind) {
+    void sendUserChatMessage(String targetUserId, String senderUserId, String content, int i, boolean remind) {
         if (i != 0) {
             if (WsSession.judgeUserOnline(targetUserId)) {
                 try {
-                    // 发送消息
-                    NotifyTemplate notifyTemplate = new NotifyTemplate();
-                    // 设置消息类型
-                    notifyTemplate.setMessageType(EnumNotifyType.USER_CHAT.getNotifyType());
-                    // 设置消息所在位置
-                    notifyTemplate.setMessageLocation(EnumNotifyType.USER_CHAT.getNotifyLocation());
-                    // 设置消息内容
-                    notifyTemplate.setMessageContent(content);
-                    // 设置是否提醒
-                    notifyTemplate.setRemind(remind);
-                    WebSocketSession session = WsSession.get(targetUserId);
-                    // 发送消息
-                    session.sendMessage(new TextMessage(JSON.toJSONString(notifyTemplate)));
+                    // 查找发送人信息
+                    UserInfo userInfo = userInfoService.selectByPrimaryKey(senderUserId);
+                    if (userInfo != null) {
+                        // 发送消息
+                        NotifyTemplate notifyTemplate = new NotifyTemplate();
+                        // 设置消息类型
+                        notifyTemplate.setMessageType(EnumNotifyType.USER_CHAT.getNotifyType());
+                        // 设置消息所在位置
+                        notifyTemplate.setMessageLocation(EnumNotifyType.USER_CHAT.getNotifyLocation());
+                        // 设置消息内容
+                        notifyTemplate.setMessageContent(content);
+                        // 设置是否提醒
+                        notifyTemplate.setRemind(remind);
+                        // 设置发送人用户id
+                        notifyTemplate.setSenderUserId(senderUserId);
+                        // 设置发送人用户昵称
+                        notifyTemplate.setNickname(userInfo.getNickname());
+                        // 设置发送人用户头像地址
+                        notifyTemplate.setHeadPortrait(userInfo.getAvatarurl());
+                        WebSocketSession session = WsSession.get(targetUserId);
+                        // 发送消息
+                        session.sendMessage(new TextMessage(JSON.toJSONString(notifyTemplate)));
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
