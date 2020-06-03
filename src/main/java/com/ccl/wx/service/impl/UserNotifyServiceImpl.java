@@ -201,6 +201,8 @@ public class UserNotifyServiceImpl implements UserNotifyService {
         return EnumResultStatus.FAIL.getValue();
     }
 
+    // TODO 消息待完成！！！
+
     /**
      * 用户发送消息
      *

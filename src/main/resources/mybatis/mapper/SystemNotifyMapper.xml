@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ccl.wx.mapper.SystemNotifyMapper">
+  <resultMap id="BaseResultMap" type="com.ccl.wx.entity.SystemNotify">
+    <!--@mbg.generated-->
+    <!--@Table system_notify-->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="send_id" jdbcType="VARCHAR" property="sendId" />
+    <result column="notice_id" jdbcType="INTEGER" property="noticeId" />
+    <result column="target_id" jdbcType="VARCHAR" property="targetId" />
+    <result column="read_number" jdbcType="INTEGER" property="readNumber" />
+    <result column="user_type" jdbcType="TINYINT" property="userType" />
+    <result column="notify_type" jdbcType="TINYINT" property="notifyType" />
+    <result column="resource_id" jdbcType="INTEGER" property="resourceId" />
+    <result column="resource_type" jdbcType="TINYINT" property="resourceType" />
+    <result column="is_delete" jdbcType="TINYINT" property="delete" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_time" jdbcType="TIMESTAMP" property="deleteTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, send_id, notice_id, target_id, read_number, user_type, notify_type, resource_id, 
+    resource_type, is_delete, create_time, update_time, delete_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from system_notify
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from system_notify
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ccl.wx.entity.SystemNotify">
+    <!--@mbg.generated-->
+    insert into system_notify (id, send_id, notice_id, 
+      target_id, read_number, user_type, 
+      notify_type, resource_id, resource_type, 
+      is_delete, create_time, update_time, 
+      delete_time)
+    values (#{id,jdbcType=INTEGER}, #{sendId,jdbcType=VARCHAR}, #{noticeId,jdbcType=INTEGER}, 
+      #{targetId,jdbcType=VARCHAR}, #{readNumber,jdbcType=INTEGER}, #{userType,jdbcType=TINYINT}, 
+      #{notifyType,jdbcType=TINYINT}, #{resourceId,jdbcType=INTEGER}, #{resourceType,jdbcType=TINYINT}, 
+      #{delete,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{deleteTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ccl.wx.entity.SystemNotify">
+    <!--@mbg.generated-->
+    insert into system_notify
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="sendId != null">
+        send_id,
+      </if>
+      <if test="noticeId != null">
+        notice_id,
+      </if>
+      <if test="targetId != null">
+        target_id,
+      </if>
+      <if test="readNumber != null">
+        read_number,
+      </if>
+      <if test="userType != null">
+        user_type,
+      </if>
+      <if test="notifyType != null">
+        notify_type,
+      </if>
+      <if test="resourceId != null">
+        resource_id,
+      </if>
+      <if test="resourceType != null">
+        resource_type,
+      </if>
+      <if test="delete != null">
+        is_delete,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="deleteTime != null">
+        delete_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="sendId != null">
+        #{sendId,jdbcType=VARCHAR},
+      </if>
+      <if test="noticeId != null">
+        #{noticeId,jdbcType=INTEGER},
+      </if>
+      <if test="targetId != null">
+        #{targetId,jdbcType=VARCHAR},
+      </if>
+      <if test="readNumber != null">
+        #{readNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userType != null">
+        #{userType,jdbcType=TINYINT},
+      </if>
+      <if test="notifyType != null">
+        #{notifyType,jdbcType=TINYINT},
+      </if>
+      <if test="resourceId != null">
+        #{resourceId,jdbcType=INTEGER},
+      </if>
+      <if test="resourceType != null">
+        #{resourceType,jdbcType=TINYINT},
+      </if>
+      <if test="delete != null">
+        #{delete,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deleteTime != null">
+        #{deleteTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ccl.wx.entity.SystemNotify">
+    <!--@mbg.generated-->
+    update system_notify
+    <set>
+      <if test="sendId != null">
+        send_id = #{sendId,jdbcType=VARCHAR},
+      </if>
+      <if test="noticeId != null">
+        notice_id = #{noticeId,jdbcType=INTEGER},
+      </if>
+      <if test="targetId != null">
+        target_id = #{targetId,jdbcType=VARCHAR},
+      </if>
+      <if test="readNumber != null">
+        read_number = #{readNumber,jdbcType=INTEGER},
+      </if>
+      <if test="userType != null">
+        user_type = #{userType,jdbcType=TINYINT},
+      </if>
+      <if test="notifyType != null">
+        notify_type = #{notifyType,jdbcType=TINYINT},
+      </if>
+      <if test="resourceId != null">
+        resource_id = #{resourceId,jdbcType=INTEGER},
+      </if>
+      <if test="resourceType != null">
+        resource_type = #{resourceType,jdbcType=TINYINT},
+      </if>
+      <if test="delete != null">
+        is_delete = #{delete,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deleteTime != null">
+        delete_time = #{deleteTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ccl.wx.entity.SystemNotify">
+    <!--@mbg.generated-->
+    update system_notify
+    set send_id = #{sendId,jdbcType=VARCHAR},
+      notice_id = #{noticeId,jdbcType=INTEGER},
+      target_id = #{targetId,jdbcType=VARCHAR},
+      read_number = #{readNumber,jdbcType=INTEGER},
+      user_type = #{userType,jdbcType=TINYINT},
+      notify_type = #{notifyType,jdbcType=TINYINT},
+      resource_id = #{resourceId,jdbcType=INTEGER},
+      resource_type = #{resourceType,jdbcType=TINYINT},
+      is_delete = #{delete,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      delete_time = #{deleteTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
