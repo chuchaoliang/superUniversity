@@ -4,17 +4,15 @@ package com.ccl.wx.enums.notify;
  * @author 褚超亮
  * @date 2020/5/22 21:56
  */
-public enum EnumNotifyNoticeType {
-    // 全部
-    ALL(0),
-    // 部分
-    PART(1),
-    // 单独
-    ONE(2);
+public enum EnumNotifyUserType {
+    // 普通用户
+    COMMON_USER(0),
+    // 系统用户
+    SYSTEM_USER(1);
 
     private int value;
 
-    EnumNotifyNoticeType(int value) {
+    EnumNotifyUserType(int value) {
         this.value = value;
     }
 

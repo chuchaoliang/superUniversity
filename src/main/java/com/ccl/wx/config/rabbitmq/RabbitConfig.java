@@ -128,7 +128,7 @@ public class RabbitConfig {
     }
 
     /**
-     * 添加通知、公告队列（系统通知、普通用户通知）
+     * 添加普通用户通知队列（普通用户通知）
      *
      * @return
      */
@@ -137,6 +137,21 @@ public class RabbitConfig {
         return new Queue(EnumNotifyType.COMMON_NOTICE.getQueue(), true);
     }
 
+    /**
+     * 添加系统用户通知队列（系统用户通知）
+     *
+     * @return
+     */
+    @Bean
+    public Queue systemNotice() {
+        return new Queue(EnumNotifyType.SYSTEM_NOTICE.getQueue(), true);
+    }
+
+    /**
+     * 添加用户私聊队列
+     *
+     * @return
+     */
     @Bean
     public Queue userChat() {
         return new Queue(EnumNotifyType.USER_CHAT.getQueue(), true);
@@ -257,13 +272,23 @@ public class RabbitConfig {
     }
 
     /**
-     * 绑定用户通知交换机
+     * 绑定用户-用户通知交换机
      *
      * @return
      */
     @Bean
     public Binding bindingDirectOfNotice() {
         return BindingBuilder.bind(notice()).to(commonNotifyDirectExchange()).with(EnumNotifyType.COMMON_NOTICE.getQueue());
+    }
+
+    /**
+     * 绑定系统-用户通知交换机
+     *
+     * @return
+     */
+    @Bean
+    public Binding bindingDirectOfSystemNotice() {
+        return BindingBuilder.bind(systemNotice()).to(commonNotifyDirectExchange()).with(EnumNotifyType.SYSTEM_NOTICE.getQueue());
     }
 
     /**

@@ -9,6 +9,7 @@ import com.ccl.wx.entity.UserNotify;
 import com.ccl.wx.enums.common.EnumCommon;
 import com.ccl.wx.enums.common.EnumResultStatus;
 import com.ccl.wx.enums.notify.EnumNotifyType;
+import com.ccl.wx.enums.notify.EnumNotifyUserType;
 import com.ccl.wx.mapper.UserNotifyMapper;
 import com.ccl.wx.pojo.NotifyTemplate;
 import com.ccl.wx.service.NotifyConfigService;
@@ -25,7 +26,9 @@ import org.springframework.web.socket.WebSocketSession;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author 褚超亮
@@ -81,6 +84,9 @@ public class UserNotifyServiceImpl implements UserNotifyService {
     public String userMessageNotify(IUserNotify userNotifyType, String sendUserId, List<String> targetUserIdList,
                                     Integer resourceId) {
         Integer notifyType = userNotifyType.getNotifyType();
+        if (targetUserIdList.isEmpty() || StringUtils.isEmpty(sendUserId) || StringUtils.isEmpty(resourceId)) {
+            return EnumResultStatus.FAIL.getValue();
+        }
         for (String targetUserId : targetUserIdList) {
             if (notifyConfigService.judgeMessagePersistence(notifyType, targetUserId) && !sendUserId.equals(targetUserId)) {
                 // 保存数据到mysql通知表中
@@ -99,8 +105,24 @@ public class UserNotifyServiceImpl implements UserNotifyService {
                 userNotify.setLocation(userNotifyType.getNotifyLocation().byteValue());
                 // 将数据发送到rabbitmq中
                 rabbitTemplate.convertAndSend(EnumNotifyType.EXCHANGE_NAME, userNotifyType.getQueue(), JSON.toJSONString(userNotify));
-                return EnumResultStatus.SUCCESS.getValue();
             }
+        }
+        return EnumResultStatus.SUCCESS.getValue();
+    }
+
+    @Override
+    public String systemMessageNotify(IUserNotify userNotifyType, String sendUserId, List<String> targetUserIdList,
+                                      Integer resourceId) {
+        // 目标用户为空，并且这个消息必须为系统通知
+        if ((targetUserIdList == null || targetUserIdList.isEmpty()) && userNotifyType.getNotifyType().equals(EnumNotifyType.SYSTEM_NOTICE.getNotifyType())) {
+            // 发送给全部用户
+            targetUserIdList = new ArrayList<>();
+            targetUserIdList.add(EnumCommon.SYSTEM_NOTIFY.getValue());
+        }
+        String result = userMessageNotify(userNotifyType, sendUserId, targetUserIdList, resourceId);
+        String success = EnumResultStatus.SUCCESS.getValue();
+        if (result.equals(success)) {
+            return success;
         }
         return EnumResultStatus.FAIL.getValue();
     }
@@ -112,16 +134,46 @@ public class UserNotifyServiceImpl implements UserNotifyService {
         String targetId = userNotify.getTargetId();
         // 获取通知类型
         int notifyType = userNotify.getAction();
-        boolean judgeMessageRemind = notifyConfigService.judgeMessageRemind(notifyType, targetId);
+        // 发送消息到用户
+        sendMessageToOnlineUser(userNotify, notifyType, targetId);
+        return EnumResultStatus.FAIL.getValue();
+    }
+
+    @Override
+    public String systemMessageDispose(String message) throws IOException {
+        UserNotify userNotify = JSON.parseObject(message, UserNotify.class);
+        // 判断用户是否消息提醒
+        String targetId = userNotify.getTargetId();
+        // 获取通知类型
+        int notifyType = userNotify.getAction();
+        if (EnumCommon.SYSTEM_NOTIFY.getValue().equals(targetId)) {
+            // 获取全部在线用户，通知全部用户
+            Set<String> userIds = WsSession.getSessionPool().keySet();
+            for (String userId : userIds) {
+                // 判断用户是否持久化数据 TODO 系统消息必须设置持久化，无需设置
+                //if (notifyConfigService.judgeMessagePersistence(notifyType, userId)) {
+                // 发送消息到用户
+                userNotify.setTargetId(userId);
+                userNotify.setUserType((byte) EnumNotifyUserType.SYSTEM_USER.getValue());
+                sendMessageToOnlineUser(userNotify, notifyType, userId);
+                //}
+            }
+        } else {
+            return userMessageDispose(message);
+        }
+        return EnumResultStatus.FAIL.getValue();
+    }
+
+    private boolean sendMessageToOnlineUser(UserNotify userNotify, int notifyType, String userId) throws IOException {
+        // 判断用户是否设置消息提醒
+        boolean judgeMessageRemind = notifyConfigService.judgeMessageRemind(notifyType, userId);
         // 判断用户是否设置已读或者未读，如果用户设置不提醒则已读，否则未读
         userNotify.setRead(judgeMessageRemind ? (byte) EnumCommon.NOT_READ.getData() : (byte) EnumCommon.HAVE_READ.getData());
-        // 插入用户消息数据
         int i = insertSelective(userNotify);
         if (i != 0) {
-            // 插入消息成功
             if (judgeMessageRemind) {
                 // 进行消息提醒，判断用户是否在线
-                if (WsSession.judgeUserOnline(targetId)) {
+                if (WsSession.judgeUserOnline(userId)) {
                     // 用户在线进行消息提醒
                     NotifyTemplate notifyTemplate = new NotifyTemplate();
                     // 设置消息类型
@@ -129,14 +181,14 @@ public class UserNotifyServiceImpl implements UserNotifyService {
                     // 消息所在位置
                     notifyTemplate.setMessageLocation(userNotify.getLocation());
                     // 获取用户的session对象
-                    WebSocketSession session = WsSession.get(targetId);
+                    WebSocketSession session = WsSession.get(userId);
                     // 发送提醒
                     session.sendMessage(new TextMessage(JSON.toJSONString(notifyTemplate)));
                 }
-                return EnumResultStatus.SUCCESS.getValue();
+                return true;
             }
         }
-        return EnumResultStatus.FAIL.getValue();
+        return false;
     }
 
     @Override
@@ -176,6 +228,8 @@ public class UserNotifyServiceImpl implements UserNotifyService {
                         notify.setRead(judgeMessageRemind ? (byte) EnumCommon.NOT_READ.getData() : (byte) EnumCommon.HAVE_READ.getData());
                         // 设置资源类型
                         notify.setResourceType(EnumNotifyType.USER_CHAT.getResourceType().byteValue());
+                        // 设置资源位置
+                        notify.setLocation(EnumNotifyType.USER_CHAT.getNotifyLocation().byteValue());
                         // 设置资源id
                         notify.setResourceId(userChat.getId().intValue());
                         // 设置消息类型
@@ -201,8 +255,6 @@ public class UserNotifyServiceImpl implements UserNotifyService {
         return EnumResultStatus.FAIL.getValue();
     }
 
-    // TODO 消息待完成！！！
-
     /**
      * 用户发送消息
      *
@@ -214,7 +266,7 @@ public class UserNotifyServiceImpl implements UserNotifyService {
      * @param id
      * @throws IOException
      */
-    void sendUserChatMessage(String targetUserId, String senderUserId, String content, int i, boolean remind, Integer id) {
+    private void sendUserChatMessage(String targetUserId, String senderUserId, String content, int i, boolean remind, Integer id) {
         if (i != 0) {
             if (WsSession.judgeUserOnline(targetUserId)) {
                 try {

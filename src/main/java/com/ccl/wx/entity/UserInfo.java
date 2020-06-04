@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * @author 褚超亮
- * @date 2020/4/19 18:21
+ * @date 2020/6/4 15:32
  */
 
 @ApiModel(value = "com-ccl-wx-entity-UserInfo")
@@ -86,6 +86,12 @@ public class UserInfo implements Serializable {
      */
     @ApiModelProperty(value = "用户标签")
     private String userLabel;
+
+    /**
+     * 用户状态(0正常1封号..待定)
+     */
+    @ApiModelProperty(value = "用户状态(0正常1封号..待定)")
+    private Byte userStatus;
 
     private static final long serialVersionUID = 1L;
 }

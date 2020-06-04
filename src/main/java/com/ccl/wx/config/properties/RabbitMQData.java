@@ -8,7 +8,7 @@ package com.ccl.wx.config.properties;
 public class RabbitMQData {
     // ============================= queue ==============================
     // 系统通知
-    public static final String SYSTEM_NOTICE = "wx.notify.notice";
+    public static final String SYSTEM_NOTICE = "wx.notify.system.notice";
     // 日志--点赞
     public static final String DIARY_LIKE = "wx.notify.diary.like";
     // 日志--评论

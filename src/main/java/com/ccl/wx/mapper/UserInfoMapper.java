@@ -1,13 +1,11 @@
 package com.ccl.wx.mapper;
 
 import com.ccl.wx.entity.UserInfo;
-import org.apache.ibatis.annotations.Mapper;
-
-import java.util.List;
+import org.apache.ibatis.annotations.Mapper;import java.util.List;
 
 /**
  * @author 褚超亮
- * @date 2020/4/19 18:21
+ * @date 2020/6/4 15:32
  */
 
 @Mapper

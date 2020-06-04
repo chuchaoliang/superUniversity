@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Set;
 
 @Slf4j
 //@RunWith(SpringRunner.class)
@@ -32,5 +34,13 @@ public class CclWxApplicationTests {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Test
     public void test() throws Exception {
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("1", "2");
+        hashMap.put("2", "2");
+        hashMap.put("3", "2");
+        hashMap.put("4", "2");
+        hashMap.put("5", "2");
+        Set<String> strings = hashMap.keySet();
+        System.out.println(strings);
     }
 }

@@ -37,6 +37,17 @@ public interface UserNotifyService {
     String userMessageNotify(IUserNotify userNotifyType, String sendUserId, List<String> targetUserIdList, Integer resourceId);
 
     /**
+     * 系统通知方法（只提供给系统通知，其他无效）
+     *
+     * @param userNotifyType
+     * @param sendUserId
+     * @param targetUserIdList
+     * @param resourceId
+     * @return
+     */
+    String systemMessageNotify(IUserNotify userNotifyType, String sendUserId, List<String> targetUserIdList, Integer resourceId);
+
+    /**
      * 用户的消息推送处理
      *
      * @param message 消息内容json字符串
@@ -44,6 +55,15 @@ public interface UserNotifyService {
      * @throws IOException
      */
     String userMessageDispose(String message) throws IOException;
+
+    /**
+     * 系统消息处理
+     *
+     * @param message
+     * @return
+     * @throws IOException
+     */
+    String systemMessageDispose(String message) throws IOException;
 
     /**
      * 用户聊天消息处理

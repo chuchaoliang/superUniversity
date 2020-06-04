@@ -133,10 +133,22 @@ public class NotifyConsumer {
      * 监听系统、用户通知
      *
      * @param msg
+     * @throws IOException
      */
     @RabbitListener(queues = RabbitMQData.COMMON_NOTICE)
     public void notice(String msg) throws IOException {
         userNotifyService.userMessageDispose(msg);
+    }
+
+    /**
+     * 监听系统通知
+     *
+     * @param msg
+     * @throws IOException
+     */
+    @RabbitListener(queues = RabbitMQData.SYSTEM_NOTICE)
+    public void systemNotice(String msg) throws IOException {
+        userNotifyService.systemMessageDispose(msg);
     }
 
     /**

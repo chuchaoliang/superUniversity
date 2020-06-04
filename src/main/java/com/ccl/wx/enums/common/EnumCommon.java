@@ -22,7 +22,9 @@ public enum EnumCommon {
     // 未删除
     NOT_DELETE(0),
     // 已删除
-    HAVE_DELETE(1);
+    HAVE_DELETE(1),
+    // 系统通知目标用户id
+    SYSTEM_NOTIFY("-1");
 
     private String value;
 
