@@ -1,4 +1,4 @@
-package com.ccl.wx.controller.system;
+package com.ccl.wx.admin.system;
 
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;

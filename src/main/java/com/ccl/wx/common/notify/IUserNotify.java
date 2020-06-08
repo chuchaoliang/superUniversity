@@ -32,4 +32,11 @@ public interface IUserNotify {
      * @return
      */
     String getQueue();
+
+    /**
+     * 获取内容是否显示查看按钮
+     *
+     * @return
+     */
+    Boolean getLook();
 }

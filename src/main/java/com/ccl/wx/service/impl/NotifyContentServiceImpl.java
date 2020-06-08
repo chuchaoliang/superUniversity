@@ -5,13 +5,14 @@ import javax.annotation.Resource;
 import com.ccl.wx.entity.NotifyContent;
 import com.ccl.wx.mapper.NotifyContentMapper;
 import com.ccl.wx.service.NotifyContentService;
+
 /**
- * @author  褚超亮
- * @date  2020/6/3 22:29
+ * @author 褚超亮
+ * @date 2020/6/3 22:29
  */
 
 @Service
-public class NotifyContentServiceImpl implements NotifyContentService{
+public class NotifyContentServiceImpl implements NotifyContentService {
 
     @Resource
     private NotifyContentMapper notifyContentMapper;
@@ -47,3 +48,5 @@ public class NotifyContentServiceImpl implements NotifyContentService{
     }
 
 }
+
+

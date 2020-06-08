@@ -13,10 +13,13 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="is_delete" jdbcType="TINYINT" property="delete" />
     <result column="delete_time" jdbcType="TIMESTAMP" property="deleteTime" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="label" jdbcType="VARCHAR" property="label" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, content, image, voice, video, create_time, update_time, is_delete, delete_time
+    id, content, image, voice, video, create_time, update_time, is_delete, delete_time, 
+    title, `label`
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -30,24 +33,21 @@
     delete from notify_content
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.ccl.wx.entity.NotifyContent">
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.NotifyContent" useGeneratedKeys="true">
     <!--@mbg.generated-->
-    insert into notify_content (id, content, image, 
-      voice, video, create_time, 
-      update_time, is_delete, delete_time
-      )
-    values (#{id,jdbcType=INTEGER}, #{content,jdbcType=LONGVARCHAR}, #{image,jdbcType=VARCHAR}, 
-      #{voice,jdbcType=VARCHAR}, #{video,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{delete,jdbcType=TINYINT}, #{deleteTime,jdbcType=TIMESTAMP}
-      )
+    insert into notify_content (content, image, voice, 
+      video, create_time, update_time, 
+      is_delete, delete_time, title, 
+      `label`)
+    values (#{content,jdbcType=LONGVARCHAR}, #{image,jdbcType=VARCHAR}, #{voice,jdbcType=VARCHAR}, 
+      #{video,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{delete,jdbcType=TINYINT}, #{deleteTime,jdbcType=TIMESTAMP}, #{title,jdbcType=VARCHAR}, 
+      #{label,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.ccl.wx.entity.NotifyContent">
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ccl.wx.entity.NotifyContent" useGeneratedKeys="true">
     <!--@mbg.generated-->
     insert into notify_content
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
       <if test="content != null">
         content,
       </if>
@@ -72,11 +72,14 @@
       <if test="deleteTime != null">
         delete_time,
       </if>
+      <if test="title != null">
+        title,
+      </if>
+      <if test="label != null">
+        `label`,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=INTEGER},
-      </if>
       <if test="content != null">
         #{content,jdbcType=LONGVARCHAR},
       </if>
@@ -100,6 +103,12 @@
       </if>
       <if test="deleteTime != null">
         #{deleteTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="label != null">
+        #{label,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -131,6 +140,12 @@
       <if test="deleteTime != null">
         delete_time = #{deleteTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="label != null">
+        `label` = #{label,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -144,7 +159,9 @@
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       is_delete = #{delete,jdbcType=TINYINT},
-      delete_time = #{deleteTime,jdbcType=TIMESTAMP}
+      delete_time = #{deleteTime,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR},
+      `label` = #{label,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

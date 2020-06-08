@@ -4,8 +4,8 @@ import com.ccl.wx.entity.NotifyContent;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * @author  褚超亮
- * @date  2020/6/3 22:29
+ * @author 褚超亮
+ * @date 2020/6/8 16:57
  */
 
 @Mapper

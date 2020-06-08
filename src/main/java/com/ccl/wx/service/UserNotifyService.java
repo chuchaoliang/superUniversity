@@ -72,5 +72,15 @@ public interface UserNotifyService {
      * @return
      */
     String userChatMessageDispose(String message);
+
+    /**
+     * 获取用户某一位置通知信息
+     *
+     * @param location 位置
+     * @param userId   用户id
+     * @param page     当前页数
+     * @return
+     */
+    String getUserLocationNotify(Integer location, String userId, Integer page);
 }
 

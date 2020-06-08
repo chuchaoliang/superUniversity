@@ -36,4 +36,28 @@ public interface UserNotifyMapper {
      */
     List<UserNotify> selectUserNotifyInfo(@Param("sendUserId") String sendUserId, @Param("targetUserId") String targetUserId,
                                           @Param("action") Integer action, @Param("delete") Integer delete);
+
+    /**
+     * 根据通知位置查找消息信息
+     *
+     * @param userId   用户id
+     * @param location 消息位置
+     * @param start    开始数据
+     * @param number   要查找的数据量
+     * @return
+     */
+    List<UserNotify> selectUserNotifyByNotifyLocation(@Param("userId") String userId, @Param("location") int location,
+                                                      @Param("start") int start, @Param("number") int number);
+
+    /**
+     * 根据条件查找用户的消息数量
+     *
+     * @param userId
+     * @param location
+     * @param read
+     * @param delete
+     * @return
+     */
+    Integer getNotifyAllNumber(@Param("userId") String userId, @Param("location") Integer location,
+                               @Param("read") Integer read, @Param("delete") Integer delete);
 }

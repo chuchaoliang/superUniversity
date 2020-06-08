@@ -1,21 +1,20 @@
 package com.ccl.wx.service.impl;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.ccl.wx.common.notify.IUserNotify;
 import com.ccl.wx.config.websocket.WsSession;
-import com.ccl.wx.entity.UserChat;
-import com.ccl.wx.entity.UserInfo;
-import com.ccl.wx.entity.UserNotify;
+import com.ccl.wx.entity.*;
 import com.ccl.wx.enums.common.EnumCommon;
+import com.ccl.wx.enums.common.EnumPage;
 import com.ccl.wx.enums.common.EnumResultStatus;
 import com.ccl.wx.enums.notify.EnumNotifyType;
 import com.ccl.wx.enums.notify.EnumNotifyUserType;
 import com.ccl.wx.mapper.UserNotifyMapper;
+import com.ccl.wx.pojo.Notify;
 import com.ccl.wx.pojo.NotifyTemplate;
-import com.ccl.wx.service.NotifyConfigService;
-import com.ccl.wx.service.UserChatService;
-import com.ccl.wx.service.UserInfoService;
-import com.ccl.wx.service.UserNotifyService;
+import com.ccl.wx.service.*;
 import com.ccl.wx.util.CclUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -27,6 +26,7 @@ import org.springframework.web.socket.WebSocketSession;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -49,6 +49,14 @@ public class UserNotifyServiceImpl implements UserNotifyService {
     private UserChatService userChatService;
     @Resource
     private UserInfoService userInfoService;
+    @Resource
+    private SystemUserService systemUserService;
+    @Resource
+    private NotifyContentService notifyContentService;
+    @Resource
+    private UserDiaryService userDiaryService;
+    @Resource
+    private CircleInfoService circleInfoService;
 
     @Override
     public int deleteByPrimaryKey(Long id) {
@@ -114,7 +122,9 @@ public class UserNotifyServiceImpl implements UserNotifyService {
     public String systemMessageNotify(IUserNotify userNotifyType, String sendUserId, List<String> targetUserIdList,
                                       Integer resourceId) {
         // 目标用户为空，并且这个消息必须为系统通知
-        if ((targetUserIdList == null || targetUserIdList.isEmpty()) && userNotifyType.getNotifyType().equals(EnumNotifyType.SYSTEM_NOTICE.getNotifyType())) {
+        boolean judgeUserIsPermission = (targetUserIdList == null || targetUserIdList.isEmpty())
+                && userNotifyType.getNotifyType().equals(EnumNotifyType.SYSTEM_NOTICE.getNotifyType());
+        if (judgeUserIsPermission) {
             // 发送给全部用户
             targetUserIdList = new ArrayList<>();
             targetUserIdList.add(EnumCommon.SYSTEM_NOTIFY.getValue());
@@ -298,6 +308,149 @@ public class UserNotifyServiceImpl implements UserNotifyService {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    @Override
+    public String getUserLocationNotify(Integer location, String userId, Integer page) {
+        int pageNumberValue = EnumPage.PAGE_NUMBER.getValue();
+        // 获取此用户的通知内容
+        List<UserNotify> userNotifies = userNotifyMapper.selectUserNotifyByNotifyLocation(userId, location, page * pageNumberValue, pageNumberValue);
+        List<Notify> messageList = messageDispose(userNotifies);
+        // 获取通知总页数
+        Integer notifyAllNumber = userNotifyMapper.getNotifyAllNumber(userId, location, null, EnumCommon.NOT_DELETE.getData());
+        ArrayList<Object> list = new ArrayList<>();
+        list.add(messageList);
+        list.add(CclUtil.judgeNextPage(notifyAllNumber, EnumPage.PAGE_NUMBER.getValue(), page));
+        return JSON.toJSONString(list);
+    }
+
+    private List<Notify> messageDispose(List<UserNotify> userNotify) {
+        ArrayList<Notify> list = new ArrayList<>();
+        userNotify.forEach(notify -> {
+            switch (notify.getAction()) {
+                case 0:
+                    list.add(message0(notify));
+                    break;
+                case 1:
+                    list.add(messageTemplate1(notify, EnumNotifyType.DIARY_LIKE));
+                    break;
+                case 2:
+                    list.add(messageTemplate1(notify, EnumNotifyType.DIARY_COMMON_COMMENT));
+                    break;
+                case 3:
+                    list.add(messageTemplate1(notify, EnumNotifyType.DIARY_COMMENT));
+                    break;
+                case 4:
+                    list.add(messageTemplate1(notify, EnumNotifyType.DIARY_REPLY));
+                    break;
+                case 5:
+                    list.add(messageTemplate2(notify, EnumNotifyType.CIRCLE_APPLY));
+                    break;
+                case 6:
+                    list.add(messageTemplate2(notify, EnumNotifyType.CIRCLE_REFUSE));
+                    break;
+                case 7:
+                    list.add(messageTemplate2(notify, EnumNotifyType.CIRCLE_AGREE));
+                    break;
+                case 8:
+                    list.add(messageTemplate2(notify, EnumNotifyType.CIRCLE_OUT));
+                    break;
+                case 9:
+                    list.add(messageTemplate2(notify, EnumNotifyType.CIRCLE_JOIN));
+                    break;
+                case 10:
+                    list.add(messageTemplate2(notify, EnumNotifyType.CIRCLE_EXIT));
+                    break;
+                default:
+                    list.add(null);
+            }
+        });
+        return list;
+    }
+
+    /**
+     * 初步处理消息
+     *
+     * @param nickname     昵称
+     * @param portrait     头像
+     * @param createTime   创建时间
+     * @param look         是否显示详情按钮
+     * @param resourceId   资源id
+     * @param resourceType 资源类型
+     * @return
+     */
+    private Notify setNotify(String nickname, String portrait, Date createTime, boolean look, int resourceId, int resourceType) {
+        Notify notify = new Notify();
+        notify.setNickname(nickname);
+        notify.setPortrait(portrait);
+        notify.setCreateTime(DateUtil.format(createTime, DatePattern.NORM_DATETIME_MINUTE_PATTERN));
+        notify.setLook(look);
+        notify.setResourceId(resourceId);
+        notify.setResourceType(resourceType);
+        return notify;
+    }
+
+    // 申请，同意，淘汰，加入，退出，拒绝，
+    private Notify messageTemplate2(UserNotify userNotify, IUserNotify iUserNotify) {
+        Integer circleId = userNotify.getResourceId();
+        CircleInfo circleInfo = circleInfoService.selectByPrimaryKey(circleId.longValue());
+        if (circleInfo == null) {
+            return null;
+        } else {
+            String userId = userNotify.getSenderId();
+            UserInfo userInfo = userInfoService.selectByPrimaryKey(userId);
+            if (userInfo == null) {
+                return null;
+            } else {
+                Notify notify = setNotify(circleInfo.getCircleName(), circleInfo.getCircleHimage(), userNotify.getCreateTime(),
+                        iUserNotify.getLook(), userNotify.getResourceId(), iUserNotify.getResourceType());
+                // 设置用户信息
+                notify.setUserNickname(userInfo.getNickname());
+                notify.setUserId(userInfo.getId());
+                return notify;
+            }
+        }
+    }
+
+    // 点赞，评论，点评，回复消息处理模板
+    private Notify messageTemplate1(UserNotify userNotify, IUserNotify iUserNotify) {
+        String senderId = userNotify.getSenderId();
+        UserInfo userInfo = userInfoService.selectByPrimaryKey(senderId);
+        if (userInfo == null) {
+            return null;
+        } else {
+            Notify notify = setNotify(userInfo.getNickname(), userInfo.getAvatarurl(), userNotify.getCreateTime(),
+                    iUserNotify.getLook(), userNotify.getResourceId(), iUserNotify.getResourceType());
+            return notify;
+        }
+    }
+
+    // 系统消息处理
+    private Notify message0(UserNotify userNotify) {
+        // 获取系统用户
+        SystemUser systemUser = systemUserService.selectByPrimaryKey(Integer.parseInt(userNotify.getSenderId()));
+        if (systemUser == null || systemUser.getDelete().intValue() == EnumCommon.HAVE_DELETE.getData()) {
+            return null;
+        } else {
+            NotifyContent notifyContent = notifyContentService.selectByPrimaryKey(userNotify.getResourceId());
+            if (notifyContent == null) {
+                return null;
+            } else {
+                // 设置消息模板内容
+                Notify notify = setNotify(systemUser.getNickname(), systemUser.getHeadPortrait(), notifyContent.getCreateTime(),
+                        EnumNotifyType.SYSTEM_NOTICE.getLook(), notifyContent.getId(), EnumNotifyType.SYSTEM_NOTICE.getResourceType());
+                notify.setContent(notifyContent.getContent());
+                String title = notifyContent.getTitle();
+                if (!StringUtils.isEmpty(title)) {
+                    notify.setTitle(title);
+                }
+                String label = notifyContent.getLabel();
+                if (!StringUtils.isEmpty(label)) {
+                    notify.setLabel(label);
+                }
+                return notify;
             }
         }
     }
