@@ -15,6 +15,7 @@ import com.ccl.wx.mapper.UserNotifyMapper;
 import com.ccl.wx.pojo.Notify;
 import com.ccl.wx.pojo.NotifyTemplate;
 import com.ccl.wx.service.*;
+import com.ccl.wx.util.CclDateUtil;
 import com.ccl.wx.util.CclUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -326,6 +327,44 @@ public class UserNotifyServiceImpl implements UserNotifyService {
         return JSON.toJSONString(list);
     }
 
+    @Override
+    public String getUserChatMessage(String userId, Integer page) {
+        int pageNumberValue = EnumPage.PAGE_NUMBER.getValue();
+        List<UserNotify> userNotifies = userNotifyMapper.selectUserNotifyByNotifyLocation(userId, EnumNotifyType.USER_CHAT.getNotifyLocation(),
+                page * pageNumberValue, pageNumberValue);
+        List<Notify> notifies = new ArrayList<>();
+        userNotifies.forEach(userNotify -> {
+            System.out.println(userNotify);
+            // TODO ForEach 有问题
+            // 查询目标用户是否存在
+            String targetUserId = userNotify.getTargetId();
+            UserInfo userInfo = userInfoService.selectByPrimaryKey(targetUserId);
+            if (userInfo != null) {
+                Integer resourceId = userNotify.getResourceId();
+                UserChat userChat = userChatService.selectByPrimaryKey(resourceId.longValue());
+                if (userChat != null) {
+                    Notify notify = new Notify();
+                    // 设置用户信息
+                    notify.setUserId(targetUserId);
+                    notify.setPortrait(userInfo.getAvatarurl());
+                    notify.setNickname(userInfo.getNickname());
+                    // 设置消息内容
+                    notify.setContent(userChat.getContent());
+                    // 设置消息创建时间
+                    notify.setCreateTime(CclDateUtil.todayDate(userChat.getCreateTime()));
+                    notifies.add(notify);
+                }
+            } else {
+                log.error("获取用户消息出现问题===>" + targetUserId + "用户不存在！");
+            }
+        });
+        List<Object> list = new ArrayList<>();
+        list.add(notifies);
+        list.add(CclUtil.judgeNextPage(userNotifyMapper.getNotifyAllNumber(userId, EnumNotifyType.USER_CHAT.getNotifyLocation(),
+                null, EnumCommon.NOT_DELETE.getData()), pageNumberValue, page));
+        return JSON.toJSONString(list);
+    }
+
     private List<Notify> messageDispose(List<UserNotify> userNotify) {
         ArrayList<Notify> list = new ArrayList<>();
         userNotify.forEach(notify -> {
@@ -421,9 +460,8 @@ public class UserNotifyServiceImpl implements UserNotifyService {
         if (userInfo == null) {
             return null;
         } else {
-            Notify notify = setNotify(userInfo.getNickname(), userInfo.getAvatarurl(), userNotify.getCreateTime(),
+            return setNotify(userInfo.getNickname(), userInfo.getAvatarurl(), userNotify.getCreateTime(),
                     iUserNotify.getLook(), userNotify.getResourceId(), iUserNotify.getResourceType());
-            return notify;
         }
     }
 

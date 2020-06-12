@@ -228,17 +228,14 @@
         from user_notify
         <where>
             target_id = #{userId,jdbcType=VARCHAR}
-                    and
             <if test="location != null">
-                location = #{location,jdbcType=INTEGER}
-                        and
+                and location = #{location,jdbcType=INTEGER}
             </if>
             <if test="read != null">
-                is_read = #{read,jdbcType=INTEGER}
-                        and
+                and is_read = #{read,jdbcType=INTEGER}
             </if>
             <if test="delete != null">
-                is_delete = #{delete,jdbcType=INTEGER}
+                and is_delete = #{delete,jdbcType=INTEGER}
             </if>
         </where>
     </select>

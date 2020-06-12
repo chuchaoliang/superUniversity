@@ -82,5 +82,14 @@ public interface UserNotifyService {
      * @return
      */
     String getUserLocationNotify(Integer location, String userId, Integer page);
+
+    /**
+     * 获取用户的私信消息
+     *
+     * @param userId 用户id
+     * @param page   当前页数
+     * @return
+     */
+    String getUserChatMessage(String userId, Integer page);
 }
 

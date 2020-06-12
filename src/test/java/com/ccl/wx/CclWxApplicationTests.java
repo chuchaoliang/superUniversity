@@ -1,5 +1,6 @@
 package com.ccl.wx;
 
+import com.ccl.wx.mapper.UserNotifyMapper;
 import com.ccl.wx.service.JoinCircleService;
 import com.ccl.wx.service.UserChatService;
 import com.ccl.wx.service.UserNotifyService;
@@ -22,21 +23,19 @@ public class CclWxApplicationTests {
 
     @Resource
     private RabbitTemplate rabbitTemplate;
-
     @Resource
     private RedisTemplate redisTemplate;
-
     @Resource
     private JoinCircleService joinCircleService;
-
     @Resource
     private UserChatService userChatService;
     @Resource
     private UserNotifyService userNotifyService;
+    @Resource
+    private UserNotifyMapper userNotifyMapper;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Test
     public void test() throws Exception {
-        System.out.println(userNotifyService.getUserLocationNotify(0, "o1x2q5czO_xCH9eemeEfL41_gvMk", 0));
     }
 }
