@@ -185,7 +185,16 @@ public interface CircleInfoService {
      * @throws IOException
      */
     String searchCircleInfo(String keyword, Integer page, String userId, Integer type) throws IOException;
+
+    /**
+     * 获取热门圈子
+     *
+     * @param userId 用户id
+     * @return
+     */
+    String selectRecommendCircle(String userId);
 }
+
 
 
 

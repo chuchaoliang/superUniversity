@@ -115,6 +115,17 @@ public class CircleInfoController {
     }
 
     /**
+     * 获取热门圈子
+     *
+     * @param userId 用户id
+     * @return
+     */
+    @GetMapping("/get/hot")
+    public Result<String> getCircleHot(@RequestHeader(value = "token", required = false) String userId) {
+        return ResponseMsgUtil.success(circleInfoService.selectRecommendCircle(userId));
+    }
+
+    /**
      * 根据关键词搜索圈子数据
      *
      * @param keyword 圈子关键词

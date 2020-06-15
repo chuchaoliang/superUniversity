@@ -2,14 +2,13 @@ package com.ccl.wx.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Data;
 
 /**
  * @author 褚超亮
- * @date 2020/4/16 10:17
+ * @date 2020/6/15 18:04
  */
 
 @ApiModel(value = "com-ccl-wx-entity-CircleInfo")
@@ -134,6 +133,12 @@ public class CircleInfo implements Serializable {
      */
     @ApiModelProperty(value = "乐观锁")
     private Integer version;
+
+    /**
+     * 是否被推荐（0未被推荐1推荐）
+     */
+    @ApiModelProperty(value = "是否被推荐（0未被推荐1推荐）")
+    private Byte circleRecommend;
 
     private static final long serialVersionUID = 1L;
 }

@@ -1,14 +1,11 @@
 package com.ccl.wx.mapper;
 
 import com.ccl.wx.entity.CircleInfo;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
+import org.apache.ibatis.annotations.Mapper;import org.apache.ibatis.annotations.Param;import java.util.List;
 
 /**
  * @author 褚超亮
- * @date 2020/4/16 10:17
+ * @date 2020/6/15 18:04
  */
 
 @Mapper
@@ -66,4 +63,10 @@ public interface CircleInfoMapper {
      * @return
      */
     int updateCircleData(@Param("circleInfo") CircleInfo circleInfo, @Param("circleId") Long circleId, @Param("value") Integer value);
+
+    /**
+     * 查询全部推荐圈子
+     * @return
+     */
+    List<CircleInfo> selectRecommendCircle();
 }

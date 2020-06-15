@@ -388,7 +388,20 @@ public class CircleInfoServiceImpl implements CircleInfoService {
         }
         return circleInfoEsSearch(circleInfos, userId, number.intValue(), page);
     }
+
+    @Override
+    public String selectRecommendCircle(String userId) {
+        List<CircleInfo> circleInfos = circleInfoMapper.selectRecommendCircle();
+        ArrayList<CircleInfoVO> circleInfoVOS = new ArrayList<>();
+        for (CircleInfo circleInfo : circleInfos) {
+            CircleInfoVO circleInfoVO = new CircleInfoVO();
+            BeanUtils.copyProperties(circleInfo, circleInfoVO);
+            circleInfoVOS.add(circleInfoVO);
+        }
+        return JSON.toJSONString(circleInfoVOS);
+    }
 }
+
 
 
 

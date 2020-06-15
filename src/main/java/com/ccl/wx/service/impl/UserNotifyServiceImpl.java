@@ -335,7 +335,6 @@ public class UserNotifyServiceImpl implements UserNotifyService {
         List<Notify> notifies = new ArrayList<>();
         userNotifies.forEach(userNotify -> {
             System.out.println(userNotify);
-            // TODO ForEach 有问题
             // 查询目标用户是否存在
             String targetUserId = userNotify.getTargetId();
             UserInfo userInfo = userInfoService.selectByPrimaryKey(targetUserId);
